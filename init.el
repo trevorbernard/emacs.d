@@ -12,5 +12,6 @@
        (normal-top-level-add-subdirs-to-load-path))
 
 (load-library "my-scala.el")
+(load-library "my-nxml.el")
 (require 'bindings)
 (require 'preferences)
