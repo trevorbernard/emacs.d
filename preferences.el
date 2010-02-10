@@ -11,14 +11,14 @@
 (show-paren-mode 1)			;; Highlight parenthesis
 (transient-mark-mode 1)			;; Highlight selected Regions
 (setq scroll-preserve-screen-position t);; make pgup/dn remember current line
-;; Not cross platform
-;;(set-message-beep 'silent)	      	;; Disable Bell
 (setq-default truncate-lines nil)	;; Wrap Lines
 
 (if (fboundp 'blink-cursor-mode)
     (blink-cursor-mode -1))
 
 (setq default-directory "~/")		;; Set default directory
+(setq make-backup-files nil)
+(setq ring-bell-function 'ignore)
 
 ;; Allow functions w/o warnings
 (put 'downcase-region 'disabled nil)
