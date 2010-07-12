@@ -19,7 +19,7 @@
 (setq default-directory "~/")		;; Set default directory
 (setq make-backup-files nil)
 (setq ring-bell-function 'ignore)
-
+(setq x-select-enable-clipboard t)
 ;; Allow functions w/o warnings
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
