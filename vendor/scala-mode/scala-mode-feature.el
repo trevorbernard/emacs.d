@@ -4,7 +4,6 @@
 ;; Copyright (C) 2009 Scala Dev Team at EPFL
 ;; Authors: See AUTHORS file
 ;; Keywords: scala languages oop
-;; $Id: scala-mode-feature.el 20031 2009-12-07 11:59:42Z cunei $
 
 ;;; License
 
