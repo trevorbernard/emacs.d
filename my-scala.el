@@ -6,7 +6,8 @@
 
 (require 'scala-mode)
 (add-to-list 'auto-mode-alist '("\\.scala$" . scala-mode))
-(add-to-list 'load-path "~/ensime/dist/elisp/")
+(add-to-list 'load-path "vendor/ensime/dist/elisp/")
+
 (require 'ensime)
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
