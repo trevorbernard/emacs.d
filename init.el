@@ -12,7 +12,7 @@
        (normal-top-level-add-subdirs-to-load-path))
 (load-library "my-scala.el")
 (load-library "my-javascript.el")
-;(load-library "my-nxml.el")
+(load-library "my-php.el")
 (require 'bindings)
 (require 'preferences)
 
