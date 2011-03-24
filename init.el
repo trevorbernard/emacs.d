@@ -1,4 +1,4 @@
-;(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
+(if (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
@@ -11,7 +11,7 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 (load-library "my-scala.el")
-;(load-library "my-nxml.el")
+(load-library "my-nxml.el")
 (require 'bindings)
 (require 'preferences)
 
@@ -23,3 +23,6 @@
       (load-library "color-theme-underwater.el")
       (color-theme-underwater)))
 
+;; Sending mail
+(setq user-full-name "Trevor Bernard")
+(setq user-full-mail-address "trevor.bernard@gmail.com")
