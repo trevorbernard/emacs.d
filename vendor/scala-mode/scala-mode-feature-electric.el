@@ -5,7 +5,6 @@
 ;; Modified by Anders Bach Nielsen <andersbach.nielsen at epfl dot ch> to fit into the scala mode
 ;; Based on ruby-electric by Dee Zsombor <dee dot zsombor at gmail dot com>.
 ;; Keywords: scala languages oop
-;; $Id: scala-mode-feature-electric.el 20031 2009-12-07 11:59:42Z cunei $
 
 ;;; License
 

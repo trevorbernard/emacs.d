@@ -1,4 +1,4 @@
-(set-default-font "Bitstream Vera Sans Mono-10")
+;(set-default-font "Bitstream Vera Sans Mono-12")
 (iswitchb-mode 1)			;; Switch browswer viewing
 (setq iswitchb-prompt-newbuffer nil)
 (column-number-mode 1)			;; Show column number

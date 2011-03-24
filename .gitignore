@@ -1,3 +1,5 @@
+tramp
 *~
 auto-save-list/*
 *.elc
+.DS_Store

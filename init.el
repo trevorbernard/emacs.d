@@ -12,16 +12,18 @@
        (normal-top-level-add-subdirs-to-load-path))
 (load-library "my-scala.el")
 (load-library "my-nxml.el")
+(load-library "my-javascript.el")
+(load-library "my-php.el")
 (require 'bindings)
 (require 'preferences)
 
 ; TODO: Move ColorTheme into a separate file
-(if window-system
-    (progn
-      (require 'color-theme)
-      (color-theme-initialize)
-      (load-library "color-theme-underwater.el")
-      (color-theme-underwater)))
+;; (if window-system
+;;     (progn
+;;       (require 'color-theme)
+;;       (color-theme-initialize)
+;;       (load-library "color-theme-underwater.el")
+;;       (color-theme-underwater)))
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
