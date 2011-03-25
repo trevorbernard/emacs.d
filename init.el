@@ -18,13 +18,12 @@
 (require 'preferences)
 
 ; TODO: Move ColorTheme into a separate file
-(if window-system
-    (progn
+
       (require 'color-theme)
       (color-theme-initialize)
 ;;      (load-library "color-theme-underwater.el")
       (load-library "color-theme-sunburst.el")
-      (color-theme-tm)))
+      (color-theme-tm)
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
