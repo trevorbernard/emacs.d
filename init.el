@@ -10,20 +10,16 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
+(require 'theme)
+(require 'preferences)
+(require 'bindings)
+(require 'defuns)
+(require 'modes)
+
 (load-library "my-scala.el")
 (load-library "my-nxml.el")
 (load-library "my-javascript.el")
 (load-library "my-php.el")
-(require 'bindings)
-(require 'preferences)
-
-; TODO: Move ColorTheme into a separate file
-
-      (require 'color-theme)
-      (color-theme-initialize)
-;;      (load-library "color-theme-underwater.el")
-      (load-library "color-theme-sunburst.el")
-      (color-theme-tm)
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
