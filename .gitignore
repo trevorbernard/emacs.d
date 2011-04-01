@@ -1,5 +1,6 @@
-tramp
-*~
-auto-save-list/*
 *.elc
+*~
 .DS_Store
+ac-comphist.dat
+auto-save-list/*
+tramp
