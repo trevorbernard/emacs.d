@@ -11,6 +11,7 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 (require 'theme)
+(require 'fonts)
 (require 'preferences)
 (require 'bindings)
 (require 'defuns)
@@ -20,6 +21,9 @@
 (load-library "my-nxml.el")
 (load-library "my-javascript.el")
 (load-library "my-php.el")
+
+;;(require 'pymacs)
+;;(pymacs-load "ropemacs" "rope-")
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")

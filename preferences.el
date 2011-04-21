@@ -1,6 +1,5 @@
-(set-default-font "Bitstream Vera Sans Mono-12")
-(iswitchb-mode 1)			;; Switch browswer viewing
-(setq iswitchb-prompt-newbuffer nil)
+(iswitchb-mode 1)			;; Switch browser viewing
+(setq iswitchb-prompt-newbuffer nil)	;;
 (column-number-mode 1)			;; Show column number
 (delete-selection-mode 1)		;; Allow delete of selection
 (fset 'yes-or-no-p 'y-or-n-p)		;; Shorten confirmation message
