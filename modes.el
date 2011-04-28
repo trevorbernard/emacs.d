@@ -8,3 +8,7 @@
              (setq c-basic-offset 4)))
 
 (provide 'modes)
+
+(add-hook 'css-mode
+          '(lambda ()
+             (setq css-indent-offset 2)))
