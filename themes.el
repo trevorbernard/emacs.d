@@ -22,4 +22,4 @@
     (setenv "PATH" "/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"))
 (os-x-theme)
 
-(provide 'theme)
+(provide 'themes)

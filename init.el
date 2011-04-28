@@ -10,7 +10,7 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
-(require 'theme)
+(require 'themes)
 (require 'fonts)
 (require 'preferences)
 (require 'bindings)
