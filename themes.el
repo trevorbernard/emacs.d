@@ -20,8 +20,8 @@
 
 (if (eq system-type 'darwin)
     (progn
+      (os-x-theme)
       (setenv "PATH" "/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/scala/bin:/usr/local/sbt")
       (setq exec-path (append exec-path (list "/usr/local/scala/bin" "/usr/local/sbt")))))
-(os-x-theme)
 
 (provide 'themes)
