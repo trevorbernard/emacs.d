@@ -12,3 +12,6 @@
 (add-hook 'css-mode
           '(lambda ()
              (setq css-indent-offset 2)))
+
+(add-to-list 'load-path "~/.emacs.d/vendor/thrift.el")
+(add-to-list 'auto-mode-alist '("\\.thrift$" . thrift-mode))
