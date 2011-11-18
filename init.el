@@ -11,6 +11,7 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 ;(require 'themes)
+(require 'platform)
 (require 'fonts)
 (require 'preferences)
 (require 'bindings)

@@ -16,12 +16,12 @@
       (setq mac-allow-anti-aliasing t)
       (set-face-font
        'default
-       "-apple-DejaVu_Sans_Mono-medium-normal-normal-*-12-*-*-*-m-0-iso10646-")))
+       "-apple-DejaVu_Sans_Mono-medium-normal-normal-*-14-*-*-*-m-0-iso10646-")))
 
 (if (eq system-type 'darwin)
     (progn
       (os-x-theme)
-      (setenv "PATH" "/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/scala/bin:/usr/local/sbt")
-      (setq exec-path (append exec-path (list "/usr/local/scala/bin" "/usr/local/sbt")))))
+      (setenv "PATH" "/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/scala/bin:/usr/local/sbt:~/bin")
+      (setq exec-path (append exec-path (list "/usr/local/scala/bin" "/usr/local/sbt" "~/bin")))))
 
 (provide 'themes)
