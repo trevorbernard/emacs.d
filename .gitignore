@@ -1,7 +1,7 @@
-\#*
 *.elc
 *~
 .DS_Store
+\#*
 ac-comphist.dat
 auto-save-list/*
 session.*
