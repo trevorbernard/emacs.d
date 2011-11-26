@@ -3,6 +3,7 @@
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
 (add-to-list 'load-path "~/.emacs.d")
+
 ;Add all top-level subdirectories of .emacs.d to the load path
 (progn (cd "~/.emacs.d")
        (normal-top-level-add-subdirs-to-load-path))
@@ -10,6 +11,7 @@
 (add-to-list 'load-path "~/.emacs.d/vendor")
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
+
 ;(require 'themes)
 (require 'platform)
 (require 'fonts)
