@@ -24,9 +24,7 @@
 (load-library "my-nxml.el")
 (load-library "my-javascript.el")
 (load-library "my-php.el")
-
-;;(require 'pymacs)
-;;(pymacs-load "ropemacs" "rope-")
+(load-library "my-clojure.el")
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
