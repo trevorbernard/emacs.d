@@ -25,6 +25,7 @@
 (load-library "my-javascript.el")
 (load-library "my-php.el")
 (load-library "my-clojure.el")
+(load-library "my-protobuf.el")
 
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
