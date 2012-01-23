@@ -42,18 +42,35 @@
 (add-to-list 'load-path "~/clojure-mode")
 (require 'clojure-mode)
 
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (paredit-mode 1)
+            (setq inferior-lisp-program "lein repl")))
+
+(add-hook 'inferior-lisp-mode-hook
+          (lambda ()
+            (paredit-mode 1)))
+
+(add-hook 'slime-mode-hook
+          (lambda ()
+            (paredit-mode 1)))
+
+(add-hook 'slime-repl-mode-hook
+          (lambda ()
+            (paredit-mode 1)))
+
 ;; paredit
 ;;(add-to-list 'load-path "~/opt/paredit")
 (require 'paredit)
 
 ;; slime
-(eval-after-load "slime" 
-  '(progn (slime-setup '(slime-repl))	
-	(defun paredit-mode-enable () (paredit-mode 1))	
-	(add-hook 'slime-mode-hook 'paredit-mode-enable)	
-	(add-hook 'slime-repl-mode-hook 'paredit-mode-enable)
-	(setq slime-protocol-version 'ignore)))
+;; (eval-after-load "slime" 
+;;   '(progn (slime-setup '(slime-repl))	
+;; 	(defun paredit-mode-enable () (paredit-mode 1))	
+;; 	(add-hook 'slime-mode-hook 'paredit-mode-enable)	
+;; 	(add-hook 'slime-repl-mode-hook 'paredit-mode-enable)
+;; 	(setq slime-protocol-version 'ignore)))
 
-(add-to-list 'load-path "~/slime")
-(require 'slime)
-(slime-setup)
+;; (add-to-list 'load-path "~/slime")
+;; (require 'slime)
+;; (slime-setup)
