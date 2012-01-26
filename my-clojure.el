@@ -1,8 +1,9 @@
-(require 'clojure-mode)
-;; clojure-mode
+;; My clojure environment customizations
+
 (add-to-list 'load-path "~/.emacs.d/vendor/clojure-mode")
 (require 'clojure-mode)
 (require 'paredit)
+(require 'ac-slime)
 
 (add-hook 'clojure-mode-hook
           (lambda ()
@@ -15,13 +16,15 @@
 
 (add-hook 'slime-mode-hook
           (lambda ()
+            (set-up-slime-ac)
+            (auto-complete-mode 1)
             (paredit-mode 1)))
 
 (add-hook 'slime-repl-mode-hook
           (lambda ()
-            (defun clojure-mode-slime-font-lock ()
-              (let (font-lock-mode)
-                (clojure-mode-font-lock-setup)))
-            (clojure-mode-font-lock-setup)
+            (let (font-lock-mode)
+              (clojure-mode-font-lock-setup))
+            (set-up-slime-ac)
             (paredit-mode 1)))
+
 (provide 'my-clojure)
