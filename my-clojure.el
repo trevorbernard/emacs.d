@@ -19,5 +19,9 @@
 
 (add-hook 'slime-repl-mode-hook
           (lambda ()
+            (defun clojure-mode-slime-font-lock ()
+              (let (font-lock-mode)
+                (clojure-mode-font-lock-setup)))
+            (clojure-mode-font-lock-setup)
             (paredit-mode 1)))
 (provide 'my-clojure)
