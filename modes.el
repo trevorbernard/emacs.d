@@ -11,6 +11,15 @@
           '(lambda ()
              (setq css-indent-offset 2)))
 
+;; Thrift mode
 (add-to-list 'load-path "~/.emacs.d/vendor/thrift.el")
 (add-to-list 'auto-mode-alist '("\\.thrift$" . thrift-mode))
+
+;; Markdown mode
+(add-hook 'markdown-mode '(lambda ()
+                            (setq fill-column 80)))
+(autoload 'markdown-mode "markdown-mode.el"
+  "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\|\\.md\\|\\.markdown" . markdown-mode))
+
 (provide 'modes)

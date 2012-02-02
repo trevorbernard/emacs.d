@@ -16,15 +16,15 @@
 
 (add-hook 'slime-mode-hook
           (lambda ()
-            (set-up-slime-ac)
-            (auto-complete-mode 1)
+            ;; (set-up-slime-ac)
+            ;; (auto-complete-mode 1)
             (paredit-mode 1)))
 
 (add-hook 'slime-repl-mode-hook
           (lambda ()
             (let (font-lock-mode)
               (clojure-mode-font-lock-setup))
-            (set-up-slime-ac)
-            (paredit-mode 1)))
+            (paredit-mode 1)
+            ))
 
 (provide 'my-clojure)

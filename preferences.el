@@ -5,7 +5,7 @@
 (fset 'yes-or-no-p 'y-or-n-p)		;; Shorten confirmation message
 (global-font-lock-mode 1)		;; Syntax Highlighting
 (setq inhibit-startup-message t)	;; No splash screen
-(setq-default set-fill-column 79)	;; Set fill to 79 chars
+(setq-default set-fill-column 80)	;; Set fill to 80 chars
 (setq-default indent-tabs-mode nil)	;; Use Spaces
 (setq default-tab-width 8)		;; Tab width: 8 chars
 (show-paren-mode 1)			;; Highlight parenthesis
