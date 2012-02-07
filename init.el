@@ -30,13 +30,8 @@
 (load-library "my-php.el")
 (load-library "my-clojure.el")
 (load-library "my-protobuf.el")
-
+(load-library "vendor/thrift.el")
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
 (setq user-full-mail-address "trevor.bernard@gmail.com")
 
-;; (add-to-list 'load-path "~/.emacs.d/packages/")
-;; (require 'package)
-;; (add-to-list 'package-archives
-;; '("marmalade" . "http://marmalade-repo.org/packages/"))
-;; (package-initialize)
