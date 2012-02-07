@@ -16,8 +16,8 @@
 
 (add-hook 'slime-mode-hook
           (lambda ()
-            ;; (set-up-slime-ac)
-            ;; (auto-complete-mode 1)
+            (set-up-slime-ac)
+            (auto-complete-mode 1)
             (paredit-mode 1)))
 
 (add-hook 'slime-repl-mode-hook
