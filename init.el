@@ -5,7 +5,9 @@
 (if (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
-(set-default-font "Inconsolata-18")
+(if (eq system-type 'darwin)
+    (progn
+      (set-default-font "Inconsolata-16")))
 
 (add-to-list 'load-path "~/.emacs.d")
 ;Add all top-level subdirectories of .emacs.d to the load path
