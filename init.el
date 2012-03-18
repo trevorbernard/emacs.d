@@ -26,6 +26,8 @@
 (require 'defuns)
 (require 'modes)
 
+(add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
+
 (load-library "my-scala.el")
 (load-library "my-nxml.el")
 (load-library "my-javascript.el")
