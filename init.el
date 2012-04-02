@@ -20,7 +20,6 @@
        (normal-top-level-add-subdirs-to-load-path))
 
 (require 'platform)
-(require 'fonts)
 (require 'preferences)
 (require 'bindings)
 (require 'defuns)
@@ -38,4 +37,3 @@
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
 (setq user-full-mail-address "trevor.bernard@gmail.com")
-
