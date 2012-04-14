@@ -4,6 +4,9 @@
 (require 'paredit)
 (require 'ac-slime)
 
+;; Hush fontifying compilation message in emacs23 that slows down compile
+(setq font-lock-verbose nil)
+
 (add-hook 'clojure-mode-hook
           (lambda ()
             (paredit-mode 1)
