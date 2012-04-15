@@ -1,4 +1,4 @@
-(defun prelude-google ()
+(defun google ()
   "Googles a query or region if any."
   (interactive)
   (browse-url
@@ -8,11 +8,18 @@
         (buffer-substring (region-beginning) (region-end))
       (read-string "Google: ")))))
 
-(defun maximize-frame ()
+(defun lein2-repl ()
   (interactive)
-  (set-frame-size (selected-frame)
-                  (display-pixel-width)
-                  (display-pixel-height))
-  (set-frame-position (selected-frame) 0 0))
+  (inferior-lisp "lein2 repl"))
+
+(defun grep-find-in-project (command-args)
+  (interactive
+   (progn
+     (list (read-shell-command "Run find (like this): "
+                               '("git ls-files -z | xargs -0 egrep -nH -e " . 41)
+                               'grep-find-history))))
+  (when command-args
+    (let ((null-device nil)) ; see grep
+      (grep command-args))))
 
 (provide 'defuns)
