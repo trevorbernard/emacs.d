@@ -23,6 +23,7 @@
 (require 'bindings)
 (require 'defuns)
 (require 'modes)
+(require 'themes)
 
 (add-to-list 'load-path "~/.emacs/vendor/magit")
 (require 'magit)
