@@ -5,6 +5,8 @@
 (if (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
+;; (add-to-list 'default-frame-alist '(cursor-color . "#cacaca"))
+
 (when (equal system-type 'darwin)
   (set-default-font "Inconsolata-16"))
 
