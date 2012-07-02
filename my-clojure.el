@@ -4,6 +4,13 @@
 (require 'ac-slime)
 (require 'eldoc)
 
+(eval-after-load 'paredit
+  '(progn
+     (define-key paredit-mode-map (kbd "M-)") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "M-(") 'paredit-wrap-round)
+     (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
+     (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
+
 ;; Hush fontifying compilation message in emacs23 that slows down compile
 (setq font-lock-verbose nil
       slime-kill-without-query-p t
@@ -14,7 +21,7 @@
 (add-hook 'clojure-mode-hook
           (lambda ()
             (setq-default fill-column 80)
-            (auto-fill-mode 1)
+            ;; (auto-fill-mode 1)
             (paredit-mode 1)
             (eldoc-mode 1)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)

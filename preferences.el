@@ -1,5 +1,8 @@
+(require 'rainbow-delimiters)
+
 (iswitchb-mode 1)			;; Switch browser viewing
 (setq iswitchb-prompt-newbuffer nil)	;;
+(global-rainbow-delimiters-mode)
 (column-number-mode 1)			;; Show column number
 (delete-selection-mode 1)		;; Allow delete of selection
 (fset 'yes-or-no-p 'y-or-n-p)		;; Shorten confirmation message
@@ -13,8 +16,8 @@
 (setq scroll-preserve-screen-position t);; make pgup/dn remember current line
 (setq-default truncate-lines nil)	;; Wrap Lines
 
-(if (fboundp 'blink-cursor-mode)
-    (blink-cursor-mode -1))
+;; (if (fboundp 'blink-cursor-mode)
+;;     (blink-cursor-mode -1))
 
 (setq default-directory "~/")		;; Set default directory
 (setq make-backup-files nil)
