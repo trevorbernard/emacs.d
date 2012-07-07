@@ -5,10 +5,6 @@
 (if (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
-;; (add-to-list 'default-frame-alist '(cursor-color . "#cacaca"))
-
-(when (equal system-type 'darwin)
-  (set-default-font "Inconsolata-16"))
 
 (add-to-list 'load-path "~/.emacs.d")
 ;Add all top-level subdirectories of .emacs.d to the load path
@@ -20,7 +16,9 @@
 (progn (cd "~/.emacs.d/vendor")
        (normal-top-level-add-subdirs-to-load-path))
 
-(require 'platform)
+(when (equal system-type 'darwin)
+  (load-library "mac.el"))
+
 (require 'preferences)
 (require 'bindings)
 (require 'defuns)
