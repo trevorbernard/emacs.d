@@ -1,3 +1,6 @@
+(dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+  (when (fboundp mode) (funcall mode -1)))
+
 (if (fboundp 'menu-bar-mode)
     (menu-bar-mode -1))
 (if (fboundp 'tool-bar-mode)
@@ -17,7 +20,8 @@
        (normal-top-level-add-subdirs-to-load-path))
 
 (when (equal system-type 'darwin)
-  (load-library "mac.el"))
+  (load-library "mac.el")
+)
 
 (require 'preferences)
 (require 'bindings)
