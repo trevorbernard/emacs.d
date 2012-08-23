@@ -45,3 +45,6 @@
 ;; Sending mail
 (setq user-full-name "Trevor Bernard")
 (setq user-full-mail-address "trevor.bernard@gmail.com")
+
+(load "~/.emacs.d/vendor/haskell-mode/haskell-site-file")
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)

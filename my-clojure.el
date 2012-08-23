@@ -3,6 +3,7 @@
 (require 'auto-complete-config)
 (require 'ac-slime)
 (require 'eldoc)
+(require 'nrepl)
 
 (eval-after-load 'paredit
   '(progn
@@ -13,10 +14,16 @@
 
 ;; Hush fontifying compilation message in emacs23 that slows down compile
 (setq font-lock-verbose nil
-      slime-kill-without-query-p t
-      clojure-swank-command "lein2 jack-in %s")
+      slime-kill-without-query-p t)
+
 
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+
+(require 'ac-nrepl)
+(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'nrepl-mode))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
