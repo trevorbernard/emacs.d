@@ -16,19 +16,12 @@
 (setq font-lock-verbose nil
       slime-kill-without-query-p t)
 
-
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
-
-(require 'ac-nrepl)
-(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
-(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
-(eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'nrepl-mode))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
             (setq-default fill-column 80)
-            ;; (auto-fill-mode 1)
+            (auto-complete-mode 1)
             (paredit-mode 1)
             (eldoc-mode 1)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
@@ -51,5 +44,12 @@
               (clojure-mode-font-lock-setup))
             (paredit-mode 1)
             (auto-complete-mode 1)))
+
+(require 'ac-nrepl)
+
+(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'nrepl-mode))
 
 (provide 'my-clojure)
