@@ -1,50 +1,68 @@
+(require 'package)
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
+(package-initialize)
+
+(add-to-list 'load-path "~/.emacs.d")
+
 (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
   (when (fboundp mode) (funcall mode -1)))
 
-(if (fboundp 'menu-bar-mode)
-    (menu-bar-mode -1))
-(if (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1))
-(if (fboundp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
-
-
-(add-to-list 'load-path "~/.emacs.d")
-;Add all top-level subdirectories of .emacs.d to the load path
-(progn (cd "~/.emacs.d")
-       (normal-top-level-add-subdirs-to-load-path))
-
-;I like to keep third party libraries seperate in ~/.emacs.d/vendor
-(add-to-list 'load-path "~/.emacs.d/vendor")
-(progn (cd "~/.emacs.d/vendor")
-       (normal-top-level-add-subdirs-to-load-path))
-
 (when (equal system-type 'darwin)
-  (load-library "mac.el")
-)
+  (load-library "mac.el"))
 
 (require 'preferences)
 (require 'bindings)
-(require 'defuns)
-(require 'modes)
-(require 'themes)
+(require 'nrepl)
+(require 'auto-complete)
+(require 'ac-nrepl)
 
-(add-to-list 'load-path "~/.emacs/vendor/magit")
-(require 'magit)
 
-(add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
+(defun repl-modes ()
+  (auto-complete-mode)
+  (ac-nrepl-setup)
+  (paredit-mode))
 
-(load-library "my-scala.el")
-(load-library "my-nxml.el")
-(load-library "my-javascript.el")
-(load-library "my-php.el")
-(load-library "my-clojure.el")
-(load-library "my-protobuf.el")
-(load-library "vendor/thrift.el")
+(add-to-list 'same-window-buffer-names "*nrepl*")
+(setq nrepl-popup-stacktraces nil)
 
-;; Sending mail
-(setq user-full-name "Trevor Bernard")
-(setq user-full-mail-address "trevor.bernard@gmail.com")
 
-(load "~/.emacs.d/vendor/haskell-mode/haskell-site-file")
-(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+(eval-after-load 'paredit
+  '(progn
+     (define-key paredit-mode-map (kbd "M-)") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "M-(") 'paredit-wrap-round)
+     (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
+     (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
+
+;; Hush fontifying compilation message in emacs23 that slows down compile
+(setq font-lock-verbose nil
+      slime-kill-without-query-p t)
+
+(add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+
+(add-hook 'clojure-mode-hook
+          (lambda ()
+            (setq-default fill-column 80)
+            (auto-complete-mode 1)
+            (paredit-mode 1)
+            (eldoc-mode 1)
+            (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
+            (setq show-trailing-whitespace 1)
+            (setq inferior-lisp-program "lein repl")))
+
+(add-hook 'nrepl-mode-hook (lambda ()
+                             (ac-nrepl-setup)
+                             (paredit-mode 1)
+                             (eldoc-mode 1)
+                             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
+(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
+;; (add-hook 'nrepl-mode-hook (lambda () (repl-modes)) t)
+;; (add-hook 'clojure-nrepl-mode-hook (lambda () (repl-modes)) t)
+
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'nrepl-mode))
+
+(load-theme 'solarized-dark t)
