@@ -1,9 +1,22 @@
 (require 'package)
 (add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
+
+(when (not package-archive-contents)
+  (package-refresh-contents))
+
+(defvar my-packages '(solarized-theme
+                      clojure-mode
+                      paredit
+                      nrepl
+                      auto-complete
+                      ac-nrepl)
+  "A list of packages to ensure are installed at launch.")
+
+(dolist (p my-packages)
+  (when (not (package-installed-p p))
+    (package-install p)))
 
 (add-to-list 'load-path "~/.emacs.d")
 
@@ -18,7 +31,6 @@
 (require 'nrepl)
 (require 'auto-complete)
 (require 'ac-nrepl)
-
 
 (defun repl-modes ()
   (auto-complete-mode)
@@ -66,3 +78,15 @@
   '(add-to-list 'ac-modes 'nrepl-mode))
 
 (load-theme 'solarized-dark t)
+
+(require 'clojure-mode)
+
+(define-clojure-indent
+  (defroutes 'defun)
+  (GET 2)
+  (POST 2)
+  (PUT 2)
+  (DELETE 2)
+  (HEAD 2)
+  (ANY 2)
+  (context 2))

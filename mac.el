@@ -9,8 +9,14 @@
       `((font . "Inconsolata-16")))
 
 ;; make sure path is correct when launched as application
-(setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
-(push "/usr/local/bin" exec-path)
+(defun set-exec-path-from-shell-PATH ()
+  (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
+    (setenv "PATH" path-from-shell)
+    (setq exec-path (split-string path-from-shell path-separator))))
+(set-exec-path-from-shell-PATH)
+
+;; (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
+;; (push "/usr/local/bin" exec-path)
 
 ;; keybinding to toggle full screen mode
 (global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))
