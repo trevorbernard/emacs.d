@@ -8,6 +8,8 @@
 
 (defvar my-packages '(solarized-theme
                       clojure-mode
+                      haskell-mode
+                      markdown-mode
                       paredit
                       nrepl
                       auto-complete
@@ -39,7 +41,6 @@
 
 (add-to-list 'same-window-buffer-names "*nrepl*")
 (setq nrepl-popup-stacktraces nil)
-
 
 (eval-after-load 'paredit
   '(progn
@@ -77,6 +78,9 @@
 (eval-after-load "auto-complete"
   '(add-to-list 'ac-modes 'nrepl-mode))
 
+(add-hook 'emacs-lisp-mode-hook (lambda ()
+                                  (paredit-mode 1)
+                                  (eldoc-mode 1)))
 (load-theme 'solarized-dark t)
 
 (require 'clojure-mode)
@@ -90,3 +94,12 @@
   (HEAD 2)
   (ANY 2)
   (context 2))
+
+(setq js-indent-level 2)
+
+(defun transparency (value)
+  "Sets the transparency of the frame window. 0=transparent/100=opaque"
+  (interactive "nTransparency Value 0 - 100 opaque:")
+  (set-frame-parameter (selected-frame) 'alpha value))
+
+(transparency 93)
