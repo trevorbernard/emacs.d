@@ -8,12 +8,13 @@
 
 (defvar my-packages '(solarized-theme
                       clojure-mode
-                      haskell-mode
-                      markdown-mode
+                      clojure-test-mode
                       paredit
                       nrepl
                       auto-complete
-                      ac-nrepl)
+                      ac-nrepl
+                      markdown-mode
+                      haskell-mode)
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p my-packages)
@@ -33,13 +34,8 @@
 (require 'nrepl)
 (require 'auto-complete)
 (require 'ac-nrepl)
+(require 'clojure-mode)
 
-(defun repl-modes ()
-  (auto-complete-mode)
-  (ac-nrepl-setup)
-  (paredit-mode))
-
-(add-to-list 'same-window-buffer-names "*nrepl*")
 (setq nrepl-popup-stacktraces nil)
 
 (eval-after-load 'paredit
@@ -49,41 +45,28 @@
      (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
      (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
 
-;; Hush fontifying compilation message in emacs23 that slows down compile
-(setq font-lock-verbose nil
-      slime-kill-without-query-p t)
-
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+
+(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
+
+(eval-after-load 'auto-complete
+  '(add-to-list 'ac-modes 'nrepl-mode))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
-            (setq-default fill-column 80)
             (auto-complete-mode 1)
-            (paredit-mode 1)
-            (eldoc-mode 1)
+            (setq-default fill-column 80)
+            (paredit-mode t)
+            (subword-mode t)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-            (setq show-trailing-whitespace 1)
             (setq inferior-lisp-program "lein repl")))
-
-(add-hook 'nrepl-mode-hook (lambda ()
-                             (ac-nrepl-setup)
-                             (paredit-mode 1)
-                             (eldoc-mode 1)
-                             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
-(add-hook 'clojure-nrepl-mode-hook 'ac-nrepl-setup)
-(add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
-;; (add-hook 'nrepl-mode-hook (lambda () (repl-modes)) t)
-;; (add-hook 'clojure-nrepl-mode-hook (lambda () (repl-modes)) t)
-
-(eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'nrepl-mode))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
                                   (eldoc-mode 1)))
 (load-theme 'solarized-dark t)
-
-(require 'clojure-mode)
 
 (define-clojure-indent
   (defroutes 'defun)
