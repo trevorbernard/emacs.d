@@ -6,7 +6,7 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(defvar my-packages '(solarized-theme
+(defvar my-packages '(color-theme-sanityinc-tomorrow
                       clojure-mode
                       clojure-test-mode
                       paredit
@@ -28,6 +28,8 @@
 
 (when (equal system-type 'darwin)
   (load-library "mac.el"))
+
+(color-theme-sanityinc-tomorrow-night)
 
 (require 'preferences)
 (require 'bindings)
@@ -66,7 +68,6 @@
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
                                   (eldoc-mode 1)))
-(load-theme 'solarized-dark t)
 
 (define-clojure-indent
   (defroutes 'defun)
