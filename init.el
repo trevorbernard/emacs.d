@@ -13,7 +13,8 @@
                       nrepl
                       auto-complete
                       ac-nrepl
-                      markdown-mode)
+                      markdown-mode
+                      pandoc-mode)
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p my-packages)
@@ -123,6 +124,15 @@
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+(defun markdown-hook ()
+  (setq-default fill-column 80)
+  (auto-fill-mode t)
+  (pandoc-mode t)
+  (flyspell-mode t))
+
+(add-hook 'markdown-mode-hook 'markdown-hook)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
