@@ -9,6 +9,7 @@
 (defvar my-packages '(color-theme-sanityinc-tomorrow
                       clojure-mode
                       clojure-test-mode
+                      mmm-mode
                       paredit
                       nrepl
                       auto-complete
@@ -31,7 +32,7 @@
 
 (defun transparency (value)
   "Sets the transparency of the frame window. 0=transparent/100=opaque"
-  (interactive "nTransparency Value 0 - 100 opaque:")
+  (interactive "Transparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
 (transparency 93)
@@ -43,7 +44,7 @@
 (require 'ac-nrepl)
 (require 'clojure-mode)
 
-(setq nrepl-popup-stacktraces nil)
+;; (setq nrepl-popup-stacktraces nil)
 
 (eval-after-load 'paredit
   '(progn
@@ -67,10 +68,11 @@
             (auto-complete-mode 1)
             (setq-default fill-column 80)
             (paredit-mode 1)
-            (subword-mode t)
+;;            (subword-mode t)
             (setq show-trailing-whitespace 1)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-            (setq inferior-lisp-program "lein repl")))
+;;            (setq inferior-lisp-program "lein repl")
+            ))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
@@ -130,6 +132,18 @@
   (auto-fill-mode t)
   (pandoc-mode t)
   (flyspell-mode t))
+
+(require 'mmm-auto)
+
+(mmm-add-classes
+ '((markdown-clojure
+    :submode clojure-mode
+    :face mmm-declaration-submode-face
+    :front "^```clj[\n\r]+"
+    :back "^```$")))
+
+(setq mmm-global-mode 'maybe)
+(mmm-add-mode-ext-class 'markdown-mode nil 'markdown-clojure)
 
 (add-hook 'markdown-mode-hook 'markdown-hook)
 

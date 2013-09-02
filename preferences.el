@@ -82,6 +82,9 @@
           (vconcat `(unspecified ,base02 ,red ,green ,yellow ,blue
                                  ,magenta ,cyan ,base2)))))
 
+(defun indent-buffer ()
+  (indent-region (point-min) (point-max)))
+
 ;; (add-hook 'term-mode-hook 'my-term-hook)
 
 (provide 'preferences)
