@@ -12,6 +12,7 @@
                       mmm-mode
                       paredit
                       nrepl
+                      nrepl-decompile
                       auto-complete
                       ac-nrepl
                       markdown-mode
@@ -55,8 +56,8 @@
 
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
 
-(add-hook 'nrepl-mode-hook 'ac-nrepl-setup)
-(add-hook 'nrepl-mode-hook 'paredit-mode)
+(add-hook 'nrepl-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'nrepl-repl-mode-hook 'paredit-mode)
 (add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
 (add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
 
@@ -132,6 +133,8 @@
   (auto-fill-mode t)
   (pandoc-mode t)
   (flyspell-mode t))
+
+(require 'erlang-start)
 
 (require 'mmm-auto)
 
