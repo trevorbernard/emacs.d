@@ -36,7 +36,7 @@
   (interactive "Transparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(transparency 93)
+(transparency 95)
 
 (require 'preferences)
 (require 'bindings)
@@ -45,6 +45,7 @@
 (require 'ac-nrepl)
 (require 'clojure-mode)
 
+;; Clojure
 ;; (setq nrepl-popup-stacktraces nil)
 
 (eval-after-load 'paredit
@@ -88,6 +89,33 @@
   (HEAD 2)
   (ANY 2)
   (context 2))
+
+(defun nrepl-execute-in-current-repl (expr)
+  (if (not (get-buffer (nrepl-current-connection-buffer)))
+      (message "No active nREPL connection.")
+    (progn
+      (set-buffer (nrepl-find-or-create-repl-buffer))
+      (goto-char (point-max))
+      (insert expr)
+      (nrepl-return))))
+
+(defun nrepl-refresh ()
+  (interactive)
+  (nrepl-execute-in-current-repl
+   "(clojure.tools.namespace.repl/refresh)"))
+
+(defun nrepl-reset ()
+  (interactive)
+  (nrepl-execute-in-current-repl
+   "(user/reset)"))
+
+(defun nrepl-eval-expression-at-point-in-repl ()
+  (interactive)
+  (let ((form (nrepl-expression-at-point)))
+    ;; Strip excess whitespace
+    (while (string-match "\\`\s+\\|\n+\\'" form)
+      (setq form (replace-match "" t t form)))
+    (nrepl-execute-in-current-repl form)))
 
 (setq js-indent-level 2)
 
@@ -133,8 +161,6 @@
   (auto-fill-mode t)
   (pandoc-mode t)
   (flyspell-mode t))
-
-(require 'erlang-start)
 
 (require 'mmm-auto)
 
