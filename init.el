@@ -8,11 +8,11 @@
 
 (defvar my-packages '(color-theme-sanityinc-tomorrow
                       clojure-mode
-                      clojure-test-mode
+		      clojure-test-mode
                       mmm-mode
                       paredit
-                      nrepl
-                      nrepl-decompile
+		      cider
+                      ;; nrepl-decompile
                       auto-complete
                       ac-nrepl
                       markdown-mode
@@ -40,7 +40,7 @@
 
 (require 'preferences)
 (require 'bindings)
-(require 'nrepl)
+(require 'cider)
 (require 'auto-complete)
 (require 'ac-nrepl)
 (require 'clojure-mode)
@@ -57,13 +57,13 @@
 
 (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
 
-(add-hook 'nrepl-repl-mode-hook 'ac-nrepl-setup)
-(add-hook 'nrepl-repl-mode-hook 'paredit-mode)
-(add-hook 'nrepl-interaction-mode-hook 'ac-nrepl-setup)
-(add-hook 'nrepl-interaction-mode-hook 'nrepl-turn-on-eldoc-mode)
+(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-repl-mode-hook 'paredit-mode)
+(add-hook 'cider-interaction-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-interaction-mode-hook 'cider-turn-on-eldoc-mode)
 
 (eval-after-load 'auto-complete
-  '(add-to-list 'ac-modes 'nrepl-mode))
+  '(add-to-list 'ac-modes 'cider-mode))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
@@ -90,32 +90,28 @@
   (ANY 2)
   (context 2))
 
-(defun nrepl-execute-in-current-repl (expr)
+(defun my-last-expression ()
+  "Return the last sexp."
+  (buffer-substring-no-properties
+   (save-excursion (backward-sexp) (point))
+   (point)))
+
+(defun cider-execute-in-current-repl (expr)
   (if (not (get-buffer (nrepl-current-connection-buffer)))
       (message "No active nREPL connection.")
     (progn
-      (set-buffer (nrepl-find-or-create-repl-buffer))
+      (set-buffer (cider-find-or-create-repl-buffer))
       (goto-char (point-max))
       (insert expr)
-      (nrepl-return))))
+      (cider-return))))
 
-(defun nrepl-refresh ()
+(defun cider-eval-expression-at-point-in-repl ()
   (interactive)
-  (nrepl-execute-in-current-repl
-   "(clojure.tools.namespace.repl/refresh)"))
-
-(defun nrepl-reset ()
-  (interactive)
-  (nrepl-execute-in-current-repl
-   "(user/reset)"))
-
-(defun nrepl-eval-expression-at-point-in-repl ()
-  (interactive)
-  (let ((form (nrepl-expression-at-point)))
-    ;; Strip excess whitespace
+  (let ((form (my-last-expression)))
+    ;; Eat white
     (while (string-match "\\`\s+\\|\n+\\'" form)
       (setq form (replace-match "" t t form)))
-    (nrepl-execute-in-current-repl form)))
+    (cider-execute-in-current-repl form)))
 
 (setq js-indent-level 2)
 
