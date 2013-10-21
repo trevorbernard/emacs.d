@@ -7,16 +7,15 @@
   (package-refresh-contents))
 
 (defvar my-packages '(color-theme-sanityinc-tomorrow
+                      paredit
                       clojure-mode
 		      clojure-test-mode
-                      mmm-mode
-                      paredit
 		      cider
-                      ;; nrepl-decompile
                       auto-complete
                       ac-nrepl
                       markdown-mode
-                      pandoc-mode)
+                      pandoc-mode
+                      mmm-mode)
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p my-packages)
@@ -46,7 +45,8 @@
 (require 'clojure-mode)
 
 ;; Clojure
-;; (setq nrepl-popup-stacktraces nil)
+(setq nrepl-popup-stacktraces nil)
+(setq nrepl-hide-special-buffers t)
 
 (eval-after-load 'paredit
   '(progn
@@ -59,22 +59,23 @@
 
 (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
-(add-hook 'cider-interaction-mode-hook 'ac-nrepl-setup)
-(add-hook 'cider-interaction-mode-hook 'cider-turn-on-eldoc-mode)
 
 (eval-after-load 'auto-complete
-  '(add-to-list 'ac-modes 'cider-mode))
+  '(add-to-list 'ac-modes 'cider-repl-mode))
+
+(eval-after-load 'cider
+  '(progn
+     (add-hook 'cider-mode-hook 'ac-nrepl-setup)
+     (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
-            (auto-complete-mode 1)
+            ;; (auto-complete-mode 1)
             (setq-default fill-column 80)
             (paredit-mode 1)
-;;            (subword-mode t)
+            (subword-mode t)
             (setq show-trailing-whitespace 1)
-            (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-;;            (setq inferior-lisp-program "lein repl")
-            ))
+            (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
