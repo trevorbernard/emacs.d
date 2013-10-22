@@ -13,9 +13,10 @@
 		      cider
                       auto-complete
                       ac-nrepl
-                      markdown-mode
-                      pandoc-mode
-                      mmm-mode)
+                      ;; markdown-mode
+                      ;; pandoc-mode
+                      ;; mmm-mode
+		      )
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p my-packages)
@@ -59,18 +60,15 @@
 
 (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
+(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
 
 (eval-after-load 'auto-complete
   '(add-to-list 'ac-modes 'cider-repl-mode))
 
-(eval-after-load 'cider
-  '(progn
-     (add-hook 'cider-mode-hook 'ac-nrepl-setup)
-     (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)))
-
 (add-hook 'clojure-mode-hook
           (lambda ()
-            ;; (auto-complete-mode 1)
+            (auto-complete-mode 1)
             (setq-default fill-column 80)
             (paredit-mode 1)
             (subword-mode t)
@@ -80,6 +78,9 @@
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
                                   (eldoc-mode 1)))
+
+(global-set-key (kbd "C-c C-j") 'cider-jack-in)
+(global-set-key '[f3] 'cider-eval-expression-at-point-in-repl)
 
 (define-clojure-indent
   (defroutes 'defun)
@@ -147,31 +148,31 @@
                               (setq css-indent-level 2)
                               (setq css-indent-offset 2))))
 
-(autoload 'markdown-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
-(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+;; (autoload 'markdown-mode "markdown-mode"
+;;    "Major mode for editing Markdown files" t)
+;; (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+;; (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+;; (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-(defun markdown-hook ()
-  (setq-default fill-column 80)
-  (auto-fill-mode t)
-  (pandoc-mode t)
-  (flyspell-mode t))
+;;(defun markdown-hook ()
+;;  (setq-default fill-column 80)
+;;  (auto-fill-mode t)
+;;  (pandoc-mode t)
+;;  (flyspell-mode t))
 
-(require 'mmm-auto)
+;;(require 'mmm-auto)
 
-(mmm-add-classes
- '((markdown-clojure
-    :submode clojure-mode
-    :face mmm-declaration-submode-face
-    :front "^```clj[\n\r]+"
-    :back "^```$")))
+;;(mmm-add-classes
+;; '((markdown-clojure
+;;    :submode clojure-mode
+;;    :face mmm-declaration-submode-face
+;;   :front "^```clj[\n\r]+"
+;;    :back "^```$")))
 
-(setq mmm-global-mode 'maybe)
-(mmm-add-mode-ext-class 'markdown-mode nil 'markdown-clojure)
+;;(setq mmm-global-mode 'maybe)
+;;(mmm-add-mode-ext-class 'markdown-mode nil 'markdown-clojure)
 
-(add-hook 'markdown-mode-hook 'markdown-hook)
+;;(add-hook 'markdown-mode-hook 'markdown-hook)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
