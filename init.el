@@ -13,8 +13,8 @@
 		      cider
                       auto-complete
                       ac-nrepl
-                      ;; markdown-mode
-                      ;; pandoc-mode
+                      markdown-mode
+                      pandoc-mode
                       ;; mmm-mode
 		      )
   "A list of packages to ensure are installed at launch.")
@@ -66,6 +66,9 @@
 (eval-after-load 'auto-complete
   '(add-to-list 'ac-modes 'cider-repl-mode))
 
+(add-hook 'cider-repl-mode-hook
+          (lambda ()
+            (auto-complete-mode 1)))
 (add-hook 'clojure-mode-hook
           (lambda ()
             (auto-complete-mode 1)
@@ -74,6 +77,7 @@
             (subword-mode t)
             (setq show-trailing-whitespace 1)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
+
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
@@ -105,7 +109,7 @@
       (set-buffer (cider-find-or-create-repl-buffer))
       (goto-char (point-max))
       (insert expr)
-      (cider-return))))
+      (cider-repl-return))))
 
 (defun cider-eval-expression-at-point-in-repl ()
   (interactive)
@@ -148,21 +152,21 @@
                               (setq css-indent-level 2)
                               (setq css-indent-offset 2))))
 
-;; (autoload 'markdown-mode "markdown-mode"
-;;    "Major mode for editing Markdown files" t)
-;; (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-;; (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-;; (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(autoload 'markdown-mode "markdown-mode"
+   "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
-;;(defun markdown-hook ()
-;;  (setq-default fill-column 80)
-;;  (auto-fill-mode t)
-;;  (pandoc-mode t)
-;;  (flyspell-mode t))
+(defun markdown-hook ()
+ (setq-default fill-column 80)
+ (auto-fill-mode t)
+ (pandoc-mode t)
+ (flyspell-mode t))
 
-;;(require 'mmm-auto)
+;; (require 'mmm-auto)
 
-;;(mmm-add-classes
+;; (mmm-add-classes
 ;; '((markdown-clojure
 ;;    :submode clojure-mode
 ;;    :face mmm-declaration-submode-face
@@ -172,7 +176,7 @@
 ;;(setq mmm-global-mode 'maybe)
 ;;(mmm-add-mode-ext-class 'markdown-mode nil 'markdown-clojure)
 
-;;(add-hook 'markdown-mode-hook 'markdown-hook)
+(add-hook 'markdown-mode-hook 'markdown-hook)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
