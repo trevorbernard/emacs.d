@@ -6,17 +6,15 @@
 (when (not package-archive-contents)
   (package-refresh-contents))
 
-(defvar my-packages '(color-theme-sanityinc-tomorrow
-                      paredit
+(defvar my-packages '(paredit
                       clojure-mode
 		      clojure-test-mode
 		      cider
                       auto-complete
                       ac-nrepl
                       markdown-mode
-                      pandoc-mode
-                      ;; mmm-mode
-		      )
+                      ;; pandoc-mode
+                      mmm-mode)
   "A list of packages to ensure are installed at launch.")
 
 (dolist (p my-packages)
@@ -47,7 +45,7 @@
 
 ;; Clojure
 (setq nrepl-popup-stacktraces nil)
-(setq nrepl-hide-special-buffers t)
+;; (setq nrepl-hide-special-buffers t)
 
 (eval-after-load 'paredit
   '(progn
@@ -56,7 +54,7 @@
      (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
      (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
 
-(add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
+;; (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
 
 (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
@@ -161,7 +159,7 @@
 (defun markdown-hook ()
  (setq-default fill-column 80)
  (auto-fill-mode t)
- (pandoc-mode t)
+ ;; (pandoc-mode t)
  (flyspell-mode t))
 
 ;; (require 'mmm-auto)
@@ -183,8 +181,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
- '(custom-safe-themes (quote ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default))))
+ '(ansi-color-faces-vector [default bold shadow italic underline bold bold-italic bold])
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-safe-themes (quote ("bf648fd77561aae6722f3d53965a9eb29b08658ed045207fe32ffed90433eb52" "33c5a452a4095f7e4f6746b66f322ef6da0e770b76c0ed98a438e76c497040bb" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a774c5551bc56d7a9c362dca4d73a374582caedb110c201a09b410c0ebbb5e70" default)))
+ '(fci-rule-color "#282a2e")
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map (quote ((20 . "#cc6666") (40 . "#de935f") (60 . "#f0c674") (80 . "#b5bd68") (100 . "#8abeb7") (120 . "#81a2be") (140 . "#b294bb") (160 . "#cc6666") (180 . "#de935f") (200 . "#f0c674") (220 . "#b5bd68") (240 . "#8abeb7") (260 . "#81a2be") (280 . "#b294bb") (300 . "#cc6666") (320 . "#de935f") (340 . "#f0c674") (360 . "#b5bd68"))))
+ '(vc-annotate-very-old-color nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
