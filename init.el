@@ -8,7 +8,7 @@
 
 (defvar my-packages '(paredit
                       clojure-mode
-		      clojure-test-mode
+                      projectile
 		      cider
                       auto-complete
                       ac-nrepl
@@ -44,7 +44,7 @@
 (require 'clojure-mode)
 
 ;; Clojure
-(setq nrepl-popup-stacktraces nil)
+;; (setq nrepl-popup-stacktraces nil)
 ;; (setq nrepl-hide-special-buffers t)
 
 (eval-after-load 'paredit
