@@ -54,8 +54,6 @@
      (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
      (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
 
-;; (add-to-list 'auto-mode-alist '("\\.cljs$" . clojure-mode))
-
 (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
 (add-hook 'cider-mode-hook 'ac-nrepl-setup)
@@ -67,6 +65,7 @@
 (add-hook 'cider-repl-mode-hook
           (lambda ()
             (auto-complete-mode 1)))
+
 (add-hook 'clojure-mode-hook
           (lambda ()
             (auto-complete-mode 1)

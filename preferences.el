@@ -1,8 +1,6 @@
-;;(require 'rainbow-delimiters)
-;;(global-rainbow-delimiters-mode)
+(setq x-select-enable-clipboard t)
+(setq interprogram-paste-function 'x-selection-value)
 
-(setq x-select-enable-clipboard t) ; as above
-(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 (global-auto-revert-mode t)             ;; Auto revert buffers
 (iswitchb-mode 1)			;; Switch browser viewing
 (setq iswitchb-prompt-newbuffer nil)	;;
@@ -26,7 +24,7 @@
 (setq default-directory "~/")		;; Set default directory
 (setq make-backup-files nil)
 (setq ring-bell-function 'ignore)
-(setq x-select-enable-clipboard t)
+
 ;; Allow functions w/o warnings
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)

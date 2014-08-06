@@ -15,18 +15,12 @@
     (setq exec-path (split-string path-from-shell path-separator))))
 (set-exec-path-from-shell-PATH)
 
-;; (setenv "PATH" (concat "/usr/local/bin:" (getenv "PATH")))
-;; (push "/usr/local/bin" exec-path)
-
-;; keybinding to toggle full screen mode
-(global-set-key (quote [M-f10]) (quote ns-toggle-fullscreen))
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin")))
 
 ;; Move to trash when deleting stuff
 (setq delete-by-moving-to-trash t
       trash-directory "~/.Trash/emacs")
-
-;; Ignore .DS_Store files with ido mode
-;; (add-to-list 'ido-ignore-files "\\.DS_Store")
 
 ;; Don't open files from the workspace in a new frame
 (setq ns-pop-up-frames nil)
