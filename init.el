@@ -10,10 +10,9 @@
                       clojure-mode
                       projectile
 		      cider
-                      auto-complete
-                      ac-nrepl
+                      company
+                      rainbow-delimiters
                       markdown-mode
-                      ;; pandoc-mode
                       mmm-mode)
   "A list of packages to ensure are installed at launch.")
 
@@ -34,14 +33,13 @@
   (interactive "Transparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(transparency 95)
+;; (transparency 95)
 
 (require 'preferences)
 (require 'bindings)
 (require 'cider)
-(require 'auto-complete)
-(require 'ac-nrepl)
 (require 'clojure-mode)
+(require 'company)
 
 ;; Clojure
 ;; (setq nrepl-popup-stacktraces nil)
@@ -54,27 +52,19 @@
      (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
      (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
 
-(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-repl-mode-hook 'company-mode)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
-(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'cider-mode-hook 'company-mode)
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-
-(eval-after-load 'auto-complete
-  '(add-to-list 'ac-modes 'cider-repl-mode))
-
-(add-hook 'cider-repl-mode-hook
-          (lambda ()
-            (auto-complete-mode 1)))
 
 (add-hook 'clojure-mode-hook
           (lambda ()
-            (auto-complete-mode 1)
             (setq-default fill-column 80)
             (paredit-mode 1)
             (subword-mode t)
             (setq show-trailing-whitespace 1)
             (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
-
 
 (add-hook 'emacs-lisp-mode-hook (lambda ()
                                   (paredit-mode 1)
@@ -182,6 +172,7 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector [default bold shadow italic underline bold bold-italic bold])
  '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
+
  '(custom-safe-themes (quote ("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "bf648fd77561aae6722f3d53965a9eb29b08658ed045207fe32ffed90433eb52" "33c5a452a4095f7e4f6746b66f322ef6da0e770b76c0ed98a438e76c497040bb" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "a774c5551bc56d7a9c362dca4d73a374582caedb110c201a09b410c0ebbb5e70" default)))
  '(fci-rule-color "#282a2e")
  '(vc-annotate-background nil)
