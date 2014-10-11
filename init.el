@@ -93,7 +93,7 @@
   (if (not (get-buffer (nrepl-current-connection-buffer)))
       (message "No active nREPL connection.")
     (progn
-      (set-buffer (cider-find-or-create-repl-buffer))
+      (set-buffer (cider-get-repl-buffer))
       (goto-char (point-max))
       (insert expr)
       (cider-repl-return))))
