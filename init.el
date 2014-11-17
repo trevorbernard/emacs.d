@@ -8,8 +8,9 @@
 
 (defvar my-packages '(paredit
                       clojure-mode
+                      color-theme-sanityinc-tomorrow
                       projectile
-		      cider
+                      cider
                       company
                       rainbow-delimiters
                       markdown-mode
