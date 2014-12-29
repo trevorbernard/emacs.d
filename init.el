@@ -42,16 +42,11 @@
 (require 'clojure-mode)
 (require 'company)
 
-;; Clojure
-;; (setq nrepl-popup-stacktraces nil)
-;; (setq nrepl-hide-special-buffers t)
-
 (eval-after-load 'paredit
   '(progn
-     (define-key paredit-mode-map (kbd "M-)") 'paredit-forward-slurp-sexp)
-     (define-key paredit-mode-map (kbd "M-(") 'paredit-wrap-round)
-     (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
-     (define-key paredit-mode-map (kbd "M-{") 'paredit-wrap-curly)))
+     (define-key paredit-mode-map (kbd "<C-left>") 'paredit-forward-barf-sexp)
+     (define-key paredit-mode-map (kbd "<C-right>") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "<C-backspace>") 'paredit-backward-kill-word)))
 
 (add-hook 'cider-repl-mode-hook 'company-mode)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
@@ -109,31 +104,6 @@
 
 (setq js-indent-level 2)
 
-(defun ruby-mode-hook ()
-  (autoload 'ruby-mode "ruby-mode" nil t)
-  (add-to-list 'auto-mode-alist '("Capfile" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("Gemfile" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("Rakefile" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("\\.rake\\'" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("\\.rb\\'" . ruby-mode))
-  (add-to-list 'auto-mode-alist '("\\.ru\\'" . ruby-mode))
-  (add-hook 'ruby-mode-hook '(lambda ()
-                               (setq ruby-deep-arglist t)
-                               (setq ruby-deep-indent-paren nil)
-                               (setq c-tab-always-indent nil)
-                               (require 'inf-ruby)
-                               (require 'ruby-compilation))))
-(defun rhtml-mode-hook ()
-  (autoload 'rhtml-mode "rhtml-mode" nil t)
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . rhtml-mode))
-  (add-to-list 'auto-mode-alist '("\\.rjs\\'" . rhtml-mode))
-  (add-hook 'rhtml-mode '(lambda ()
-                           (define-key rhtml-mode-map (kbd "M-s") 'save-buffer))))
-(defun yaml-mode-hook ()
-  (autoload 'yaml-mode "yaml-mode" nil t)
-  (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
-  (add-to-list 'auto-mode-alist '("\\.yaml$" . yaml-mode)))
-
 (defun css-mode-hook ()
   (autoload 'css-mode "css-mode" nil t)
   (add-hook 'css-mode-hook '(lambda ()
@@ -152,17 +122,6 @@
  ;; (pandoc-mode t)
  (flyspell-mode t))
 
-;; (require 'mmm-auto)
-
-;; (mmm-add-classes
-;; '((markdown-clojure
-;;    :submode clojure-mode
-;;    :face mmm-declaration-submode-face
-;;   :front "^```clj[\n\r]+"
-;;    :back "^```$")))
-
-;;(setq mmm-global-mode 'maybe)
-;;(mmm-add-mode-ext-class 'markdown-mode nil 'markdown-clojure)
 
 (add-hook 'markdown-mode-hook 'markdown-hook)
 
