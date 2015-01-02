@@ -1,8 +1,3 @@
-;; change command to meta, and ignore option to use weird Norwegian keyboard
-;;(setq mac-option-modifier 'none)
-;;(setq mac-command-modifier 'meta)
-;;(setq ns-function-modifier 'hyper)
-
 (set-default-font "Inconsolata-16")
 
 (setq default-frame-alist
