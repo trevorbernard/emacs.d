@@ -8,13 +8,13 @@
 
 (defvar my-packages '(paredit
                       clojure-mode
-                      color-theme-sanityinc-tomorrow
                       zenburn-theme
                       projectile
                       cider
                       company
                       rainbow-delimiters
                       markdown-mode
+                      protobuf-mode
                       mmm-mode)
   "A list of packages to ensure are installed at launch.")
 
