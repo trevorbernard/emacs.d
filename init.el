@@ -119,7 +119,7 @@
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
+(add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 (defun markdown-hook ()
  (setq-default fill-column 80)
  (auto-fill-mode t)
