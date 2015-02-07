@@ -38,7 +38,7 @@
   (interactive "Transparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(transparency 95)
+(transparency 90)
 
 (require 'preferences)
 (require 'bindings)
@@ -46,11 +46,14 @@
 (require 'clojure-mode)
 (require 'company)
 
+
 (eval-after-load 'paredit
   '(progn
      (define-key paredit-mode-map (kbd "<C-left>") 'paredit-forward-barf-sexp)
      (define-key paredit-mode-map (kbd "<C-right>") 'paredit-forward-slurp-sexp)
      (define-key paredit-mode-map (kbd "<C-backspace>") 'paredit-backward-kill-word)))
+
+(setq cider-repl-use-clojure-font-lock t)
 
 (add-hook 'cider-repl-mode-hook 'company-mode)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
@@ -77,6 +80,7 @@
   (defroutes 'defun)
   (GET 2)
   (POST 2)
+  (OPTIONS 2)
   (PUT 2)
   (DELETE 2)
   (HEAD 2)
