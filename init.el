@@ -38,7 +38,7 @@
   (interactive "Transparency Value 0 - 100 opaque:")
   (set-frame-parameter (selected-frame) 'alpha value))
 
-(transparency 90)
+;; (transparency 90)
 
 (require 'preferences)
 (require 'bindings)
@@ -46,6 +46,7 @@
 (require 'clojure-mode)
 (require 'company)
 
+(setq nrepl-log-messages t)
 
 (eval-after-load 'paredit
   '(progn
@@ -79,12 +80,19 @@
 (define-clojure-indent
   (defroutes 'defun)
   (GET 2)
+  (GET* 2)
   (POST 2)
+  (POST* 2)
   (OPTIONS 2)
+  (OPTIONS* 2)
   (PUT 2)
+  (PUT* 2)
   (DELETE 2)
+  (DELETE* 2)
   (HEAD 2)
+  (HEAD* 2)
   (ANY 2)
+  (ANY* 2)
   (context 2))
 
 (defun my-last-expression ()
@@ -132,3 +140,17 @@
 
 
 (add-hook 'markdown-mode-hook 'markdown-hook)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (gradle-mode groovy-mode jsx-mode zenburn-theme yaml-mode rainbow-delimiters protobuf-mode projectile paredit mmm-mode markdown-mode company cider))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
