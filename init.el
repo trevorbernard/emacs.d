@@ -3,6 +3,8 @@
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
 
+(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+
 (when (not package-archive-contents)
   (package-refresh-contents))
 
