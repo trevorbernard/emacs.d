@@ -1,9 +1,13 @@
 (require 'package)
+
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
-(package-initialize)
+(add-to-list 'package-archives
+             '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
 
 (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+
+(package-initialize)
 
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -149,7 +153,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (gradle-mode groovy-mode jsx-mode zenburn-theme yaml-mode rainbow-delimiters protobuf-mode projectile paredit mmm-mode markdown-mode company cider))))
+    (yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile zenburn-theme clojure-mode paredit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
