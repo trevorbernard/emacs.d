@@ -61,6 +61,7 @@
      (define-key paredit-mode-map (kbd "<C-backspace>") 'paredit-backward-kill-word)))
 
 (setq cider-repl-use-clojure-font-lock t)
+(setq cider-repl-clear-help-banner t)
 
 (add-hook 'cider-repl-mode-hook 'company-mode)
 (add-hook 'cider-repl-mode-hook 'paredit-mode)
