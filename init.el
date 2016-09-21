@@ -58,9 +58,9 @@
 
 (eval-after-load 'paredit
   '(progn
-     (define-key paredit-mode-map (kbd "<C-left>") 'paredit-forward-barf-sexp)
-     (define-key paredit-mode-map (kbd "<C-right>") 'paredit-forward-slurp-sexp)
-     (define-key paredit-mode-map (kbd "<C-backspace>") 'paredit-backward-kill-word)))
+     (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
+     (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
+     (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
 
 (setq cider-repl-use-clojure-font-lock t)
 (setq cider-repl-display-help-banner nil)
