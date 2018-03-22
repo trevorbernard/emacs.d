@@ -157,7 +157,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (dracula-theme less-css-mode terraform-mode yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile zenburn-theme clojure-mode paredit))))
+    (typescript-mode markdown-mode+ dracula-theme less-css-mode terraform-mode yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile clojure-mode paredit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
