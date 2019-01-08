@@ -14,7 +14,6 @@
 
 (defvar my-packages '(paredit
                       clojure-mode
-                      ;; zenburn-theme
                       dracula-theme
                       projectile
                       cider
@@ -31,7 +30,6 @@
     (package-install p)))
 
 (load-theme 'dracula t)
-;; (load-theme 'zenburn t)
 
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
@@ -53,6 +51,9 @@
 (require 'cider)
 (require 'clojure-mode)
 (require 'company)
+
+(add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
 
 (setq nrepl-log-messages t)
 
@@ -157,7 +158,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (typescript-mode markdown-mode+ dracula-theme less-css-mode terraform-mode yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile clojure-mode paredit))))
+    (clang-format company-irony irony cmake-mode typescript-mode markdown-mode+ dracula-theme less-css-mode terraform-mode yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile clojure-mode paredit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
