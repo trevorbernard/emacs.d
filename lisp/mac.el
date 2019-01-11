@@ -1,4 +1,6 @@
 (set-default-font "Inconsolata-16")
+;; Mac's ls doesn't support --dired
+(setq dired-use-ls-dired nil)
 
 (setq default-frame-alist
       `((font . "Inconsolata-16")))

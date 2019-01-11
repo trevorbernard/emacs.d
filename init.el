@@ -21,7 +21,6 @@
                       rainbow-delimiters
                       markdown-mode
                       protobuf-mode
-                      mmm-mode
                       yaml-mode)
   "A list of packages to ensure are installed at launch.")
 
@@ -143,12 +142,11 @@
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
+
 (defun markdown-hook ()
  (setq-default fill-column 80)
  (auto-fill-mode t)
- ;; (pandoc-mode t)
  (flyspell-mode t))
-
 
 (add-hook 'markdown-mode-hook 'markdown-hook)
 (custom-set-variables
@@ -158,7 +156,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (clang-format company-irony irony cmake-mode typescript-mode markdown-mode+ dracula-theme less-css-mode terraform-mode yaml-mode mmm-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile clojure-mode paredit))))
+    (yaml-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile dracula-theme clojure-mode paredit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
