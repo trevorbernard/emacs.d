@@ -25,4 +25,7 @@
 ;; Use aspell for spell checking: brew install aspell --lang=en
 (setq ispell-program-name "/usr/local/bin/aspell")
 
+;; Open up links in Google Chrome
+(setq browse-url-browser-function 'browse-url-default-macosx-browser)
+
 (provide 'mac)
