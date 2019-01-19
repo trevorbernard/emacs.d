@@ -305,23 +305,17 @@ Some handy dandy paredit shortcuts
 
 ** Org Mode
 
-Add auto fill mode when org mode starts
-
-#+BEGIN_SRC emacs-lisp
-  (defun my-org-mode-hook ()
-    (turn-on-auto-fill))
-
-  (add-hook 'org-mode-hook 'my-org-mode-hook)
-#+END_SRC
-
 I almost exclusively use =C-j= in place of hitting the enter key. The problem is
-that it's bound to =newline-and-indent= function. This is very annoying in when
+that it's bound to =org-return-indent= function. This is very annoying in when
 you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 =newline=.
 
 #+BEGIN_SRC emacs-lisp
-  (eval-after-load 'org-mode-hook
-                   '(local-set-key (kbd "C-j") 'newline))
+  (defun my-org-mode-hook ()
+    (turn-on-auto-fill)
+    (define-key org-mode-map (kbd "C-j") 'org-return))
+
+  (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+END_SRC
 
 ** JavaScript
@@ -361,11 +355,9 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
   (add-hook 'markdown-mode-hook 'my-markdown-hook)
 #+END_SRC
 
-
 ** Git
 
 Use diff-mode when editing a git commit message
-
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+END_SRC
