@@ -1,6 +1,5 @@
-;; (setq x-select-enable-clipboard t)
+
 (setq interprogram-paste-function 'x-selection-value)
-;; (setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 (global-auto-revert-mode t)             ;; Auto revert buffers
 (ido-mode 1)
 (setq iswitchb-prompt-newbuffer nil)	;;

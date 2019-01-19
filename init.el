@@ -54,7 +54,7 @@
 (add-hook 'org-mode-hook '(lambda () (setq fill-column 80)))
 (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-(setq nrepl-log-messages t)
+
 
 (eval-after-load 'paredit
   '(progn
@@ -62,6 +62,7 @@
      (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
      (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
 
+(setq nrepl-log-messages t)
 (setq cider-repl-use-clojure-font-lock t)
 (setq cider-repl-display-help-banner nil)
 
@@ -156,7 +157,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (yaml-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile dracula-theme clojure-mode paredit))))
+    (htmlize dockerfile-mode yaml-mode protobuf-mode markdown-mode rainbow-delimiters company cider projectile dracula-theme clojure-mode paredit))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
