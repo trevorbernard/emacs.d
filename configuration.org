@@ -129,47 +129,40 @@ intuitive.
 * Mac specific configuration
 
 #+BEGIN_SRC emacs-lisp
-  (defun mac-specific ()
-    )
-
-  (when (equal system-type 'darwin)
-    (mac-specific))
-
-
-  ;; Mac's ls doesn't support --dired
-  (setq dired-use-ls-dired nil)
-
-  (setq default-frame-alist
-        `((font . "Inconsolata-16")))
-
-  ;; make sure path is correct when launched as application
   (defun set-exec-path-from-shell-PATH ()
     (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
       (setenv "PATH" path-from-shell)
       (setq exec-path (split-string path-from-shell path-separator))))
-  (set-exec-path-from-shell-PATH)
 
-  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-  (setq exec-path (append exec-path '("/usr/local/bin")))
+  (defun my-mac-config ()
+    ;; Mac's ls doesn't support --dired
+    (setq dired-use-ls-dired nil)
 
-  ;; Move to trash when deleting stuff
-  (setq delete-by-moving-to-trash t
-        trash-directory "~/.Trash/emacs")
+    (setq default-frame-alist `((font . "Inconsolata-16")))
 
-  ;; Don't open files from the workspace in a new frame
-  (setq ns-pop-up-frames nil)
+    ;; make sure path is correct when launched as application
+    (set-exec-path-from-shell-PATH)
 
-  ;; Use aspell for spell checking: brew install aspell --lang=en
-  (setq ispell-program-name "/usr/local/bin/aspell")
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+    (setq exec-path (append exec-path '("/usr/local/bin")))
 
-  ;; Open up links in Google Chrome
-  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+    ;; Move to trash when deleting stuff
+    (setq delete-by-moving-to-trash t
+          trash-directory "~/.Trash/emacs")
 
-  (provide 'mac)
+    ;; Don't open files from the workspace in a new frame
+    (setq ns-pop-up-frames nil)
 
+    ;; Use aspell for spell checking: brew install aspell --lang=en
+    (setq ispell-program-name "/usr/local/bin/aspell")
 
+    ;; Open up links in Google Chrome
+    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
 
+  (when (equal system-type 'darwin)
+    (my-mac-config))
 #+END_SRC
+
 * Preferences
 
 ** Global Preferences

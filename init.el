@@ -106,28 +106,7 @@
   (ANY* 2)
   (context 2))
 
-(defun my-last-expression ()
-  "Return the last sexp."
-  (buffer-substring-no-properties
-   (save-excursion (backward-sexp) (point))
-   (point)))
 
-(defun cider-execute-in-current-repl (expr)
-  (if (not (get-buffer (nrepl-current-connection-buffer)))
-      (message "No active nREPL connection.")
-    (progn
-      (set-buffer (cider-get-repl-buffer))
-      (goto-char (point-max))
-      (insert expr)
-      (cider-repl-return))))
-
-(defun cider-eval-expression-at-point-in-repl ()
-  (interactive)
-  (let ((form (my-last-expression)))
-    ;; Eat white
-    (while (string-match "\\`\s+\\|\n+\\'" form)
-      (setq form (replace-match "" t t form)))
-    (cider-execute-in-current-repl form)))
 
 (setq js-indent-level 2)
 
