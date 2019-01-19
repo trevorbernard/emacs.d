@@ -84,7 +84,7 @@ nature. You can thank me later.
     (when (fboundp mode) (funcall mode -1)))
 
   (when window-system
-    (setq default-frame-alist `((font . "Inconsolata-16")))
+    (set-frame-font "Inconsolata-16")
     (load-theme 'dracula t))
 #+END_SRC
 
@@ -282,6 +282,15 @@ be useful to someone eventually.
     '(local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
 #+END_SRC
 
+** Elisp
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-emacs-lisp-mode-hook ()
+    (paredit-mode 1)
+    (eldoc-mode 1))
+
+  (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hook)
+#+END_SRC
 ** Paredit
 
 Some handy dandy paredit shortcuts
