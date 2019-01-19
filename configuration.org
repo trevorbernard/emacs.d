@@ -13,17 +13,17 @@ This is my emacs, there are many like it, but this one is mine...
 
 The very first thing you need to have installed is a recent version of Emacs. I
 believe the minimum supported version is Emacs 24 otherwise you'll have to
-install package.el and you're on your own.
+install =package.el= and you're on your own.
 
 I strongly suggest you remap your cap locks key to control to help reduce the
 onset of Emacs pinky. I even go further and have a new key binding for =M-x=, so
-you are hitting Ctrl instead of Alt.
+you are hitting =Ctrl= instead of =Alt=.
 
 You will need the following already installed for this configuration to run
 correctly.
 
 Install the [[https://fonts.google.com/specimen/Inconsolata][Inconsolata]] font because it's beautiful and makes for a wonderful
-font. You will need ispell installed in order to user flymake-mode. Clojure mode
+font. You will need ispell installed in order to user Flymake mode. Clojure mode
 requires [[https://leiningen.org/][leiningen]].
 
 
@@ -40,8 +40,8 @@ I use melpa and melpa stable for my packages.
 
 #+END_SRC
 
-I don't like my cider to be bleeding edge since it's caused me problems in the
-past so pin it to melpa-stable.
+I don't like my cider to be bleeding edge since it's caused compatability
+problems in the past so pin it to melpa-stable.
 
 #+BEGIN_SRC emacs-lisp
   (setq 'package-pinned-packages '((cider . "melpa-stable") t))
@@ -59,6 +59,7 @@ Install my packages if they aren't installed.
                         clojure-mode
                         clj-refactor
                         dracula-theme
+                        dockerfile-mode
                         projectile
                         cider
                         company
@@ -225,7 +226,11 @@ Allow functions without issuing warnings
 I have long since used this key binding to jack into a repl. My fingers are
 programmed this way.
    
-#+BEGIN_SRC 
+#+BEGIN_SRC emacs-lisp
+  (require 'cider)
+  (require 'clojure-mode)
+  (require 'company)
+
   (global-set-key (kbd "C-c C-j") 'cider-jack-in)
 #+END_SRC   
 
@@ -248,10 +253,55 @@ programmed this way.
   (add-hook 'clojure-mode-hook
             '(lambda ()
                (setq show-trailing-whitespace 1)
+               (rainbow-delimiters-mode 1)
                (linum-mode t)
                (paredit-mode 1)
                (subword-mode t)
                (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)))
+#+END_SRC
+
+When you hit =f3= at the end of the sexp in Clojure, it will copy and evaluate
+the function into the current repl. I no longer use this function but it might
+be useful to someone eventually.
+
+#+BEGIN_SRC emacs-lisp
+  (defun my-last-expression ()
+    "Return the last sexp."
+    (buffer-substring-no-properties
+     (save-excursion (backward-sexp) (point))
+     (point)))
+
+  (defun cider-execute-in-current-repl (expr)
+    (if (not (get-buffer (cider-current-connection)))
+        (message "No active nREPL connection.")
+      (progn
+        (set-buffer (cider-current-repl))
+        (goto-char (point-max))
+        (insert expr)
+        (cider-repl-return))))
+
+  (defun cider-eval-expression-at-point-in-repl ()
+    (interactive)
+    (let ((form (my-last-expression)))
+      ;; Eat white
+      (while (string-match "\\`\s+\\|\n+\\'" form)
+        (setq form (replace-match "" t t form)))
+      (cider-execute-in-current-repl form)))
+
+  (eval-after-load 'cider-repl-mode-hook
+    '(local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
+#+END_SRC
+
+** Paredit
+
+Some handy dandy paredit shortcuts
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'paredit
+    '(progn
+       (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
+       (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
+       (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
 #+END_SRC
 
 ** Org Mode
@@ -262,6 +312,56 @@ Add auto fill mode when org mode starts
   (add-hook 'org-mode-hook
             '(lambda ()
                (turn-on-auto-fill)))
+#+END_SRC
+
+I almost exclusively use =C-j= in place of hitting the enter key. The problem is
+that it's bound to =newline-and-indent= function. This is very annoying in when
+you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
+=newline=.
+
+#+BEGIN_SRC emacs-lisp
   (eval-after-load 'org-mode-hook
-                   '(define-key ignore-newline-and-indent (kbd "C-j") 'newline))
+                   '(local-set-key (kbd "C-j") 'newline))
+#+END_SRC
+
+** JavaScript
+
+#+BEGIN_SRC emacs-lisp
+  (setq js-indent-level 2)
+#+END_SRC
+
+** CSS
+
+#+BEGIN_SRC emacs-lisp
+  (defun css-mode-hook ()
+    (autoload 'css-mode "css-mode" nil t)
+    (add-hook 'css-mode-hook '(lambda ()
+                                (setq css-indent-level 2)
+                                (setq css-indent-offset 2))))
+#+END_SRC   
+
+** Markdown
+
+#+BEGIN_SRC emacs-lisp
+  (autoload 'markdown-mode "markdown-mode"
+     "Major mode for editing Markdown files" t)
+  (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+  (defun markdown-hook ()
+   (setq-default fill-column 80)
+   (auto-fill-mode t)
+   (flyspell-mode t))
+
+  (add-hook 'markdown-mode-hook 'markdown-hook)
+#+END_SRC
+
+
+** Git
+
+Use diff-mode when editing a git commit message
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+END_SRC
