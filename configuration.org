@@ -84,7 +84,7 @@ nature. You can thank me later.
     (when (fboundp mode) (funcall mode -1)))
 
   (when window-system
-    (set-default-font "Inconsolata-16")
+    (setq default-frame-alist `((font . "Inconsolata-16")))
     (load-theme 'dracula t))
 #+END_SRC
 
@@ -184,8 +184,6 @@ Allow functions without issuing warnings
   (defun my-mac-config ()
     ;; Mac's ls doesn't support --dired
     (setq dired-use-ls-dired nil)
-
-    (setq default-frame-alist `((font . "Inconsolata-16")))
 
     ;; make sure path is correct when launched as application
     (set-exec-path-from-shell-PATH)
