@@ -58,6 +58,7 @@ Install my packages if they aren't installed.
                         clj-refactor
                         dracula-theme
                         dockerfile-mode
+                        elpy
                         projectile
                         cider
                         company
@@ -129,6 +130,8 @@ intuitive.
 ** Global Preferences
 
 #+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil) ; stop creating backup~ files
+  (setq auto-save-default nil) ; stop creating #autosave# files
   (setq interprogram-paste-function 'x-selection-value) ;
   (global-auto-revert-mode t) ; Auto revert buffers
   (ido-mode 1)
@@ -232,6 +235,7 @@ Allow functions without issuing warnings
 
   (defun my-clojure-mode-hook ()
     (setq show-trailing-whitespace 1)
+    (clj-refactor-mode 1)
     (rainbow-delimiters-mode 1)
     (linum-mode t)
     (paredit-mode 1)
@@ -360,4 +364,11 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 Use diff-mode when editing a git commit message
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
+#+END_SRC
+
+** Python
+
+#+BEGIN_SRC emacs-lisp
+(elpy-enable)
+;;  (add-hook 'python-mode-hook 'elpy-enable)
 #+END_SRC
