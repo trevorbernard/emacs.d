@@ -219,7 +219,7 @@ Allow functions without issuing warnings
   (require 'cider)
   (require 'clojure-mode)
   (require 'company)
-  
+
   (setq nrepl-log-messages t)
   (setq cider-repl-use-clojure-font-lock t)
   (setq cider-repl-display-help-banner nil)
@@ -235,6 +235,7 @@ Allow functions without issuing warnings
 
   (defun my-clojure-mode-hook ()
     (setq show-trailing-whitespace 1)
+    (setq clojure-align-forms-automatically t)
     (clj-refactor-mode 1)
     (rainbow-delimiters-mode 1)
     (linum-mode t)
