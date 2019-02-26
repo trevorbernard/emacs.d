@@ -66,7 +66,10 @@ Install my packages if they aren't installed.
                         markdown-mode
                         protobuf-mode
                         htmlize
-                        yaml-mode)
+                        yaml-mode
+                        gradle-mode
+                        projectile
+                        ag)
     "A list of packages to ensure are installed at launch.")
 
   (dolist (p my-packages)
