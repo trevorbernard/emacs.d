@@ -290,6 +290,17 @@ be useful to someone eventually.
     '(local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
 #+END_SRC
 
+** ClojureScript
+
+This is required for re-frame cider intergration.
+
+#+BEGIN_SRC elisp
+  (setq cider-cljs-lein-repl
+          "(do (require 'figwheel-sidecar.repl-api)
+           (figwheel-sidecar.repl-api/start-figwheel!)
+           (figwheel-sidecar.repl-api/cljs-repl))")
+#+END_SRC
+
 ** Elisp
 
 #+BEGIN_SRC emacs-lisp
