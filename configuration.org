@@ -296,9 +296,9 @@ This is required for re-frame cider intergration.
 
 #+BEGIN_SRC elisp
   (setq cider-cljs-lein-repl
-          "(do (require 'figwheel-sidecar.repl-api)
-           (figwheel-sidecar.repl-api/start-figwheel!)
-           (figwheel-sidecar.repl-api/cljs-repl))")
+        "(do (require 'figwheel-sidecar.repl-api)
+             (figwheel-sidecar.repl-api/start-figwheel!)
+             (figwheel-sidecar.repl-api/cljs-repl))")
 #+END_SRC
 
 ** Elisp
@@ -344,6 +344,7 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
     (setq js-indent-level 2))
 
   (add-hook 'javascript-mode 'my-js-mode-hook)
+  (add-hook 'js2-mode 'my-js-mode-hook)
 #+END_SRC
 
 ** CSS
