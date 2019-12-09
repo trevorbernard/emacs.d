@@ -58,7 +58,6 @@ Install my packages if they aren't installed.
                         clj-refactor
                         dracula-theme
                         dockerfile-mode
-                        elpy
                         projectile
                         cider
                         company
@@ -69,7 +68,9 @@ Install my packages if they aren't installed.
                         yaml-mode
                         gradle-mode
                         projectile
-                        ag)
+                        ag
+                        plantuml-mode
+                        flycheck-plantuml)
     "A list of packages to ensure are installed at launch.")
 
   (dolist (p my-packages)
@@ -133,6 +134,7 @@ intuitive.
 ** Global Preferences
 
 #+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/lisp/")
   (setq make-backup-files nil) ; stop creating backup~ files
   (setq auto-save-default nil) ; stop creating #autosave# files
   (setq interprogram-paste-function 'x-selection-value) ;
@@ -322,6 +324,17 @@ Some handy dandy paredit shortcuts
        (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
 #+END_SRC
 
+** PlantUML
+
+Easily create beautiful UML Diagrams from simple textual description.
+
+#+BEGIN_SRC elisp
+  (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+  (setq plantuml-default-exec-mode 'jar)
+  (setq org-plantuml-jar-path
+        (expand-file-name "~/plantuml.jar"))
+#+END_SRC
+
 ** Org Mode
 
 I almost exclusively use =C-j= in place of hitting the enter key. The problem is
@@ -332,8 +345,13 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 #+BEGIN_SRC emacs-lisp
   (defun my-org-mode-hook ()
     (turn-on-auto-fill)
-    (define-key org-mode-map (kbd "C-j") 'org-return))
-
+    (define-key org-mode-map (kbd "C-j") 'org-return)
+    (require 'ox-confluence) ;; export to confluence
+    (org-babel-do-load-languages 
+     'org-babel-load-languages '((clojure . t)
+                                 (plantuml . t)
+                                 (ruby . t)
+                                 (shell . t))))
   (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+END_SRC
 
