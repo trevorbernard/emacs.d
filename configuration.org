@@ -22,10 +22,9 @@ you are hitting =Ctrl= instead of =Alt=.
 You will need the following already installed for this configuration to run
 correctly.
 
-Install the [[https://fonts.google.com/specimen/Inconsolata][Inconsolata]] font because it's beautiful and makes for a wonderful
-font. You will need ispell installed in order to user Flymake mode. Clojure mode
-requires [[https://leiningen.org/][leiningen]].
-
+Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
+a wonderful font. You will need ispell installed in order to user
+Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
 ** Emacs Initialization
 
@@ -59,18 +58,21 @@ Install my packages if they aren't installed.
                         dracula-theme
                         dockerfile-mode
                         projectile
+                        projectile-rails
                         cider
                         company
                         rainbow-delimiters
+                        magit
                         markdown-mode
                         protobuf-mode
                         htmlize
                         yaml-mode
                         gradle-mode
-                        projectile
                         ag
                         plantuml-mode
-                        flycheck-plantuml)
+                        flycheck-plantuml
+                        robe
+                        rvm)
     "A list of packages to ensure are installed at launch.")
 
   (dolist (p my-packages)
@@ -84,13 +86,14 @@ mouse. Protip: Learn the Emacs navigation key strokes until they are second
 nature. You can thank me later.
 
 #+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode) (funcall mode -1)))
+      (setq inhibit-startup-message t)
 
-  (when window-system
-    (set-frame-font "Inconsolata-16")
-    (load-theme 'dracula t))
+      (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+        (when (fboundp mode) (funcall mode -1)))
+
+      (when window-system
+        (set-frame-font "Fira Code Retina 16" nil t)
+        (load-theme 'dracula t))
 #+END_SRC
 
 ** Personal
@@ -135,6 +138,8 @@ intuitive.
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lisp/")
+
+  (set-fringe-mode 10) ; breathing room
   (setq make-backup-files nil) ; stop creating backup~ files
   (setq auto-save-default nil) ; stop creating #autosave# files
   (setq interprogram-paste-function 'x-selection-value) ;
@@ -217,6 +222,15 @@ Allow functions without issuing warnings
 #+END_SRC
 
 * Programming Languages
+
+
+Bind projectile to =C-c p= and enable by default.
+
+  #+begin_src emacs-lisp
+  (setq projectile-keymap-prefix (kbd "C-c p"))
+  (projectile-mode)
+  #+end_src
+** Magit
 
 ** Clojure
 
@@ -330,9 +344,12 @@ Easily create beautiful UML Diagrams from simple textual description.
 
 #+BEGIN_SRC elisp
   (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+  (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+
   (setq plantuml-default-exec-mode 'jar)
-  (setq org-plantuml-jar-path
-        (expand-file-name "~/plantuml.jar"))
+  (setq plantuml-jar-path (expand-file-name "~/plantuml.jar"))
+
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
 #+END_SRC
 
 ** Org Mode
@@ -403,9 +420,27 @@ Use diff-mode when editing a git commit message
 ** Python
 
 #+BEGIN_SRC emacs-lisp
-(elpy-enable)
+;;  (elpy-enable)
 ;;  (add-hook 'python-mode-hook 'elpy-enable)
 #+END_SRC
+
+** Ruby
+
+Since starting at Introhive, I wanted to continue using Emacs as my
+primary editor but alas, I've been primary programming in
+RubyMine... For now...
+
+   #+begin_src emacs-lisp
+     (defun my-ruby-mode-hook ()
+       (robe-mode)
+       (global-company-mode t)
+       (push 'company-robe company-backends)
+       (rvm-activate-corresponding-ruby)
+       (projectile-rails))
+
+     (add-hook 'ruby-mode 'my-ruby-mode-hook)
+   #+end_src
+
 
 ** Java
 
