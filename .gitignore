@@ -5,7 +5,9 @@ elpa/*
 url/*
 ido.last
 \#*
-
 .\#*
 configuration.el
 eshell/*
+project
+projectile-bookmarks.eld
+transient/*
