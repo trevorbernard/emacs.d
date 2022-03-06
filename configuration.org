@@ -52,27 +52,29 @@ Install my packages if they aren't installed.
   (when (not package-archive-contents)
     (package-refresh-contents))
 
-  (defvar my-packages '(paredit
-                        clojure-mode
-                        clj-refactor
-                        dracula-theme
-                        dockerfile-mode
-                        projectile
-                        projectile-rails
+  (defvar my-packages '(ag
+                        bnf-mode
                         cider
+                        clj-refactor
+                        clojure-mode
                         company
-                        rainbow-delimiters
+                        dockerfile-mode
+                        dracula-theme
+                        eclim
+                        flycheck-plantuml
+                        gradle-mode
+                        htmlize
                         magit
                         markdown-mode
-                        protobuf-mode
-                        htmlize
-                        yaml-mode
-                        gradle-mode
-                        ag
+                        paredit
                         plantuml-mode
-                        flycheck-plantuml
+                        projectile
+                        projectile-rails
+                        protobuf-mode
+                        rainbow-delimiters
                         robe
-                        rvm)
+                        rvm
+                        yaml-mode)
     "A list of packages to ensure are installed at launch.")
 
   (dolist (p my-packages)
