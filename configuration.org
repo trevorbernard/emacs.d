@@ -61,6 +61,7 @@ Install my packages if they aren't installed.
                         dockerfile-mode
                         dracula-theme
                         eclim
+                        elixir-mode
                         flycheck-plantuml
                         gradle-mode
                         htmlize
@@ -461,3 +462,16 @@ RubyMine... For now...
 
   (add-hook 'java-mode-hook 'my-java-mode-hook)
 #+END_SRC
+
+** Elixir Language
+
+   Elixir seems like a very cool language and I would like to kick the
+   tires and create some actor apps.
+
+#+begin_src elisp
+  (require 'elixir-mode)
+
+  (defun my-elixir-mode ())
+
+  (add-hook 'elixir-mode-hook 'my-elixir-mode)
+#+end_src
