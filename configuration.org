@@ -95,7 +95,7 @@ nature. You can thank me later.
         (when (fboundp mode) (funcall mode -1)))
 
       (when window-system
-        (set-frame-font "Fira Code Retina 16" nil t)
+        (set-frame-font "Fira Code Retina 18" nil t)
         (load-theme 'dracula t))
 #+END_SRC
 
