@@ -201,11 +201,8 @@ Allow functions without issuing warnings
     ;; Mac's ls doesn't support --dired
     (setq dired-use-ls-dired nil)
 
-    ;; make sure path is correct when launched as application
+    ;; setup the correct shell path
     (set-exec-path-from-shell-PATH)
-
-    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-    (setq exec-path (append exec-path '("/usr/local/bin")))
 
     ;; Move to trash when deleting stuff
     (setq delete-by-moving-to-trash t
@@ -380,6 +377,16 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
   (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+END_SRC
 
+*** Exporting to PDF
+
+    In order to export to PDF, I choose to use basictex and install
+    packages only when they are missing.
+
+    #+begin_src bash
+      brew reinstall --cask basictex
+      sudo tlmgr update --self
+      sudo tlmgr install wrapfig
+    #+end_src
 ** JavaScript
 
 #+BEGIN_SRC emacs-lisp
