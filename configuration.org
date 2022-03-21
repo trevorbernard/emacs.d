@@ -230,7 +230,15 @@ Bind projectile to =C-c p= and enable by default.
   (setq projectile-keymap-prefix (kbd "C-c p"))
   (projectile-mode)
   #+end_src
+
 ** Magit
+
+   =C-c= is reserved for the user. Add a more friendly binding for
+   =magit-file-dispatch=
+   
+   #+begin_src emacs-lisp
+     (global-set-key (kbd "C-c g") 'magit-file-dispatch)
+   #+end_src
 
 ** Clojure
 
@@ -386,6 +394,7 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
       brew reinstall --cask basictex
       sudo tlmgr update --self
       sudo tlmgr install wrapfig
+      sudo tlmgr install capt-of
     #+end_src
 ** JavaScript
 
