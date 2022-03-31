@@ -226,9 +226,10 @@ Allow functions without issuing warnings
 
 Bind projectile to =C-c p= and enable by default.
 
+** Projectile Mode
   #+begin_src emacs-lisp
-  (setq projectile-keymap-prefix (kbd "C-c p"))
-  (projectile-mode)
+    (setq projectile-keymap-prefix (kbd "C-c p"))
+    (projectile-mode +1)
   #+end_src
 
 ** Magit
