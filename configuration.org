@@ -377,9 +377,9 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
   (defun my-org-mode-hook ()
     (turn-on-auto-fill)
     (define-key org-mode-map (kbd "C-j") 'org-return)
-    (require 'ox-confluence) ;; export to confluence
     (org-babel-do-load-languages 
      'org-babel-load-languages '((clojure . t)
+                                 (scala . t)
                                  (plantuml . t)
                                  (ruby . t)
                                  (shell . t))))
