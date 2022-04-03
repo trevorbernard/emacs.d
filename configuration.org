@@ -374,12 +374,15 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 =newline=.
 
 #+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c l") #'org-store-link)
+  (global-set-key (kbd "C-c a") #'org-agenda)
+  (global-set-key (kbd "C-c c") #'org-capture)
+
   (defun my-org-mode-hook ()
     (turn-on-auto-fill)
     (define-key org-mode-map (kbd "C-j") 'org-return)
     (org-babel-do-load-languages 
      'org-babel-load-languages '((clojure . t)
-                                 (scala . t)
                                  (plantuml . t)
                                  (ruby . t)
                                  (shell . t))))
@@ -387,7 +390,6 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 #+END_SRC
 
 *** Exporting to PDF
-
     In order to export to PDF, I choose to use basictex and install
     packages only when they are missing.
 
@@ -397,6 +399,7 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
       sudo tlmgr install wrapfig
       sudo tlmgr install capt-of
     #+end_src
+
 ** JavaScript
 
 #+BEGIN_SRC emacs-lisp
