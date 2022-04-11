@@ -75,6 +75,9 @@ Install my packages if they aren't installed.
                         rainbow-delimiters
                         robe
                         rvm
+                        sbt-mode
+                        scala-mode
+                        terraform-mode
                         yaml-mode)
     "A list of packages to ensure are installed at launch.")
 
@@ -495,3 +498,16 @@ RubyMine... For now...
 
   (add-hook 'elixir-mode-hook 'my-elixir-mode)
 #+end_src
+
+** Scala Language
+
+   what about sbt-mode?
+
+#+begin_src elisp
+  (require 'scala-mode)
+
+  (defun my-scala-mode-hook ())
+
+  (add-hook 'scala-mode-hook 'my-scala-mode-hook)
+#+end_src
+   
