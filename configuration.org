@@ -42,6 +42,7 @@ problems in the past so pin it to melpa-stable.
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+  (add-to-list 'package-pinned-packages '(rust-mode . "melpa-stable") t)
 #+END_SRC
 
 Install my packages if they aren't installed.
@@ -74,6 +75,7 @@ Install my packages if they aren't installed.
                         protobuf-mode
                         rainbow-delimiters
                         robe
+                        rust-mode
                         rvm
                         sbt-mode
                         scala-mode
@@ -234,9 +236,8 @@ Bind projectile to =C-c p= and enable by default.
     (setq projectile-project-search-path '("~/p/"))
     (setq projectile-keymap-prefix (kbd "C-c p"))
     (projectile-mode +1)
-
   #+end_src
-
+  
 ** Magit
 
    =C-c= is reserved for the user. Add a more friendly binding for
@@ -340,6 +341,7 @@ This is required for re-frame cider intergration.
 
   (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hook)
 #+END_SRC
+
 ** Paredit
 
 Some handy dandy paredit shortcuts
@@ -390,20 +392,22 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
      'org-babel-load-languages '((clojure . t)
                                  (plantuml . t)
                                  (ruby . t)
+                                 (rust . t)
                                  (shell . t))))
   (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+END_SRC
 
 *** Exporting to PDF
-    In order to export to PDF, I choose to use basictex and install
-    packages only when they are missing.
 
-    #+begin_src bash
-      brew reinstall --cask basictex
-      sudo tlmgr update --self
-      sudo tlmgr install wrapfig
-      sudo tlmgr install capt-of
-    #+end_src
+In order to export to PDF, I choose to use basictex and install
+packages only when they are missing.
+
+#+begin_src bash
+  brew reinstall --cask basictex
+  sudo tlmgr update --self
+  sudo tlmgr install wrapfig
+  sudo tlmgr install capt-of
+#+end_src
 
 ** JavaScript
 
@@ -446,6 +450,7 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
 ** Git
 
 Use diff-mode when editing a git commit message
+
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+END_SRC
@@ -459,22 +464,18 @@ Use diff-mode when editing a git commit message
 
 ** Ruby
 
-Since starting at Introhive, I wanted to continue using Emacs as my
-primary editor but alas, I've been primary programming in
-RubyMine... For now...
+#+begin_src emacs-lisp
+  (defun my-ruby-mode-hook ()
+    (robe-mode)
+    (global-company-mode t)
+    (push 'company-robe company-backends)
+    (rvm-activate-corresponding-ruby)
+    (projectile-rails))
 
-   #+begin_src emacs-lisp
-     (defun my-ruby-mode-hook ()
-       (robe-mode)
-       (global-company-mode t)
-       (push 'company-robe company-backends)
-       (rvm-activate-corresponding-ruby)
-       (projectile-rails))
-
-     (add-hook 'ruby-mode 'my-ruby-mode-hook)
-   #+end_src
-
-
+  (add-hook 'ruby-mode 'my-ruby-mode-hook)
+#+end_src
+   
+   
 ** Java
 
 #+BEGIN_SRC elisp
@@ -513,3 +514,36 @@ RubyMine... For now...
   (add-hook 'scala-mode-hook 'my-scala-mode-hook)
 #+end_src
    
+** Terminal Emulation
+
+Calling =M-x ansi-term= will prompt you for which shell you want to
+spawn. TODO. Find a keybinding 
+
+#+begin_src elisp
+  (defun my/term ()
+    (interactive)
+    (term "/bin/zsh"))
+#+end_src
+
+** Rust
+
+#+begin_src elisp
+  (require 'rust-mode)
+
+  (defun my-rust-mode ()
+    )
+
+  (add-hook 'rust-mode 'my-rust-mode)
+#+end_src
+
+** ELISP
+
+#+begin_src elisp
+  (defun my-ielm-mode-hook ()
+    (paredit-mode 1)
+    (rainbow-delimiters-mode 1)
+    (define-key ielm-map (kbd "C-m") 'ielm-return)
+    (define-key ielm-map (kbd "<return>") 'ielm-return))
+
+  (add-hook 'ielm-mode-hook 'my-ielm-mode-hook)
+#+end_src
