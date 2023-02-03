@@ -11,16 +11,16 @@ This is my emacs, there are many like it, but this one is mine...
 
 ** Getting Started
 
-The very first thing you need to have installed is a recent version of Emacs. I
-believe the minimum supported version is Emacs 24 otherwise you'll have to
-install =package.el= and you're on your own.
+The very first thing you need to have installed is a recent version of
+Emacs. I believe the minimum supported version is Emacs 24 otherwise
+you'll have to install =package.el= and you're on your own.
 
-I strongly suggest you remap your cap locks key to control to help reduce the
-onset of Emacs pinky. I even go further and have a new key binding for =M-x=, so
-you are hitting =Ctrl= instead of =Alt=.
+I strongly suggest you remap your cap locks key to control to help
+reduce the onset of Emacs pinky. I even go further and have a new key
+binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
-You will need the following already installed for this configuration to run
-correctly.
+You will need the following already installed for this configuration
+to run correctly.
 
 Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
 a wonderful font. You will need ispell installed in order to user
@@ -30,24 +30,24 @@ Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
 I use melpa and melpa stable for my packages.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'package)
 
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-#+END_SRC
+#+end_src
 
-I don't like my cider to be bleeding edge since it's caused compatability
-problems in the past so pin it to melpa-stable.
+I don't like my cider to be bleeding edge since it's caused
+compatability problems in the past so pin it to melpa-stable.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
   (add-to-list 'package-pinned-packages '(rust-mode . "melpa-stable") t)
-#+END_SRC
+#+end_src
 
 Install my packages if they aren't installed.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (package-initialize)
 
   (when (not package-archive-contents)
@@ -62,7 +62,6 @@ Install my packages if they aren't installed.
                         dockerfile-mode
                         dracula-theme
                         eclim
-                        elixir-mode
                         flycheck-plantuml
                         gradle-mode
                         htmlize
@@ -86,65 +85,65 @@ Install my packages if they aren't installed.
   (dolist (p my-packages)
     (when (not (package-installed-p p))
       (package-install p)))
-#+END_SRC
+#+end_src
 
-I like to have my Emacs clean, chrisp and minimal. Removing the menu bar, tool
-bar, and scroll bar frees some space and it helps remove dependency on the
-mouse. Protip: Learn the Emacs navigation key strokes until they are second
-nature. You can thank me later.
+I like to have my Emacs clean, chrisp and minimal. Removing the menu
+bar, tool bar, and scroll bar frees some space and it helps remove
+dependency on the mouse. Protip: Learn the Emacs navigation key
+strokes until they are second nature. You can thank me later.
 
-#+BEGIN_SRC emacs-lisp
-      (setq inhibit-startup-message t)
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
 
-      (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-        (when (fboundp mode) (funcall mode -1)))
+  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+    (when (fboundp mode) (funcall mode -1)))
 
-      (when window-system
-        (set-frame-font "Fira Code Retina 18" nil t)
-        (load-theme 'dracula t))
-#+END_SRC
+  (when window-system
+    (set-frame-font "Fira Code Retina 18" nil t)
+    (load-theme 'dracula t))
+#+end_src
 
 ** Personal
 
 Dats me.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq user-full-name "Trevor Bernard"
         user-mail-address "trevor@bernard.gg")
-#+END_SRC
+#+end_src
 
 ** Key Bindings
 
-Ignore minimize functionality when you're in a GUI because it's very annoying to
-accidently minimize your window.
+Ignore minimize functionality when you're in a GUI because it's very
+annoying to accidently minimize your window.
   
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when window-system
     (global-set-key "\C-z" 'ignore)
     (global-set-key "\C-x\C-z" 'ignore))
-#+END_SRC
+#+end_src
 
 *** Invoke M-x without the Alt key
 
-M-x is one of the most wildly used key combinations in Emacs but it's also the
-most annoying. You have to scrunch your left thumb and fore finger in the most
-uncomfortable RSI inducing way.
+M-x is one of the most wildly used key combinations in Emacs but it's
+also the most annoying. You have to scrunch your left thumb and fore
+finger in the most uncomfortable RSI inducing way.
 
-I choose to rebind M-x to C-x C-m because of an article Steve Yegge wrote
-called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your fingers on the home row if
-you have caps lock mapped to control. With some practice, it will become
-intuitive.
+I choose to rebind M-x to C-x C-m because of an article Steve Yegge
+wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your fingers on
+the home row if you have caps lock mapped to control. With some
+practice, it will become intuitive.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-set-key "\C-x\C-m" 'execute-extended-command)
   (global-set-key "\C-c\C-m" 'execute-extended-command)
-#+END_SRC
+#+end_src
 
 * Preferences
 
 ** Global Preferences
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lisp/")
 
   (set-fringe-mode 10) ; breathing room
@@ -162,41 +161,41 @@ intuitive.
   (transient-mark-mode 1)
   ;; Make pgup/dn remember current line
   (setq scroll-preserve-screen-position t) 
-#+END_SRC
+#+end_src
 
-Use spaces in favour of tabs because they are evil. But when there are tabs show
-them as 8 spaces.
+Use spaces in favour of tabs because they are evil. But when there are
+tabs show them as 8 spaces.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
   (setq-default tab-width 8)
-#+END_SRC  
+#+end_src  
 
 Limit the default fill mode to 80 characters
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default set-fill-column 80)
   (setq-default truncate-lines nil)
-#+END_SRC
+#+end_src
 
 Ignore the stupid ring bell feature.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq ring-bell-function 'ignore)
-#+END_SRC
+#+end_src
 
 Allow functions without issuing warnings
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (put 'downcase-region 'disabled nil)
   (put 'narrow-to-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
-#+END_SRC
+#+end_src
 
 * Mac specific configuration
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun set-exec-path-from-shell-PATH ()
     (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
       (setenv "PATH" path-from-shell)
@@ -224,32 +223,32 @@ Allow functions without issuing warnings
 
   (when (equal system-type 'darwin)
     (my-mac-config))
-#+END_SRC
+#+end_src
 
 * Programming Languages
-
 
 Bind projectile to =C-c p= and enable by default.
 
 ** Projectile Mode
-  #+begin_src emacs-lisp
-    (setq projectile-project-search-path '("~/p/"))
-    (setq projectile-keymap-prefix (kbd "C-c p"))
-    (projectile-mode +1)
-  #+end_src
+
+#+begin_src emacs-lisp
+  (setq projectile-project-search-path '("~/p/"))
+  (setq projectile-keymap-prefix (kbd "C-c p"))
+  (projectile-mode +1)
+#+end_src
   
 ** Magit
 
-   =C-c= is reserved for the user. Add a more friendly binding for
-   =magit-file-dispatch=
+=C-c= is reserved for the user. Add a more friendly binding for
+=magit-file-dispatch=
    
-   #+begin_src emacs-lisp
-     (global-set-key (kbd "C-c g") 'magit-file-dispatch)
-   #+end_src
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c g") 'magit-file-dispatch)
+#+end_src
 
 ** Clojure
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'cider)
   (require 'clojure-mode)
   (require 'company)
@@ -280,20 +279,20 @@ Bind projectile to =C-c p= and enable by default.
   (add-hook 'cider-repl-mode-hook 'my-cider-repl-mode-hook)
   (add-hook 'cider-mode-hook 'my-cider-mode-hook)
   (add-hook 'clojure-mode-hook 'my-clojure-mode-hook)
-#+END_SRC
+#+end_src
 
-I have long since used this key binding to jack into a repl. My fingers are
-programmed this way.
+I have long since used this key binding to jack into a repl. My
+fingers are programmed this way.
    
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-c C-j") 'cider-jack-in)
-#+END_SRC   
+#+end_src   
 
-When you hit =f3= at the end of the sexp in Clojure, it will copy and evaluate
-the function into the current repl. I no longer use this function but it might
-be useful to someone eventually.
+When you hit =f3= at the end of the sexp in Clojure, it will copy and
+evaluate the function into the current repl. I no longer use this
+function but it might be useful to someone eventually.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-last-expression ()
     "Return the last sexp."
     (buffer-substring-no-properties
@@ -319,28 +318,28 @@ be useful to someone eventually.
 
   (eval-after-load 'cider-repl-mode-hook
     '(local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
-#+END_SRC
+#+end_src
 
 ** ClojureScript
 
 This is required for re-frame cider intergration.
 
-#+BEGIN_SRC elisp
+#+begin_src elisp
   (setq cider-cljs-lein-repl
         "(do (require 'figwheel-sidecar.repl-api)
              (figwheel-sidecar.repl-api/start-figwheel!)
              (figwheel-sidecar.repl-api/cljs-repl))")
-#+END_SRC
+#+end_src
 
 ** Elisp
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-emacs-lisp-mode-hook ()
     (paredit-mode 1)
     (eldoc-mode 1))
 
   (add-hook 'emacs-lisp-mode-hook 'my-emacs-lisp-mode-hook)
-#+END_SRC
+#+end_src
 
 ** Paredit
 
@@ -351,19 +350,19 @@ Preferences > Keyboard > Shortcuts > Mission Control and change the
 settings for "Move left a space" and "Move right a space" or disable
 them completely.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (eval-after-load 'paredit
     '(progn
        (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
        (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
        (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
-#+END_SRC
+#+end_src
 
 ** PlantUML
 
 Easily create beautiful UML Diagrams from simple textual description.
 
-#+BEGIN_SRC elisp
+#+begin_src elisp
   (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
   (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
 
@@ -371,16 +370,16 @@ Easily create beautiful UML Diagrams from simple textual description.
   (setq plantuml-jar-path (expand-file-name "~/plantuml.jar"))
 
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-#+END_SRC
+#+end_src
 
 ** Org Mode
 
-I almost exclusively use =C-j= in place of hitting the enter key. The problem is
-that it's bound to =org-return-indent= function. This is very annoying in when
-you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
-=newline=.
+I almost exclusively use =C-j= in place of hitting the enter key. The
+problem is that it's bound to =org-return-indent= function. This is
+very annoying in when you are in =org-mode=. So instead of trying to
+remap my brain, I'll remap it to =newline=.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-c l") #'org-store-link)
   (global-set-key (kbd "C-c a") #'org-agenda)
   (global-set-key (kbd "C-c c") #'org-capture)
@@ -395,7 +394,7 @@ you are in =org-mode=. So instead of trying to remap my brain, I'll remap it to
                                  (rust . t)
                                  (shell . t))))
   (add-hook 'org-mode-hook 'my-org-mode-hook)
-#+END_SRC
+#+end_src
 
 *** Exporting to PDF
 
@@ -411,17 +410,17 @@ packages only when they are missing.
 
 ** JavaScript
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-js-mode-hook ()
     (setq js-indent-level 2))
 
   (add-hook 'javascript-mode 'my-js-mode-hook)
   (add-hook 'js2-mode 'my-js-mode-hook)
-#+END_SRC
+#+end_src
 
 ** CSS
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (autoload 'css-mode "css-mode" nil t)
 
   (defun my-css-mode-hook ()
@@ -429,11 +428,11 @@ packages only when they are missing.
     (setq css-indent-offset 2))
 
   (add-hook 'css-mode-hook 'my-css-mode-hook)
-#+END_SRC   
+#+end_src   
 
 ** Markdown
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
 
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
@@ -441,26 +440,26 @@ packages only when they are missing.
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 
   (defun my-markdown-hook ()
-   (auto-fill-mode t)
-   (flyspell-mode t))
+    (auto-fill-mode t)
+    (flyspell-mode t))
 
   (add-hook 'markdown-mode-hook 'my-markdown-hook)
-#+END_SRC
+#+end_src
 
 ** Git
 
 Use diff-mode when editing a git commit message
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
-#+END_SRC
+#+end_src
 
 ** Python
 
-#+BEGIN_SRC emacs-lisp
-;;  (elpy-enable)
-;;  (add-hook 'python-mode-hook 'elpy-enable)
-#+END_SRC
+#+begin_src emacs-lisp
+  ;;  (elpy-enable)
+  ;;  (add-hook 'python-mode-hook 'elpy-enable)
+#+end_src
 
 ** Ruby
 
@@ -475,10 +474,9 @@ Use diff-mode when editing a git commit message
   (add-hook 'ruby-mode 'my-ruby-mode-hook)
 #+end_src
    
-   
 ** Java
 
-#+BEGIN_SRC elisp
+#+begin_src elisp
   (require 'eclim)
   (setq eclimd-autostart t)
 
@@ -487,24 +485,9 @@ Use diff-mode when editing a git commit message
     )
 
   (add-hook 'java-mode-hook 'my-java-mode-hook)
-#+END_SRC
-
-** Elixir Language
-
-   Elixir seems like a very cool language and I would like to kick the
-   tires and create some actor apps.
-
-#+begin_src elisp
-  (require 'elixir-mode)
-
-  (defun my-elixir-mode ())
-
-  (add-hook 'elixir-mode-hook 'my-elixir-mode)
-#+end_src
+#+end_srcg
 
 ** Scala Language
-
-   what about sbt-mode?
 
 #+begin_src elisp
   (require 'scala-mode)
@@ -517,7 +500,7 @@ Use diff-mode when editing a git commit message
 ** Terminal Emulation
 
 Calling =M-x ansi-term= will prompt you for which shell you want to
-spawn. TODO. Find a keybinding 
+spawn. TODO. Find a keybinding
 
 #+begin_src elisp
   (defun my/term ()
@@ -530,8 +513,7 @@ spawn. TODO. Find a keybinding
 #+begin_src elisp
   (require 'rust-mode)
 
-  (defun my-rust-mode ()
-    )
+  (defun my-rust-mode ())
 
   (add-hook 'rust-mode 'my-rust-mode)
 #+end_src
