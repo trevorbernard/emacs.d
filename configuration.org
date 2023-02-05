@@ -67,6 +67,7 @@ Install my packages if they aren't installed.
                         htmlize
                         magit
                         markdown-mode
+                        nix-mode
                         paredit
                         plantuml-mode
                         projectile
@@ -95,12 +96,14 @@ strokes until they are second nature. You can thank me later.
 #+begin_src emacs-lisp
   (setq inhibit-startup-message t)
 
+  (load-theme 'dracula t)
+
   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
     (when (fboundp mode) (funcall mode -1)))
 
   (when window-system
-    (set-frame-font "Fira Code Retina 18" nil t)
-    (load-theme 'dracula t))
+    (set-frame-font "Fira Code Retina 18" nil t))
+
 #+end_src
 
 ** Personal
