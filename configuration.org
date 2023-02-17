@@ -74,12 +74,11 @@ Install my packages if they aren't installed.
                         projectile-rails
                         protobuf-mode
                         rainbow-delimiters
-                        robe
                         rust-mode
-                        rvm
                         sbt-mode
                         scala-mode
                         terraform-mode
+                        tuareg
                         yaml-mode)
     "A list of packages to ensure are installed at launch.")
 
@@ -393,7 +392,6 @@ remap my brain, I'll remap it to =newline=.
     (org-babel-do-load-languages 
      'org-babel-load-languages '((clojure . t)
                                  (plantuml . t)
-                                 (ruby . t)
                                  (rust . t)
                                  (shell . t))))
   (add-hook 'org-mode-hook 'my-org-mode-hook)
@@ -461,19 +459,6 @@ Use diff-mode when editing a git commit message
 #+begin_src emacs-lisp
   ;;  (elpy-enable)
   ;;  (add-hook 'python-mode-hook 'elpy-enable)
-#+end_src
-
-** Ruby
-
-#+begin_src emacs-lisp
-  (defun my-ruby-mode-hook ()
-    (robe-mode)
-    (global-company-mode t)
-    (push 'company-robe company-backends)
-    (rvm-activate-corresponding-ruby)
-    (projectile-rails))
-
-  (add-hook 'ruby-mode 'my-ruby-mode-hook)
 #+end_src
    
 ** Java
