@@ -417,8 +417,7 @@ packages only when they are missing.
   (defun my-js-mode-hook ()
     (setq js-indent-level 2))
 
-  (add-hook 'javascript-mode 'my-js-mode-hook)
-  (add-hook 'js2-mode 'my-js-mode-hook)
+  (add-hook 'js-mode-hook 'my-js-mode-hook)
 #+end_src
 
 ** CSS
@@ -531,4 +530,12 @@ spawn. TODO. Find a keybinding
     (define-key ielm-map (kbd "<return>") 'ielm-return))
 
   (add-hook 'ielm-mode-hook 'my-ielm-mode-hook)
+#+end_src
+
+** OCaml
+
+#+begin_src elisp
+  (defun my-ocaml-mode-hook ())
+
+  (add-hook 'tuareg-mode-hook 'my-ocaml-mode-hook)
 #+end_src
