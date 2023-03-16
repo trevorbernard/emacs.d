@@ -65,6 +65,7 @@ Install my packages if they aren't installed.
                         flycheck-plantuml
                         gradle-mode
                         htmlize
+                        lsp-mode
                         magit
                         markdown-mode
                         nix-mode
@@ -75,6 +76,7 @@ Install my packages if they aren't installed.
                         protobuf-mode
                         rainbow-delimiters
                         rust-mode
+                        rustic
                         sbt-mode
                         scala-mode
                         terraform-mode
@@ -498,8 +500,7 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
-  (require 'rust-mode)
-
+ 
   (defun my-rust-mode ())
 
   (add-hook 'rust-mode 'my-rust-mode)
