@@ -77,8 +77,6 @@ Install my packages if they aren't installed.
                         rainbow-delimiters
                         rust-mode
                         rustic
-                        sbt-mode
-                        scala-mode
                         terraform-mode
                         tuareg
                         yaml-mode)
@@ -474,16 +472,6 @@ Use diff-mode when editing a git commit message
     )
 
   (add-hook 'java-mode-hook 'my-java-mode-hook)
-#+end_srcg
-
-** Scala Language
-
-#+begin_src elisp
-  (require 'scala-mode)
-
-  (defun my-scala-mode-hook ())
-
-  (add-hook 'scala-mode-hook 'my-scala-mode-hook)
 #+end_src
    
 ** Terminal Emulation
