@@ -11,3 +11,4 @@ eshell/*
 project
 projectile-bookmarks.eld
 transient/*
+.lsp-session-*

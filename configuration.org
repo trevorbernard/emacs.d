@@ -42,7 +42,6 @@ compatability problems in the past so pin it to melpa-stable.
 
 #+begin_src emacs-lisp
   (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-  (add-to-list 'package-pinned-packages '(rust-mode . "melpa-stable") t)
 #+end_src
 
 Install my packages if they aren't installed.
@@ -75,7 +74,6 @@ Install my packages if they aren't installed.
                         projectile-rails
                         protobuf-mode
                         rainbow-delimiters
-                        rust-mode
                         rustic
                         terraform-mode
                         tuareg
@@ -488,8 +486,8 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
- 
-  (defun my-rust-mode ())
+  (defun my-rust-mode ()
+    )
 
   (add-hook 'rust-mode 'my-rust-mode)
 #+end_src
