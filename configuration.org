@@ -68,6 +68,7 @@ Install my packages if they aren't installed.
                         magit
                         markdown-mode
                         nix-mode
+                        ox-gfm
                         paredit
                         plantuml-mode
                         projectile
@@ -487,9 +488,8 @@ spawn. TODO. Find a keybinding
 
 #+begin_src elisp
   (defun my-rust-mode ()
-    )
-
-  (add-hook 'rust-mode 'my-rust-mode)
+    (setq rustic-analyzer-command '("~/.nix-profile/bin/rust-analyzer ")))
+    (add-hook 'rustic-mode 'my-rust-mode)
 #+end_src
 
 ** ELISP
