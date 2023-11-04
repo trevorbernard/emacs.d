@@ -434,6 +434,12 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
 
+  ;; Double click on mac mouse trackpad
+  (eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
