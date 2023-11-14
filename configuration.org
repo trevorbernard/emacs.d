@@ -65,6 +65,7 @@ Install my packages if they aren't installed.
                         gradle-mode
                         htmlize
                         lsp-mode
+                        lsp-ui
                         magit
                         markdown-mode
                         nix-mode
@@ -161,7 +162,8 @@ practice, it will become intuitive.
   ;; Highlight selected Regions
   (transient-mark-mode 1)
   ;; Make pgup/dn remember current line
-  (setq scroll-preserve-screen-position t) 
+  (setq scroll-preserve-screen-position t)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
 Use spaces in favour of tabs because they are evil. But when there are
@@ -493,12 +495,8 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
-  (defun my-rust-mode ()
-    (display-line-number-mode)
-    (setq rustic-compile-command "just build")
-    (setq rustic-analyzer-command '("/opt/homebrew/Cellar/rust-analyzer/2023-10-30/bin/rust-analyzer")))
-
-    (add-hook 'rustic-mode-hook 'my-rust-mode)
+  (setq rustic-compile-command "just build")
+  (setq rustic-analyzer-command '("~/.nix-profile/bin/rust-analyzer"))
 #+end_src
 
 ** ELISP
