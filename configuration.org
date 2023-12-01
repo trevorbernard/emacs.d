@@ -73,7 +73,6 @@ Install my packages if they aren't installed.
                         paredit
                         plantuml-mode
                         projectile
-                        projectile-rails
                         protobuf-mode
                         rainbow-delimiters
                         rustic
@@ -361,20 +360,6 @@ them completely.
        (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
 #+end_src
 
-** PlantUML
-
-Easily create beautiful UML Diagrams from simple textual description.
-
-#+begin_src elisp
-  (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
-  (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
-
-  (setq plantuml-default-exec-mode 'jar)
-  (setq plantuml-jar-path (expand-file-name "~/plantuml.jar"))
-
-  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-#+end_src
-
 ** Org Mode
 
 I almost exclusively use =C-j= in place of hitting the enter key. The
@@ -461,26 +446,6 @@ Use diff-mode when editing a git commit message
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+end_src
 
-** Python
-
-#+begin_src emacs-lisp
-  ;;  (elpy-enable)
-  ;;  (add-hook 'python-mode-hook 'elpy-enable)
-#+end_src
-   
-** Java
-
-#+begin_src elisp
-  (require 'eclim)
-  (setq eclimd-autostart t)
-
-  (defun my-java-mode-hook ()
-    (eclim-mode t)
-    )
-
-  (add-hook 'java-mode-hook 'my-java-mode-hook)
-#+end_src
-   
 ** Terminal Emulation
 
 Calling =M-x ansi-term= will prompt you for which shell you want to
