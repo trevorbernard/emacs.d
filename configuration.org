@@ -119,9 +119,10 @@ Ignore minimize functionality when you're in a GUI because it's very
 annoying to accidently minimize your window.
   
 #+begin_src emacs-lisp
-  (when window-system
-    (global-set-key "\C-z" 'ignore)
-    (global-set-key "\C-x\C-z" 'ignore))
+    (when window-system
+      (set-frame-parameter (selected-frame) 'alpha '(90 . 50))
+      (global-set-key "\C-z" 'ignore)
+      (global-set-key "\C-x\C-z" 'ignore))
 #+end_src
 
 *** Invoke M-x without the Alt key
