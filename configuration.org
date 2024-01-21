@@ -92,15 +92,17 @@ dependency on the mouse. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
+   (setq inhibit-startup-message t)
 
-  (load-theme 'dracula t)
+   (load-theme 'dracula t)
 
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode) (funcall mode -1)))
+   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+     (when (fboundp mode) (funcall mode -1)))
 
-  (when window-system
-    (set-frame-font "Fira Code Retina 18" nil t))
+   (when window-system
+     (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
+     (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
+     (set-frame-font "Fira Code Retina 18" nil t))
 
 #+end_src
 
@@ -120,7 +122,6 @@ annoying to accidently minimize your window.
   
 #+begin_src emacs-lisp
     (when window-system
-      (set-frame-parameter (selected-frame) 'alpha '(90 . 50))
       (global-set-key "\C-z" 'ignore)
       (global-set-key "\C-x\C-z" 'ignore))
 #+end_src
