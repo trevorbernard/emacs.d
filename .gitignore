@@ -13,3 +13,4 @@ projectile-bookmarks.eld
 transient/*
 .lsp-session-*
 eln-cache/*
+projects

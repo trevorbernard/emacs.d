@@ -26,7 +26,7 @@ Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font becaus
 a wonderful font. You will need ispell installed in order to user
 Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
-** Emacs Initialization
+** COMMENT Emacs Initialization
 
 I use melpa and melpa stable for my packages.
 
@@ -64,6 +64,7 @@ Install my packages if they aren't installed.
                         flycheck-plantuml
                         gradle-mode
                         htmlize
+                        just-mode
                         lsp-mode
                         lsp-ui
                         magit
