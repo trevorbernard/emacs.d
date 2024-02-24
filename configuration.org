@@ -57,6 +57,7 @@ Install my packages if they aren't installed.
                         cider
                         clj-refactor
                         clojure-mode
+                        csv-mode
                         company
                         dockerfile-mode
                         dracula-theme
@@ -77,6 +78,7 @@ Install my packages if they aren't installed.
                         protobuf-mode
                         rainbow-delimiters
                         rustic
+                        string-inflection
                         terraform-mode
                         tuareg
                         yaml-mode)
