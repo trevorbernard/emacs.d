@@ -47,46 +47,47 @@ compatability problems in the past so pin it to melpa-stable.
 Install my packages if they aren't installed.
 
 #+begin_src emacs-lisp
-  (package-initialize)
+    (package-initialize)
 
-  (when (not package-archive-contents)
-    (package-refresh-contents))
+    (when (not package-archive-contents)
+      (package-refresh-contents))
 
-  (defvar my-packages '(ag
-                        bnf-mode
-                        cider
-                        clj-refactor
-                        clojure-mode
-                        csv-mode
-                        company
-                        dockerfile-mode
-                        dracula-theme
-                        eclim
-                        flycheck-plantuml
-                        gradle-mode
-                        htmlize
-                        just-mode
-                        lsp-mode
-                        lsp-ui
-                        magit
-                        markdown-mode
-                        nix-mode
-                        ox-gfm
-                        paredit
-                        plantuml-mode
-                        projectile
-                        protobuf-mode
-                        rainbow-delimiters
-                        rustic
-                        string-inflection
-                        terraform-mode
-                        tuareg
-                        yaml-mode)
-    "A list of packages to ensure are installed at launch.")
+    (defvar my-packages '(ag
+                          bnf-mode
+                          cider
+                          clj-refactor
+                          clojure-mode
+                          csv-mode
+                          company
+                          dockerfile-mode
+                          ;;dracula-theme
+                          eclim
+                          flycheck-plantuml
+                          gradle-mode
+                          htmlize
+                          just-mode
+                          lsp-mode
+                          lsp-ui
+                          magit
+                          markdown-mode
+                          nix-mode
+                          ox-gfm
+                          paredit
+                          plantuml-mode
+                          projectile
+                          protobuf-mode
+                          rainbow-delimiters
+                          rustic
+                          string-inflection
+                          terraform-mode
+                          timu-spacegrey-theme
+                          tuareg
+                          yaml-mode)
+      "A list of packages to ensure are installed at launch.")
 
-  (dolist (p my-packages)
-    (when (not (package-installed-p p))
-      (package-install p)))
+    (dolist (p my-packages)
+      (when (not (package-installed-p p))
+        (package-install p)))
 #+end_src
 
 I like to have my Emacs clean, chrisp and minimal. Removing the menu
@@ -95,17 +96,18 @@ dependency on the mouse. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-   (setq inhibit-startup-message t)
+  (setq inhibit-startup-message t)
 
-   (load-theme 'dracula t)
+  ;; (load-theme 'dracula t)
+  (load-theme 'timu-spacegrey t)
 
-   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-     (when (fboundp mode) (funcall mode -1)))
+  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+    (when (fboundp mode) (funcall mode -1)))
 
-   (when window-system
-     (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
-     (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
-     (set-frame-font "Fira Code Retina 18" nil t))
+  (when window-system
+  ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
+  ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
+    (set-frame-font "Fira Code Retina 18" nil t))
 
 #+end_src
 
