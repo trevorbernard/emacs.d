@@ -475,15 +475,10 @@ spawn. TODO. Find a keybinding
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
     (yas-minor-mode))
 
-  (add-hook 'rust-mode-hook 'eglot-ensure)
   (add-hook 'rust-mode-hook 'my-rust-mode-hook)
-  (add-to-list 'eglot-server-programs
-               '((rust-ts-mode rust-mode) .
-                 ("rust-analyzer" :initializationOptions (:check (:command "clippy")))))
-  (setq rustic-compile-command "just build")
-  ;;(setq rustic-analyzer-command '("~/.nix-profile/bin/rust-analyzer"))
+  (add-hook 'rust-mode-hook 'eglot-ensure)
 
-
+  (setq rustic-compile-command "cargo b --release")
 #+end_src
 
 ** ELISP
