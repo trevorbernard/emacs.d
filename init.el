@@ -7,7 +7,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(hurl-mode request treemacs tree-sitter-langs graphql-ts-mode nixpkgs-fmt timu-spacegrey-theme string-inflection csv-mode just-mode yaml-mode tuareg terraform-mode rustic rainbow-delimiters protobuf-mode projectile ox-gfm nix-mode magit lsp-ui lsp-mode htmlize dockerfile-mode company cider transient bnf-mode))
+   '(benchmark-init hurl-mode request treemacs tree-sitter-langs graphql-ts-mode nixpkgs-fmt timu-spacegrey-theme string-inflection csv-mode just-mode yaml-mode tuareg terraform-mode rustic rainbow-delimiters protobuf-mode projectile ox-gfm nix-mode magit lsp-ui lsp-mode htmlize dockerfile-mode company cider transient bnf-mode))
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(rustic-ansi-faces
