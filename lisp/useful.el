@@ -63,10 +63,3 @@ With numeric prefix arg DEC, decrement the integer by DEC amount."
 
 (global-set-key (kbd "C-c +") #'increment-integer-at-point)
 (global-set-key (kbd "C-c -") #'decrement-integer-at-point)
-
-
-(defun set-git-commit-hash-env ()
-  "Set the GIT_COMMIT_HASH environment variable in Emacs."
-  (let ((commit-hash (string-trim (shell-command-to-string "git rev-parse --short=8 HEAD"))))
-    (setenv "GIT_COMMIT_HASH" commit-hash)
-    (message "GIT_COMMIT_HASH set to %s" commit-hash)))
