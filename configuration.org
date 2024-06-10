@@ -468,18 +468,32 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
-    (require 'eglot)
+  (require 'eglot)
 
-    (defun my-rust-mode-hook ()
-      (set-git-commit-hash-env)
-      (setq rustic-cargo-build-arguments "--release")
-      (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-      (yas-minor-mode))
+  (defun set-git-commit-hash-env ()
+    "Set the GIT_COMMIT_HASH environment variable in Emacs."
+    (let ((commit-hash (string-trim (shell-command-to-string "git rev-parse --short=8 HEAD"))))
+      (setenv "GIT_COMMIT_HASH" commit-hash)
+      (message "GIT_COMMIT_HASH set to %s" commit-hash)))
 
-    (add-hook 'rust-mode-hook 'my-rust-mode-hook)
-    (add-hook 'rust-mode-hook 'eglot-ensure)
+  (defun my-rust-mode-hook ()
+    (define-key rustic-mode-map (kbd "M-j") 'lsp-ui-imenu)
+    (define-key rustic-mode-map (kbd "M-?") 'lsp-find-references)
+    (define-key rustic-mode-map (kbd "C-c C-c l") 'flycheck-list-errors)
+    (define-key rustic-mode-map (kbd "C-c C-c a") 'lsp-execute-code-action)
+    (define-key rustic-mode-map (kbd "C-c C-c r") 'lsp-rename)
+    (define-key rustic-mode-map (kbd "C-c C-c q") 'lsp-workspace-restart)
+    (define-key rustic-mode-map (kbd "C-c C-c Q") 'lsp-workspace-shutdown)
+    (define-key rustic-mode-map (kbd "C-c C-c s") 'lsp-rust-analyzer-status)
+    ;; (set-git-commit-hash-env)
+    (setq rustic-cargo-build-arguments "--release")
+    (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
+    (yas-minor-mode))
 
-    (setq rustic-compile-command "cargo b --release")
+  (add-hook 'rust-mode-hook 'my-rust-mode-hook)
+  (add-hook 'rust-mode-hook 'eglot-ensure)
+
+  (setq rustic-compile-command "cargo b --release")
 #+end_src
 
 ** ELISP
