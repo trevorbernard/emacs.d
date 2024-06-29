@@ -469,6 +469,25 @@ spawn. TODO. Find a keybinding
 
 #+begin_src elisp
   (require 'eglot)
+  (require 'rustic)
+
+  (defun my-eglot-auto-imports ()
+    "Automatically import missing imports using eglot."
+    (interactive)
+    (eglot-code-actions nil nil "quickfix" t))
+
+
+  ;; Set my custom key bindings when rust programming
+  (with-eval-after-load 'rustic
+    (define-key rustic-mode-map (kbd "C-c C-c i") #'my-eglot-auto-imports)
+    (define-key rustic-mode-map (kbd "M-j") #'lsp-ui-imenu)
+    (define-key rustic-mode-map (kbd "M-?") #'lsp-find-references)
+    (define-key rustic-mode-map (kbd "C-c C-c l") #'flycheck-list-errors)
+    (define-key rustic-mode-map (kbd "C-c C-c a") #'lsp-execute-code-action)
+    (define-key rustic-mode-map (kbd "C-c C-c r") #'lsp-rename)
+    (define-key rustic-mode-map (kbd "C-c C-c q") #'lsp-workspace-restart)
+    (define-key rustic-mode-map (kbd "C-c C-c Q") #'lsp-workspace-shutdown)
+    (define-key rustic-mode-map (kbd "C-c C-c s") #'lsp-rust-analyzer-status))
 
   (defun set-git-commit-hash-env ()
     "Set the GIT_COMMIT_HASH environment variable in Emacs."
@@ -477,14 +496,6 @@ spawn. TODO. Find a keybinding
       (message "GIT_COMMIT_HASH set to %s" commit-hash)))
 
   (defun my-rust-mode-hook ()
-    (define-key rustic-mode-map (kbd "M-j") 'lsp-ui-imenu)
-    (define-key rustic-mode-map (kbd "M-?") 'lsp-find-references)
-    (define-key rustic-mode-map (kbd "C-c C-c l") 'flycheck-list-errors)
-    (define-key rustic-mode-map (kbd "C-c C-c a") 'lsp-execute-code-action)
-    (define-key rustic-mode-map (kbd "C-c C-c r") 'lsp-rename)
-    (define-key rustic-mode-map (kbd "C-c C-c q") 'lsp-workspace-restart)
-    (define-key rustic-mode-map (kbd "C-c C-c Q") 'lsp-workspace-shutdown)
-    (define-key rustic-mode-map (kbd "C-c C-c s") 'lsp-rust-analyzer-status)
     ;; (set-git-commit-hash-env)
     (setq rustic-cargo-build-arguments "--release")
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
