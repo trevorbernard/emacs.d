@@ -65,6 +65,7 @@ Install my packages if they aren't installed.
                         flycheck-plantuml
                         gradle-mode
                         htmlize
+                        ivy
                         just-mode
                         lsp-mode
                         lsp-ui
@@ -99,11 +100,10 @@ strokes until they are second nature. You can thank me later.
 #+begin_src emacs-lisp
   (setq inhibit-startup-message t)
 
-  ;; (load-theme 'dracula t)
-  (load-theme 'timu-spacegrey t)
-
   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
     (when (fboundp mode) (funcall mode -1)))
+
+  (load-theme 'timu-spacegrey t)
 
   (when window-system
   ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
@@ -242,9 +242,18 @@ Bind projectile to =C-c p= and enable by default.
 ** Projectile Mode
 
 #+begin_src emacs-lisp
-  (setq projectile-project-search-path '("~/p/"))
-  (setq projectile-keymap-prefix (kbd "C-c p"))
-  (projectile-mode +1)
+  (autoload 'projectile-mode "projectile" nil t)
+  (autoload 'projectile-command-map "projectile" nil t)
+
+  (with-eval-after-load 'projectile
+    (setq projectile-project-search-path '("~/p/"))
+    (setq projectile-keymap-prefix (kbd "C-c p"))
+    (setq projectile-completion-system 'ivy)
+    (projectile-mode +1))
+
+  (add-hook 'after-init-hook 'projectile-mode)
+
+  (global-set-key (kbd "C-c p") 'projectile-command-map)
 #+end_src
   
 ** Magit
@@ -350,11 +359,10 @@ settings for "Move left a space" and "Move right a space" or disable
 them completely.
 
 #+begin_src emacs-lisp
-  (eval-after-load 'paredit
-    '(progn
-       (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
-       (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
-       (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word)))
+  (with-eval-after-load 'paredit
+    (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
+    (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
+    (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word))
 #+end_src
 
 ** Org Mode
@@ -365,18 +373,23 @@ very annoying in when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c l") #'org-store-link)
-  (global-set-key (kbd "C-c a") #'org-agenda)
-  (global-set-key (kbd "C-c c") #'org-capture)
+  (autoload 'org-mode "org-mode" nil t)
+
+  (with-eval-after-load 'org-mode
+    (define-key org-mode-map (kbd "C-j") 'org-return)
+    (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+    (define-key org-mode-map (kbd "C-c l") #'org-store-link)
+    (define-key org-mode-map (kbd "C-c a") #'org-agenda)
+    (define-key org-mode-map (kbd "C-c c") #'org-capture))
 
   (defun my-org-mode-hook ()
     (turn-on-auto-fill)
-    (define-key org-mode-map (kbd "C-j") 'org-return)
     (org-babel-do-load-languages 
      'org-babel-load-languages '((clojure . t)
                                  (plantuml . t)
                                  (rust . t)
                                  (shell . t))))
+
   (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+end_src
 
@@ -395,6 +408,8 @@ packages only when they are missing.
 ** JavaScript
 
 #+begin_src emacs-lisp
+  (autoload 'js-mode "js-mode" nil t)
+
   (defun my-js-mode-hook ()
     (setq js-indent-level 2))
 
@@ -419,10 +434,9 @@ packages only when they are missing.
   (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
 
   ;; Double click on mac mouse trackpad
-  (eval-after-load "flyspell"
-    '(progn
-       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+  (with-eval-after-load 'flyspell
+    (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+    (define-key flyspell-mouse-map [mouse-3] #'undefined))
 
   (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
@@ -457,48 +471,45 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
-  (require 'eglot)
-  (require 'rustic)
+    (require 'eglot)
+    (require 'rustic)
 
-  (defun my-eglot-auto-imports ()
-    "Automatically import missing imports using eglot."
-    (interactive)
-    (eglot-code-actions nil nil "quickfix" t))
+  ;;;###autoload
+    (defun my-eglot-auto-imports ()
+      "Automatically import missing imports using eglot."
+      (interactive)
+      (eglot-code-actions nil nil "quickfix" t))
 
+    (autoload 'rust-mode-hook "rust-mode" nil t)
 
-  ;; Set my custom key bindings when rust programming
-  (with-eval-after-load 'rustic
-    (define-key rustic-mode-map (kbd "C-c C-c i") #'my-eglot-auto-imports)
-    (define-key rustic-mode-map (kbd "M-j") #'lsp-ui-imenu)
-    (define-key rustic-mode-map (kbd "M-?") #'lsp-find-references)
-    (define-key rustic-mode-map (kbd "C-c C-c l") #'flycheck-list-errors)
-    (define-key rustic-mode-map (kbd "C-c C-c a") #'lsp-execute-code-action)
-    (define-key rustic-mode-map (kbd "C-c C-c r") #'lsp-rename)
-    (define-key rustic-mode-map (kbd "C-c C-c q") #'lsp-workspace-restart)
-    (define-key rustic-mode-map (kbd "C-c C-c Q") #'lsp-workspace-shutdown)
-    (define-key rustic-mode-map (kbd "C-c C-c s") #'lsp-rust-analyzer-status))
+    ;; Set my custom key bindings when rust programming
+    (with-eval-after-load 'rustic
+      (define-key rustic-mode-map (kbd "C-c C-c i") #'my-eglot-auto-imports)
+      (define-key rustic-mode-map (kbd "M-j") #'lsp-ui-imenu)
+      (define-key rustic-mode-map (kbd "M-?") #'lsp-find-references)
+      (define-key rustic-mode-map (kbd "C-c C-c l") #'flycheck-list-errors)
+      (define-key rustic-mode-map (kbd "C-c C-c a") #'lsp-execute-code-action)
+      (define-key rustic-mode-map (kbd "C-c C-c r") #'lsp-rename)
+      (define-key rustic-mode-map (kbd "C-c C-c q") #'lsp-workspace-restart)
+      (define-key rustic-mode-map (kbd "C-c C-c Q") #'lsp-workspace-shutdown)
+      (define-key rustic-mode-map (kbd "C-c C-c s") #'lsp-rust-analyzer-status)
 
-  (defun set-git-commit-hash-env ()
-    "Set the GIT_COMMIT_HASH environment variable in Emacs."
-    (let ((commit-hash (string-trim (shell-command-to-string "git rev-parse --short=8 HEAD"))))
-      (setenv "GIT_COMMIT_HASH" commit-hash)
-      (message "GIT_COMMIT_HASH set to %s" commit-hash)))
+      (setq rustic-compile-command "cargo b --release")
+      (setq rustic-cargo-build-arguments "--release")
+      (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings"))
 
-  (defun my-rust-mode-hook ()
-    ;; (set-git-commit-hash-env)
-    (setq rustic-cargo-build-arguments "--release")
-    (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (yas-minor-mode))
+    (defun my-rust-mode-hook ()
+      (yas-minor-mode))
 
-  (add-hook 'rust-mode-hook 'my-rust-mode-hook)
-  (add-hook 'rust-mode-hook 'eglot-ensure)
-
-  (setq rustic-compile-command "cargo b --release")
+    (add-hook 'rust-mode-hook 'my-rust-mode-hook)
+    (add-hook 'rust-mode-hook 'eglot-ensure)
 #+end_src
 
 ** ELISP
 
 #+begin_src elisp
+  (autoload 'ielm-mode "ielm-mode" nil t)
+
   (defun my-ielm-mode-hook ()
     (paredit-mode 1)
     (rainbow-delimiters-mode 1)
@@ -511,6 +522,8 @@ spawn. TODO. Find a keybinding
 ** OCaml
 
 #+begin_src elisp
+  (autoload 'tuareg-mode-hook "ocaml" nil t)
+
   (defun my-ocaml-mode-hook ())
 
   (add-hook 'tuareg-mode-hook 'my-ocaml-mode-hook)
@@ -519,6 +532,8 @@ spawn. TODO. Find a keybinding
 ** Nix
 
 #+begin_src elisp
+  (autoload 'nix-mode "nix-mode" nil t)
+
   (defun my-nix-mode-hook ()
     (nixpkgs-fmt-on-save-mode)
     (define-key 'nix-mode-map (kbd "C-c C-f") 'nixpkgs-fmt))
