@@ -11,7 +11,12 @@
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(rustic-ansi-faces
-   ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"]))
+   ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"])
+ '(safe-local-variable-values
+   '((eval with-eval-after-load 'lsp-mode
+           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cargo\\'")
+           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\ops\\'")
+           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\docs\\'")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
