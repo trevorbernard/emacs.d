@@ -11,8 +11,9 @@ This is my emacs, there are many like it, but this one is mine...
 ** Getting Started
 
 The very first thing you need to have installed is a recent version of
-Emacs. I believe the minimum supported version is Emacs 24 otherwise
-you'll have to install =package.el= and you're on your own.
+Emacs. I'm in the middle of converting my =package.el= configuration
+to =use-package=. I'm unsure what is the minimum supported version
+anymore but Emacs 29.x includes eglot and use-package.
 
 I strongly suggest you remap your cap locks key to control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
