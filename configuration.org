@@ -73,8 +73,6 @@ to =use-package=.
   (defvar my-packages '(ag
                         bnf-mode
                         cider
-                        clj-refactor
-                        clojure-mode
                         csv-mode
                         company
                         dockerfile-mode
@@ -285,37 +283,35 @@ Bind projectile to =C-c p= and enable by default.
 
 ** Clojure
 
+
 #+begin_src emacs-lisp
-  (require 'cider)
-  (require 'clojure-mode)
-  (require 'company)
-
-  (setq nrepl-log-messages t)
-  (setq cider-repl-use-clojure-font-lock t)
-  (setq cider-repl-display-help-banner nil)
-
-  (defun my-cider-repl-mode-hook ()
-    (company-mode 1)
-    (paredit-mode 1)
-    (rainbow-delimiters-mode 1))
-
-  (defun my-cider-mode-hook ()
-    (company-mode 1)
-    (eldoc-mode 1))
-
-  (defun my-clojure-mode-hook ()
+  (use-package clojure-mode
+    :ensure t
+    :defer t
+    :config
     (setq show-trailing-whitespace 1)
     (setq clojure-align-forms-automatically t)
-    (clj-refactor-mode 1)
-    (rainbow-delimiters-mode 1)
-    (linum-mode t)
-    (paredit-mode 1)
-    (subword-mode t)
-    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
+    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
+    (add-hook 'clojure-mode-hook #'paredit-mode)
+    (add-hook 'clojure-mode-hook #'subword-mode)
+    (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
-  (add-hook 'cider-repl-mode-hook 'my-cider-repl-mode-hook)
-  (add-hook 'cider-mode-hook 'my-cider-mode-hook)
-  (add-hook 'clojure-mode-hook 'my-clojure-mode-hook)
+  (use-package inf-clojure
+    :ensure t
+    :defer t
+    :config
+    (add-hook 'inf-clojure-mode-hook #'paredit-mode)
+    (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
+
+  (use-package cider
+    :ensure t
+    :defer t
+    :config
+    (setq nrepl-log-messages t)
+    (setq cider-repl-use-clojure-font-lock t)
+    (setq cider-repl-display-help-banner nil)
+    (add-hook 'cider-repl-mode-hook #'paredit-mode)
+    (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 #+end_src
 
 I have long since used this key binding to jack into a repl. My
