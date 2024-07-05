@@ -91,7 +91,6 @@ to =use-package=.
                         nixpkgs-fmt
                         ox-gfm
                         paredit
-                        projectile
                         rainbow-delimiters
                         rustic
                         string-inflection
@@ -257,18 +256,18 @@ Bind projectile to =C-c p= and enable by default.
 ** Projectile Mode
 
 #+begin_src emacs-lisp
-  (autoload 'projectile-mode "projectile" nil t)
-  (autoload 'projectile-command-map "projectile" nil t)
-
-  (with-eval-after-load 'projectile
+  (use-package projectile
+    :ensure t
+    :defer t
+    :commands (projectile-mode projectile-command-map)
+    :init
     (setq projectile-project-search-path '("~/p/"))
     (setq projectile-keymap-prefix (kbd "C-c p"))
     (setq projectile-completion-system 'ivy)
-    (projectile-mode +1))
-
-  (add-hook 'after-init-hook 'projectile-mode)
-
-  (global-set-key (kbd "C-c p") 'projectile-command-map)
+    :config
+    (projectile-mode +1)
+    :bind-keymap
+    ("C-c p" . projectile-command-map))
 #+end_src
   
 ** Magit
