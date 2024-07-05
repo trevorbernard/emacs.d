@@ -1,6 +1,5 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Trevor Bernard
-#+EMAIL: trevor@bernard.gg
 #+LANGUAGE: en
 
 * Configuration
