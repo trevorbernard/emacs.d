@@ -72,7 +72,6 @@ to =use-package=.
 #+begin_src emacs-lisp
   (defvar my-packages '(ag
                         bnf-mode
-                        cider
                         csv-mode
                         company
                         dockerfile-mode
