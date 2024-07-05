@@ -1,5 +1,4 @@
-
-+TITLE: Emacs Configuration
+#+TITLE: Emacs Configuration
 #+AUTHOR: Trevor Bernard
 #+LANGUAGE: en
 
@@ -66,7 +65,7 @@ strokes until they are second nature. You can thank me later.
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+end_src
 
-Install my packages if they aren't installed.
+Ensure =use-package= is installed.
 
 #+begin_src emacs-lisp
   (package-initialize)
@@ -82,20 +81,13 @@ Install my packages if they aren't installed.
     (package-refresh-contents))
 #+end_src
 
-Deprecating the use of =package.el=. Remove when full switched over
-to =use-package=.
+Load theme
 
 #+begin_src emacs-lisp
-    (defvar my-packages '(timu-spacegrey-theme)
-      "A list of packages to ensure are installed at launch.")
-
-    (dolist (p my-packages)
-      (when (not (package-installed-p p))
-	(package-install p)))
-#+end_src
-
-#+begin_src emacs-lisp
-    (load-theme 'timu-spacegrey t)
+    (use-package timu-spacegrey-theme
+      :ensure t
+      :config
+      (load-theme 'timu-spacegrey t))
 #+end_src
 
 ** Personal
@@ -211,9 +203,6 @@ Allow functions without issuing warnings
 
     ;; Don't open files from the workspace in a new frame
     (setq ns-pop-up-frames nil)
-
-    ;; Use aspell for spell checking: brew install aspell --lang=en
-;;    (setq ispell-program-name "/opt/homebrew/bin/aspell")
 
     ;; Open up links in Google Chrome
     (setq browse-url-browser-function 'browse-url-default-macosx-browser))
@@ -341,7 +330,12 @@ function but it might be useful to someone eventually.
 ** Elisp
 
 #+begin_src emacs-lisp
-  (add-hook #'emacs-lisp-mode-hook #'eldoc-mode)
+  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
+  (add-hook 'ielm-mode-hook #'paredit-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
 #+end_src
 
 ** Paredit
@@ -361,14 +355,7 @@ them completely.
           ("C-<right>" . paredit-forward-slurp-sexp)
           ("C-<left>" . paredit-forward-barf-sexp)
           ("C-<backspace>" . paredit-backward-kill-word)
-          ("RET" . nil))
-    :config
-    (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-    ;; enable in the *scratch* buffer
-    (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-    (add-hook 'ielm-mode-hook #'paredit-mode)
-    (add-hook 'lisp-mode-hook #'paredit-mode)
-    (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
+          ("RET" . nil)))
 #+end_src
 
 ** Org Mode

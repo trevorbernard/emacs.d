@@ -7,7 +7,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(javascript-mode js-mode company yasnippet ob-rust lsp-ivy ivy direnv benchmark-init hurl-mode request treemacs tree-sitter-langs graphql-ts-mode nixpkgs-fmt timu-spacegrey-theme string-inflection csv-mode just-mode yaml-mode tuareg terraform-mode rustic rainbow-delimiters protobuf-mode projectile ox-gfm nix-mode magit lsp-ui lsp-mode htmlize dockerfile-mode cider transient bnf-mode))
+   '(yasnippet string-inflection ag htmlize bnf-mode yaml-mode dockerfile-mode just-mode csv-mode terraform-mode nix-mode nixpkgs-fmt tuareg rustic lsp-ui lsp-mode ivy markdown-mode ox-gfm ob-rust paredit cider inf-clojure clojure-mode company rainbow-delimiters magit projectile timu-spacegrey-theme hurl-mode))
  '(rustic-ansi-faces
    ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"])
  '(safe-local-variable-values
