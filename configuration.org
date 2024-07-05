@@ -60,9 +60,7 @@ Install my packages if they aren't installed.
                         csv-mode
                         company
                         dockerfile-mode
-                        eclim
                         eglot
-                        flycheck-plantuml
                         gradle-mode
                         htmlize
                         ivy
@@ -75,9 +73,7 @@ Install my packages if they aren't installed.
                         nixpkgs-fmt
                         ox-gfm
                         paredit
-                        plantuml-mode
                         projectile
-                        protobuf-mode
                         rainbow-delimiters
                         rustic
                         string-inflection
@@ -507,14 +503,18 @@ spawn. TODO. Find a keybinding
 
 ** ELISP
 
+An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
+
 #+begin_src elisp
   (autoload 'ielm-mode "ielm-mode" nil t)
 
-  (defun my-ielm-mode-hook ()
-    (paredit-mode 1)
-    (rainbow-delimiters-mode 1)
+  (with-eval-after-load 'ielm-mode
     (define-key ielm-map (kbd "C-m") 'ielm-return)
     (define-key ielm-map (kbd "<return>") 'ielm-return))
+
+  (defun my-ielm-mode-hook ()
+    (paredit-mode 1)
+    (rainbow-delimiters-mode 1))
 
   (add-hook 'ielm-mode-hook 'my-ielm-mode-hook)
 #+end_src
@@ -534,9 +534,11 @@ spawn. TODO. Find a keybinding
 #+begin_src elisp
   (autoload 'nix-mode "nix-mode" nil t)
 
-  (defun my-nix-mode-hook ()
-    (nixpkgs-fmt-on-save-mode)
+  (with-eval-after-load 'nix-mode
     (define-key 'nix-mode-map (kbd "C-c C-f") 'nixpkgs-fmt))
+
+  (defun my-nix-mode-hook ()
+    (nixpkgs-fmt-on-save-mode))
 
   (add-hook 'nix-mode-hook 'my-nix-mode-hook)
 
