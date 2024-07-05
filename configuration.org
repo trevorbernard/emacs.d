@@ -363,7 +363,6 @@ function but it might be useful to someone eventually.
 ** Elisp
 
 #+begin_src emacs-lisp
-  (add-hook #'emacs-lisp-mode-hook #'paredit-mode)
   (add-hook #'emacs-lisp-mode-hook #'eldoc-mode)
 #+end_src
 
@@ -378,7 +377,15 @@ them completely.
 
 #+begin_src emacs-lisp
   (use-package paredit
-    :ensure t)
+    :ensure t
+    :config
+    (define-key paredit-mode-map (kbd "RET") nil)
+    (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+    ;; enable in the *scratch* buffer
+    (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
+    (add-hook 'ielm-mode-hook #'paredit-mode)
+    (add-hook 'lisp-mode-hook #'paredit-mode)
+    (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
 
   (with-eval-after-load 'paredit
     (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
