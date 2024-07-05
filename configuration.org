@@ -85,7 +85,6 @@ to =use-package=.
                         just-mode
                         lsp-mode
                         lsp-ui
-                        magit
                         markdown-mode
                         nix-mode
                         nixpkgs-fmt
@@ -276,7 +275,12 @@ Bind projectile to =C-c p= and enable by default.
 =magit-file-dispatch=
    
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c g") 'magit-file-dispatch)
+  (use-package magit
+    :ensure t
+    :defer t
+    :bind
+    ("C-x g" . magit-status)
+    ("C-c g" . magit-file-dispatch))
 #+end_src
 
 ** Clojure
