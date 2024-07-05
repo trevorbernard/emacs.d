@@ -1,3 +1,4 @@
+
 +TITLE: Emacs Configuration
 #+AUTHOR: Trevor Bernard
 #+LANGUAGE: en
@@ -37,18 +38,33 @@ I use melpa and melpa stable for my packages.
   (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 #+end_src
 
-I don't like my cider to be bleeding edge since it's caused
-compatability problems in the past so pin it to melpa-stable.
-
-#+begin_src emacs-lisp
-  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-#+end_src
-
 Set the default GC threshold to be 100MB to increase startup
 performance. Reset back to default at the end of file.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 100))
+#+end_src
+
+I like to have my Emacs clean, chrisp, and minimal. Removing the menu
+bar, tool bar, and scroll bar frees some space and it helps remove
+dependency on the mouse. Protip: Learn the Emacs navigation key
+strokes until they are second nature. You can thank me later.
+
+#+begin_src emacs-lisp
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+  (setq inhibit-startup-message t)
+
+  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+    (when (fboundp mode) (funcall mode -1)))
+
+  (when window-system
+    ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
+    ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
+    (set-frame-font "Fira Code Retina 18" nil t))
+
+  ;; some breathing room
+  (set-fringe-mode 10)
 #+end_src
 
 Install my packages if they aren't installed.
@@ -62,7 +78,7 @@ Install my packages if they aren't installed.
 
   (require 'use-package)
   (setq use-package-always-ensure t)
-
+    
   (when (not package-archive-contents)
     (package-refresh-contents))
 #+end_src
@@ -71,48 +87,27 @@ Deprecating the use of =package.el=. Remove when full switched over
 to =use-package=.
 
 #+begin_src emacs-lisp
-  (defvar my-packages '(ag
-                        bnf-mode
-                        csv-mode
-                        dockerfile-mode
-                        gradle-mode
-                        htmlize
-                        just-mode
-                        markdown-mode
-                        nix-mode
-                        nixpkgs-fmt
-                        ox-gfm
-                        rainbow-delimiters
-                        string-inflection
-                        terraform-mode
-                        timu-spacegrey-theme
-                        tuareg
-                        yaml-mode)
-    "A list of packages to ensure are installed at launch.")
+    (defvar my-packages '(ag
+			  bnf-mode
+			  csv-mode
+			  dockerfile-mode
+			  htmlize
+			  just-mode
+			  markdown-mode
+			  ox-gfm
+			  string-inflection
+			  timu-spacegrey-theme
+			  yaml-mode)
+      "A list of packages to ensure are installed at launch.")
 
-  (dolist (p my-packages)
-    (when (not (package-installed-p p))
-      (package-install p)))
+    (dolist (p my-packages)
+      (when (not (package-installed-p p))
+	(package-install p)))
 
 #+end_src
-I like to have my Emacs clean, chrisp, and minimal. Removing the menu
-bar, tool bar, and scroll bar frees some space and it helps remove
-dependency on the mouse. Protip: Learn the Emacs navigation key
-strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
-
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode) (funcall mode -1)))
-
-  (when window-system
-  ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
-  ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
-    (set-frame-font "Fira Code Retina 18" nil t))
-
-  (load-theme 'timu-spacegrey t)
-  (set-fringe-mode 10) ; breathing room
+    (load-theme 'timu-spacegrey t)
 #+end_src
 
 ** Personal
@@ -282,7 +277,14 @@ Bind projectile to =C-c p= and enable by default.
 
 ** Clojure
 
+I don't like my cider to be bleeding edge since it's caused
+compatability problems in the past so pin it to melpa-stable.
+
 #+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :defer t)
+
   (use-package company
     :ensure t
     :defer t)
@@ -308,6 +310,7 @@ Bind projectile to =C-c p= and enable by default.
   (use-package cider
     :ensure t
     :defer t
+    :pin melpa-stable
     :config
     (setq nrepl-log-messages t)
     (setq cider-repl-use-clojure-font-lock t)
@@ -378,19 +381,19 @@ them completely.
 #+begin_src emacs-lisp
   (use-package paredit
     :ensure t
+    :bind
+    (:map paredit-mode-map
+          ("C-<right>" . paredit-forward-slurp-sexp)
+          ("C-<left>" . paredit-forward-barf-sexp)
+          ("C-<backspace>" . paredit-backward-kill-word)
+          ("RET" . nil))
     :config
-    (define-key paredit-mode-map (kbd "RET") nil)
     (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
     ;; enable in the *scratch* buffer
     (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
     (add-hook 'ielm-mode-hook #'paredit-mode)
     (add-hook 'lisp-mode-hook #'paredit-mode)
     (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
-
-  (with-eval-after-load 'paredit
-    (define-key paredit-mode-map (kbd "C-<right>") 'paredit-forward-slurp-sexp)
-    (define-key paredit-mode-map (kbd "C-<left>") 'paredit-forward-barf-sexp)
-    (define-key paredit-mode-map (kbd "C-<backspace>") 'paredit-backward-kill-word))
 #+end_src
 
 ** Org Mode
@@ -401,23 +404,25 @@ very annoying in when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
-  (autoload 'org-mode "org-mode" nil t)
+  (use-package ob-rust
+    :ensure t)
 
-  (with-eval-after-load 'org-mode
-    (define-key org-mode-map (kbd "C-j") 'org-return)
-    (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-    (define-key org-mode-map (kbd "C-c l") #'org-store-link)
-    (define-key org-mode-map (kbd "C-c a") #'org-agenda)
-    (define-key org-mode-map (kbd "C-c c") #'org-capture))
-
-  (defun my-org-mode-hook ()
+  (use-package org
+    :ensure ob-rust
+    :defer t
+    :bind
+    (:map
+     org-mode-map
+     ("C-j" . org-return)
+     ("C-c ]" . org-ref-insert-link)
+     ("C-c l" . org-store-link)
+     ("C-c a" . org-agenda)
+     ("C-c c" . org-capture))
+    :config
     (turn-on-auto-fill)
     (org-babel-do-load-languages 
-     'org-babel-load-languages '((clojure . t)
-                                 (rust . t)
+     'org-babel-load-languages '((rust . t)
                                  (shell . t))))
-
-  (add-hook 'org-mode-hook 'my-org-mode-hook)
 #+end_src
 
 *** Exporting to PDF
@@ -435,26 +440,29 @@ packages only when they are missing.
 ** JavaScript
 
 #+begin_src emacs-lisp
-  (autoload 'js-mode "js-mode" nil t)
-
-  ;;;###autoload
-  (defun my-js-mode-hook ()
+  (use-package js
+    :ensure t
+    :config
     (setq js-indent-level 2))
-
-  (add-hook 'js-mode-hook 'my-js-mode-hook)
 #+end_src
 
 ** CSS
 
 #+begin_src emacs-lisp
-  (autoload 'css-mode "css-mode" nil t)
-
-  (defun my-css-mode-hook ()
+  (use-package css-mode
+    :ensure t
+    :config
     (setq css-indent-level 2)
     (setq css-indent-offset 2))
-
-  (add-hook 'css-mode-hook 'my-css-mode-hook)
 #+end_src   
+
+** Flyspell
+
+#+begin_src emacs-lisp
+  (with-eval-after-load 'flyspell
+      (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+      (define-key flyspell-mouse-map [mouse-3] #'undefined))
+#+end_src
 
 ** Markdown
 
@@ -514,28 +522,22 @@ spawn. TODO. Find a keybinding
 
   (use-package rustic
     :ensure t
-    :bind (("C-c C-c i" . eglot-code-action-organize-imports)
-           ("M-j" . lsp-ui-imenu)
-           ("M-?" . lsp-find-references)
-           ("C-c C-c l" . flycheck-list-errors)
-           ("C-c C-c a" . lsp-execute-code-action)
-           ("C-c C-c r" . lsp-rename)
-           ("C-c C-c q" . lsp-workspace-restart)
-           ("C-c C-c Q" . lsp-workspace-shutdown)
-           ("C-c C-c s" . lsp-rust-analyzer-status))
-
+    :bind (:map rustic-mode-map
+                ("M-j" . lsp-ui-imenu)
+                ("M-?" . lsp-find-references)
+                ("C-c C-c l" . flycheck-list-errors)
+                ("C-c C-c a" . lsp-execute-code-action)
+                ("C-c C-c r" . lsp-rename)
+                ("C-c C-c q" . lsp-workspace-restart)
+                ("C-c C-c Q" . lsp-workspace-shutdown)
+                ("C-c C-c s" . lsp-rust-analyzer-status))
     :config
     (setq lsp-eldoc-hook nil)
+    (yas-minor-mode)
     (setq rustic-compile-command "cargo b --release")
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (add-hook 'rust-mode-hook 'eglot-ensure)
-    (add-hook 'rust-mode-hook 'my-rust-mode-hook))
-
-  ;;;###autoload
-  (defun my-rust-mode-hook ()
-    ;; Disable annoying mini-buffer eldoc
-    (setq lsp-eldoc-hook nil)
-    (yas-minor-mode))
+    (add-hook 'rust-mode-hook #'eglot-ensure)
+    (add-hook 'rust-mode-hook #'my-rust-mode-hook))
 #+end_src
 
 ** ELISP
@@ -543,42 +545,59 @@ spawn. TODO. Find a keybinding
 An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src elisp
-  (autoload 'ielm-mode "ielm-mode" nil t)
-
-  (with-eval-after-load 'ielm-mode
-    (define-key ielm-map (kbd "C-m") 'ielm-return)
-    (define-key ielm-map (kbd "<return>") 'ielm-return))
-
-  (defun my-ielm-mode-hook ()
-    (paredit-mode 1)
-    (rainbow-delimiters-mode 1))
-
-  (add-hook 'ielm-mode-hook 'my-ielm-mode-hook)
+  (use-package ielm
+    :ensure t
+    :defer t
+    :bind
+    (:map ielm-map
+          ("C-m" . 'ielm-return)
+          ("<return>" . 'ielm-return))
+    :config
+    (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode)
+    (add-hook 'ielm-mode-hook #'paredit-mode))
 #+end_src
 
 ** OCaml
 
 #+begin_src elisp
-  (autoload 'tuareg-mode-hook "ocaml" nil t)
-
-  (defun my-ocaml-mode-hook ())
-
-  (add-hook 'tuareg-mode-hook 'my-ocaml-mode-hook)
+  (use-package tuareg
+    :ensure t
+    :defer t)
 #+end_src
 
 ** Nix
 
 #+begin_src elisp
-  (autoload 'nix-mode "nix-mode" nil t)
-
-  (with-eval-after-load 'nix-mode
-    (define-key 'nix-mode-map (kbd "C-c C-f") 'nixpkgs-fmt))
-
-  (defun my-nix-mode-hook ()
+  (use-package nixpkgs-fmt
+    :ensure t)
+  (use-package nix-mode
+    :mode ("\\.nix\\'" "\\.nix.in\\'")
+    :ensure nixpkgs-fmt
+    :bind
+    (:map nix-mode-map
+          ("C-c C-f" . nixpkgs-fmt))
+    :config
     (nixpkgs-fmt-on-save-mode))
 
-  (add-hook 'nix-mode-hook 'my-nix-mode-hook)
+  (use-package nix-drv-mode
+    :ensure nix-mode
+    :mode "\\.drv\\'")
 
+  (use-package nix-shell
+    :ensure nix-mode
+    :commands (nix-shell-unpack nix-shell-configure nix-shell-build))
+
+  (use-package nix-repl
+    :ensure nix-mode
+    :commands (nix-repl))
+#+end_src
+
+** Terraform
+
+#+begin_src emacs-lisp
+  (use-package terraform-mode
+    :ensure t
+    :defer t)
 #+end_src
 
 Reset the GC threshold back to default
