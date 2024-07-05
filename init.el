@@ -8,8 +8,6 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(javascript-mode js-mode company yasnippet ob-rust lsp-ivy ivy direnv benchmark-init hurl-mode request treemacs tree-sitter-langs graphql-ts-mode nixpkgs-fmt timu-spacegrey-theme string-inflection csv-mode just-mode yaml-mode tuareg terraform-mode rustic rainbow-delimiters protobuf-mode projectile ox-gfm nix-mode magit lsp-ui lsp-mode htmlize dockerfile-mode cider transient bnf-mode))
- '(package-vc-selected-packages
-   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(rustic-ansi-faces
    ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"])
  '(safe-local-variable-values

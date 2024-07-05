@@ -51,8 +51,6 @@ dependency on the mouse. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
   (setq inhibit-startup-message t)
 
   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
@@ -65,6 +63,7 @@ strokes until they are second nature. You can thank me later.
 
   ;; some breathing room
   (set-fringe-mode 10)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+end_src
 
 Install my packages if they aren't installed.
@@ -87,23 +86,12 @@ Deprecating the use of =package.el=. Remove when full switched over
 to =use-package=.
 
 #+begin_src emacs-lisp
-    (defvar my-packages '(ag
-			  bnf-mode
-			  csv-mode
-			  dockerfile-mode
-			  htmlize
-			  just-mode
-			  markdown-mode
-			  ox-gfm
-			  string-inflection
-			  timu-spacegrey-theme
-			  yaml-mode)
+    (defvar my-packages '(timu-spacegrey-theme)
       "A list of packages to ensure are installed at launch.")
 
     (dolist (p my-packages)
       (when (not (package-installed-p p))
 	(package-install p)))
-
 #+end_src
 
 #+begin_src emacs-lisp
@@ -225,7 +213,7 @@ Allow functions without issuing warnings
     (setq ns-pop-up-frames nil)
 
     ;; Use aspell for spell checking: brew install aspell --lang=en
-    (setq ispell-program-name "/opt/homebrew/bin/aspell")
+;;    (setq ispell-program-name "/opt/homebrew/bin/aspell")
 
     ;; Open up links in Google Chrome
     (setq browse-url-browser-function 'browse-url-default-macosx-browser))
@@ -236,12 +224,6 @@ Allow functions without issuing warnings
 
 * Programming Languages
 
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :defer t)
-#+end_src
-
 Bind projectile to =C-c p= and enable by default.
 
 ** Projectile Mode
@@ -249,7 +231,6 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package projectile
     :ensure t
-    :defer t
     :commands (projectile-mode projectile-command-map)
     :init
     (setq projectile-project-search-path '("~/p/"))
@@ -269,7 +250,6 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
-    :defer t
     :bind
     ("C-x g" . magit-status)
     ("C-c g" . magit-file-dispatch))
@@ -282,16 +262,13 @@ compatability problems in the past so pin it to melpa-stable.
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package company
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package clojure-mode
     :ensure t
-    :defer t
     :config
     (setq show-trailing-whitespace 1)
     (setq clojure-align-forms-automatically t)
@@ -302,14 +279,12 @@ compatability problems in the past so pin it to melpa-stable.
 
   (use-package inf-clojure
     :ensure t
-    :defer t
     :config
     (add-hook 'inf-clojure-mode-hook #'paredit-mode)
     (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
 
   (use-package cider
     :ensure t
-    :defer t
     :pin melpa-stable
     :config
     (setq nrepl-log-messages t)
@@ -409,7 +384,6 @@ remap my brain, I'll remap it to =newline=.
 
   (use-package org
     :ensure ob-rust
-    :defer t
     :bind
     (:map
      org-mode-map
@@ -459,31 +433,35 @@ packages only when they are missing.
 ** Flyspell
 
 #+begin_src emacs-lisp
-  (with-eval-after-load 'flyspell
-      (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-      (define-key flyspell-mouse-map [mouse-3] #'undefined))
+  (use-package flyspell
+    :ensure t
+    :config
+    (setq flyspell-issue-welcome-flag nil)
+    (setq flyspell-issue-message-flag nil)
+    (setq flyspell-mark-duplications-flag nil)
+    (setq-default ispell-program-name "aspell")
+    (setq-default ispell-list-command "list")
+    (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
+    (define-key flyspell-mouse-map [mouse-3] 'undefined)
+    :hook (;;(text-mode . flyspell-mode)
+           (org-mode . flyspell-mode)
+           ;;(prog-mode . flyspell-prog-mode)
+           ))
 #+end_src
 
 ** Markdown
 
 #+begin_src emacs-lisp
-  (autoload 'markdown-mode "markdown-mode" "Major mode for editing Markdown files" t)
+  (use-package ox-gfm
+    :ensure t)
 
-  ;; Double click on mac mouse trackpad
-  (with-eval-after-load 'flyspell
-    (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-    (define-key flyspell-mouse-map [mouse-3] #'undefined))
-
-  (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-
-  ;;;###autoload
-  (defun my-markdown-hook ()
+  (use-package markdown-mode
+    :ensure t
+    :mode (("\\.md\\'" . gfm-mode)
+           ("\\.markdown\\'" . gfm-mode))
+    :config
     (auto-fill-mode t)
     (flyspell-mode t))
-
-  (add-hook 'markdown-mode-hook 'my-markdown-hook)
 #+end_src
 
 ** Git
@@ -547,7 +525,6 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 #+begin_src elisp
   (use-package ielm
     :ensure t
-    :defer t
     :bind
     (:map ielm-map
           ("C-m" . 'ielm-return)
@@ -561,8 +538,7 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src elisp
   (use-package tuareg
-    :ensure t
-    :defer t)
+    :ensure t)
 #+end_src
 
 ** Nix
@@ -596,11 +572,42 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src emacs-lisp
   (use-package terraform-mode
-    :ensure t
-    :defer t)
+    :ensure t)
 #+end_src
 
 Reset the GC threshold back to default
+
+** Misc
+
+#+begin_src emacs-lisp
+  (use-package csv-mode
+    :ensure t)
+
+  (use-package just-mode
+    :ensure t)
+
+  (use-package dockerfile-mode
+    :ensure t)
+
+  (use-package yaml-mode
+    :ensure t)
+
+  (use-package bnf-mode
+    :ensure t)
+
+  (use-package htmlize
+    :ensure t)
+
+  (use-package ag
+    :ensure t)
+
+  (use-package string-inflection
+    :ensure t)
+
+  (use-package yasnippet
+    :ensure t)
+
+#+end_src
 
 #+begin_src emacs-lisp
     (setq gc-cons-threshold 800000)
