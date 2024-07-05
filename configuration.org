@@ -74,7 +74,6 @@ to =use-package=.
   (defvar my-packages '(ag
                         bnf-mode
                         csv-mode
-                        company
                         dockerfile-mode
                         eglot
                         gradle-mode
@@ -248,6 +247,18 @@ Allow functions without issuing warnings
 
 * Programming Languages
 
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :defer t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :defer t)
+#+end_src
+
 Bind projectile to =C-c p= and enable by default.
 
 ** Projectile Mode
@@ -283,7 +294,6 @@ Bind projectile to =C-c p= and enable by default.
 
 ** Clojure
 
-
 #+begin_src emacs-lisp
   (use-package clojure-mode
     :ensure t
@@ -310,6 +320,8 @@ Bind projectile to =C-c p= and enable by default.
     (setq nrepl-log-messages t)
     (setq cider-repl-use-clojure-font-lock t)
     (setq cider-repl-display-help-banner nil)
+    (add-hook 'cider-mode-hook #'company-mode)
+    (add-hook 'cider-repl-mode-hook #'company-mode)
     (add-hook 'cider-repl-mode-hook #'paredit-mode)
     (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 #+end_src
@@ -326,12 +338,14 @@ evaluate the function into the current repl. I no longer use this
 function but it might be useful to someone eventually.
 
 #+begin_src emacs-lisp
+  ;;;###autoload
   (defun my-last-expression ()
     "Return the last sexp."
     (buffer-substring-no-properties
      (save-excursion (backward-sexp) (point))
      (point)))
 
+  ;;;###autoload
   (defun cider-execute-in-current-repl (expr)
     (if (not (get-buffer (cider-current-connection)))
         (message "No active nREPL connection.")
@@ -341,6 +355,7 @@ function but it might be useful to someone eventually.
         (insert expr)
         (cider-repl-return))))
 
+  ;;;###autoload
   (defun cider-eval-expression-at-point-in-repl ()
     (interactive)
     (let ((form (my-last-expression)))
@@ -349,8 +364,8 @@ function but it might be useful to someone eventually.
         (setq form (replace-match "" t t form)))
       (cider-execute-in-current-repl form)))
 
-  (eval-after-load 'cider-repl-mode-hook
-    '(local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
+  (with-eval-after-load 'cider-repl-mode-hook
+    (local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
 #+end_src
 
 ** Elisp
