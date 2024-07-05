@@ -43,14 +43,33 @@ compatability problems in the past so pin it to melpa-stable.
   (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 #+end_src
 
+Set the default GC threshold to be 100MB to increase startup
+performance. Reset back to default at the end of file.
+
+#+begin_src emacs-lisp
+  (setq gc-cons-threshold (* 1024 1024 100))
+#+end_src
+
 Install my packages if they aren't installed.
 
 #+begin_src emacs-lisp
   (package-initialize)
 
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+
   (when (not package-archive-contents)
     (package-refresh-contents))
+#+end_src
 
+Deprecating the use of =package.el=. Remove when full switched over
+to =use-package=.
+
+#+begin_src emacs-lisp
   (defvar my-packages '(ag
                         bnf-mode
                         cider
@@ -85,9 +104,9 @@ Install my packages if they aren't installed.
   (dolist (p my-packages)
     (when (not (package-installed-p p))
       (package-install p)))
-#+end_src
 
-I like to have my Emacs clean, chrisp and minimal. Removing the menu
+#+end_src
+I like to have my Emacs clean, chrisp, and minimal. Removing the menu
 bar, tool bar, and scroll bar frees some space and it helps remove
 dependency on the mouse. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
@@ -98,13 +117,13 @@ strokes until they are second nature. You can thank me later.
   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
     (when (fboundp mode) (funcall mode -1)))
 
-  (load-theme 'timu-spacegrey t)
-
   (when window-system
   ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
   ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
     (set-frame-font "Fira Code Retina 18" nil t))
 
+  (load-theme 'timu-spacegrey t)
+  (set-fringe-mode 10) ; breathing room
 #+end_src
 
 ** Personal
@@ -150,7 +169,6 @@ practice, it will become intuitive.
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lisp/")
 
-  (set-fringe-mode 10) ; breathing room
   (setq make-backup-files nil) ; stop creating backup~ files
   (setq auto-save-default nil) ; stop creating #autosave# files
   (setq interprogram-paste-function 'x-selection-value) ;
@@ -466,38 +484,41 @@ spawn. TODO. Find a keybinding
 ** Rust
 
 #+begin_src elisp
-    (require 'eglot)
-    (require 'rustic)
+      (require 'eglot)
+      (require 'rustic)
 
-  ;;;###autoload
-    (defun my-eglot-auto-imports ()
-      "Automatically import missing imports using eglot."
-      (interactive)
-      (eglot-code-actions nil nil "quickfix" t))
+    ;;;###autoload
+      (defun my-eglot-auto-imports ()
+        "Automatically import missing imports using eglot."
+        (interactive)
+        (eglot-code-actions nil nil "quickfix" t))
 
-    (autoload 'rust-mode-hook "rust-mode" nil t)
+      (autoload 'rust-mode-hook "rust-mode" nil t)
 
-    ;; Set my custom key bindings when rust programming
-    (with-eval-after-load 'rustic
-      (define-key rustic-mode-map (kbd "C-c C-c i") #'my-eglot-auto-imports)
-      (define-key rustic-mode-map (kbd "M-j") #'lsp-ui-imenu)
-      (define-key rustic-mode-map (kbd "M-?") #'lsp-find-references)
-      (define-key rustic-mode-map (kbd "C-c C-c l") #'flycheck-list-errors)
-      (define-key rustic-mode-map (kbd "C-c C-c a") #'lsp-execute-code-action)
-      (define-key rustic-mode-map (kbd "C-c C-c r") #'lsp-rename)
-      (define-key rustic-mode-map (kbd "C-c C-c q") #'lsp-workspace-restart)
-      (define-key rustic-mode-map (kbd "C-c C-c Q") #'lsp-workspace-shutdown)
-      (define-key rustic-mode-map (kbd "C-c C-c s") #'lsp-rust-analyzer-status)
+      ;; Set my custom key bindings when rust programming
+      (with-eval-after-load 'rustic
+        (define-key rustic-mode-map (kbd "C-c C-c i") #'my-eglot-auto-imports)
+        (define-key rustic-mode-map (kbd "M-j") #'lsp-ui-imenu)
+        (define-key rustic-mode-map (kbd "M-?") #'lsp-find-references)
+        (define-key rustic-mode-map (kbd "C-c C-c l") #'flycheck-list-errors)
+        (define-key rustic-mode-map (kbd "C-c C-c a") #'lsp-execute-code-action)
+        (define-key rustic-mode-map (kbd "C-c C-c r") #'lsp-rename)
+        (define-key rustic-mode-map (kbd "C-c C-c q") #'lsp-workspace-restart)
+        (define-key rustic-mode-map (kbd "C-c C-c Q") #'lsp-workspace-shutdown)
+        (define-key rustic-mode-map (kbd "C-c C-c s") #'lsp-rust-analyzer-status)
 
-      (setq rustic-compile-command "cargo b --release")
-      (setq rustic-cargo-build-arguments "--release")
-      (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings"))
+        (setq rustic-compile-command "cargo b --release")
+        (setq rustic-cargo-build-arguments "--release")
+        (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings"))
 
-    (defun my-rust-mode-hook ()
-      (yas-minor-mode))
+      (defun my-rust-mode-hook ()
+        ;; Disable annoying mini-buffer eldoc
+        (setq lsp-eldoc-hook nil)
+        (yas-minor-mode))
 
-    (add-hook 'rust-mode-hook 'my-rust-mode-hook)
-    (add-hook 'rust-mode-hook 'eglot-ensure)
+      (add-hook 'rust-mode-hook 'eglot-ensure)
+      (add-hook 'rust-mode-hook 'my-rust-mode-hook)
+
 #+end_src
 
 ** ELISP
@@ -541,4 +562,10 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
   (add-hook 'nix-mode-hook 'my-nix-mode-hook)
 
+#+end_src
+
+Reset the GC threshold back to default
+
+#+begin_src emacs-lisp
+    (setq gc-cons-threshold 800000)
 #+end_src
