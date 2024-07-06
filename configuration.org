@@ -23,7 +23,7 @@ You will need the following already installed for this configuration
 to run correctly.
 
 Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
-a wonderful font. You will need ispell installed in order to user
+a wonderful font. You will need aspell installed in order to user
 Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
 ** Emacs Initialization
@@ -63,6 +63,8 @@ strokes until they are second nature. You can thank me later.
   ;; some breathing room
   (set-fringe-mode 10)
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  ;; defer loading the ispell process
+  (autoload 'flyspell "flyspell" nil t)
 #+end_src
 
 Ensure =use-package= is installed.
@@ -76,18 +78,15 @@ Ensure =use-package= is installed.
 
   (require 'use-package)
   (setq use-package-always-ensure t)
-    
-  (when (not package-archive-contents)
-    (package-refresh-contents))
 #+end_src
 
 Load theme
 
 #+begin_src emacs-lisp
-    (use-package timu-spacegrey-theme
-      :ensure t
-      :config
-      (load-theme 'timu-spacegrey t))
+  (use-package timu-spacegrey-theme
+    :ensure t
+    :config
+    (load-theme 'timu-spacegrey t))
 #+end_src
 
 ** Personal
@@ -184,18 +183,9 @@ Allow functions without issuing warnings
 
 #+begin_src emacs-lisp
   ;;;###autoload
-  (defun set-exec-path-from-shell-PATH ()
-    (let ((path-from-shell (shell-command-to-string "$SHELL -i -c 'echo $PATH'")))
-      (setenv "PATH" path-from-shell)
-      (setq exec-path (split-string path-from-shell path-separator))))
-
-  ;;;###autoload
   (defun my-mac-config ()
     ;; Mac's ls doesn't support --dired
     (setq dired-use-ls-dired nil)
-
-    ;; setup the correct shell path
-    (set-exec-path-from-shell-PATH)
 
     ;; Move to trash when deleting stuff
     (setq delete-by-moving-to-trash t
@@ -207,7 +197,10 @@ Allow functions without issuing warnings
     ;; Open up links in Google Chrome
     (setq browse-url-browser-function 'browse-url-default-macosx-browser))
 
-  (when (equal system-type 'darwin)
+  (use-package exec-path-from-shell
+    :if (memq window-system '(mac ns))
+    :config
+    (exec-path-from-shell-initialize)
     (my-mac-config))
 #+end_src
 
@@ -242,6 +235,26 @@ Bind projectile to =C-c p= and enable by default.
     :bind
     ("C-x g" . magit-status)
     ("C-c g" . magit-file-dispatch))
+#+end_src
+
+** Paredit
+
+Some handy dandy paredit shortcuts
+
+On mac ^-left and ^-right are bought to Misson Control. Go to System
+Preferences > Keyboard > Shortcuts > Mission Control and change the
+settings for "Move left a space" and "Move right a space" or disable
+them completely.
+
+#+begin_src emacs-lisp
+  (use-package paredit
+    :ensure t
+    :bind
+    (:map paredit-mode-map
+          ("C-<right>" . paredit-forward-slurp-sexp)
+          ("C-<left>" . paredit-forward-barf-sexp)
+          ("C-<backspace>" . paredit-backward-kill-word)
+          ("RET" . nil)))
 #+end_src
 
 ** Clojure
@@ -338,26 +351,6 @@ function but it might be useful to someone eventually.
   (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
 #+end_src
 
-** Paredit
-
-Some handy dandy paredit shortcuts
-
-On mac ^-left and ^-right are bought to Misson Control. Go to System
-Preferences > Keyboard > Shortcuts > Mission Control and change the
-settings for "Move left a space" and "Move right a space" or disable
-them completely.
-
-#+begin_src emacs-lisp
-  (use-package paredit
-    :ensure t
-    :bind
-    (:map paredit-mode-map
-          ("C-<right>" . paredit-forward-slurp-sexp)
-          ("C-<left>" . paredit-forward-barf-sexp)
-          ("C-<backspace>" . paredit-backward-kill-word)
-          ("RET" . nil)))
-#+end_src
-
 ** Org Mode
 
 I almost exclusively use =C-j= in place of hitting the enter key. The
@@ -420,20 +413,21 @@ packages only when they are missing.
 ** Flyspell
 
 #+begin_src emacs-lisp
-  (use-package flyspell
-    :ensure t
-    :config
-    (setq flyspell-issue-welcome-flag nil)
-    (setq flyspell-issue-message-flag nil)
-    (setq flyspell-mark-duplications-flag nil)
-    (setq-default ispell-program-name "aspell")
-    (setq-default ispell-list-command "list")
-    (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
-    (define-key flyspell-mouse-map [mouse-3] 'undefined)
-    :hook (;;(text-mode . flyspell-mode)
-           (org-mode . flyspell-mode)
-           ;;(prog-mode . flyspell-prog-mode)
-           ))
+  ;; (use-package flyspell
+  ;;   :ensure t
+  ;;   :defer t
+  ;;   :config
+  ;;   (setq flyspell-issue-welcome-flag nil)
+  ;;   (setq flyspell-issue-message-flag nil)
+  ;;   (setq flyspell-mark-duplications-flag nil)
+  ;;   (setq ispell-program-name "aspell")
+  ;;   (setq ispell-list-command "list")
+  ;;   (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
+  ;;   (define-key flyspell-mouse-map [mouse-3] 'undefined)
+  ;;   :hook (;;(text-mode . flyspell-mode)
+  ;;          (org-mode . flyspell-mode)
+  ;;          ;;(prog-mode . flyspell-prog-mode)
+  ;;          ))
 #+end_src
 
 ** Markdown
@@ -501,8 +495,7 @@ spawn. TODO. Find a keybinding
     (yas-minor-mode)
     (setq rustic-compile-command "cargo b --release")
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (add-hook 'rust-mode-hook #'eglot-ensure)
-    (add-hook 'rust-mode-hook #'my-rust-mode-hook))
+    (add-hook 'rust-mode-hook #'eglot-ensure))
 #+end_src
 
 ** ELISP
@@ -535,7 +528,7 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :ensure t)
   (use-package nix-mode
     :mode ("\\.nix\\'" "\\.nix.in\\'")
-    :ensure nixpkgs-fmt
+    :ensure t
     :bind
     (:map nix-mode-map
           ("C-c C-f" . nixpkgs-fmt))
