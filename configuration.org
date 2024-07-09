@@ -6,7 +6,7 @@
 
 #+BEGIN_QUOTE
 This is my emacs, there are many like it, but this one is mine...
-#+END_QUOTE   
+#+END_QUOTE
 
 ** Getting Started
 
@@ -63,8 +63,6 @@ strokes until they are second nature. You can thank me later.
   ;; some breathing room
   (set-fringe-mode 10)
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; defer loading the ispell process
-  (autoload 'flyspell "flyspell" nil t)
 #+end_src
 
 Ensure =use-package= is installed.
@@ -77,7 +75,6 @@ Ensure =use-package= is installed.
     (package-install 'use-package))
 
   (require 'use-package)
-  (setq use-package-always-ensure t)
 #+end_src
 
 Load theme
@@ -102,11 +99,11 @@ Dats me.
 
 Ignore minimize functionality when you're in a GUI because it's very
 annoying to accidently minimize your window.
-  
+
 #+begin_src emacs-lisp
-    (when window-system
-      (global-set-key "\C-z" 'ignore)
-      (global-set-key "\C-x\C-z" 'ignore))
+  (when window-system
+    (global-set-key "\C-z" 'ignore)
+    (global-set-key "\C-x\C-z" 'ignore))
 #+end_src
 
 *** Invoke M-x without the Alt key
@@ -156,7 +153,7 @@ tabs show them as 8 spaces.
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
   (setq-default tab-width 8)
-#+end_src  
+#+end_src
 
 Limit the default fill mode to 80 characters
 
@@ -198,6 +195,7 @@ Allow functions without issuing warnings
     (setq browse-url-browser-function 'browse-url-default-macosx-browser))
 
   (use-package exec-path-from-shell
+    :ensure t
     :if (memq window-system '(mac ns))
     :config
     (exec-path-from-shell-initialize)
@@ -223,12 +221,12 @@ Bind projectile to =C-c p= and enable by default.
     :bind-keymap
     ("C-c p" . projectile-command-map))
 #+end_src
-  
+
 ** Magit
 
 =C-c= is reserved for the user. Add a more friendly binding for
 =magit-file-dispatch=
-   
+
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
@@ -254,7 +252,14 @@ them completely.
           ("C-<right>" . paredit-forward-slurp-sexp)
           ("C-<left>" . paredit-forward-barf-sexp)
           ("C-<backspace>" . paredit-backward-kill-word)
-          ("RET" . nil)))
+          ("RET" . nil))
+    :hook ((emacs-lisp-mode . paredit-mode)
+           (lisp-mode . paredit-mode)
+           (lisp-interaction-mode . paredit-mode)
+           (scheme-mode . paredit-mode)
+           (clojure-mode . paredit-mode)
+           (cider-repl-mode . paredit-mode)
+           (inf-clojure-mode-hook . paredit-mode)))
 #+end_src
 
 ** Clojure
@@ -275,14 +280,12 @@ compatability problems in the past so pin it to melpa-stable.
     (setq show-trailing-whitespace 1)
     (setq clojure-align-forms-automatically t)
     (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-    (add-hook 'clojure-mode-hook #'paredit-mode)
     (add-hook 'clojure-mode-hook #'subword-mode)
     (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
   (use-package inf-clojure
     :ensure t
     :config
-    (add-hook 'inf-clojure-mode-hook #'paredit-mode)
     (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
 
   (use-package cider
@@ -294,16 +297,15 @@ compatability problems in the past so pin it to melpa-stable.
     (setq cider-repl-display-help-banner nil)
     (add-hook 'cider-mode-hook #'company-mode)
     (add-hook 'cider-repl-mode-hook #'company-mode)
-    (add-hook 'cider-repl-mode-hook #'paredit-mode)
     (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 #+end_src
 
 I have long since used this key binding to jack into a repl. My
 fingers are programmed this way.
-   
+
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c C-j") 'cider-jack-in)
-#+end_src   
+#+end_src
 
 When you hit =f3= at the end of the sexp in Clojure, it will copy and
 evaluate the function into the current repl. I no longer use this
@@ -343,12 +345,7 @@ function but it might be useful to someone eventually.
 ** Elisp
 
 #+begin_src emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
   (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode)
 #+end_src
 
 ** Org Mode
@@ -374,7 +371,7 @@ remap my brain, I'll remap it to =newline=.
      ("C-c c" . org-capture))
     :config
     (turn-on-auto-fill)
-    (org-babel-do-load-languages 
+    (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
                                  (shell . t))))
 #+end_src
@@ -408,41 +405,39 @@ packages only when they are missing.
     :config
     (setq css-indent-level 2)
     (setq css-indent-offset 2))
-#+end_src   
+#+end_src
 
 ** Flyspell
 
 #+begin_src emacs-lisp
-  ;; (use-package flyspell
-  ;;   :ensure t
-  ;;   :defer t
-  ;;   :config
-  ;;   (setq flyspell-issue-welcome-flag nil)
-  ;;   (setq flyspell-issue-message-flag nil)
-  ;;   (setq flyspell-mark-duplications-flag nil)
-  ;;   (setq ispell-program-name "aspell")
-  ;;   (setq ispell-list-command "list")
-  ;;   (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
-  ;;   (define-key flyspell-mouse-map [mouse-3] 'undefined)
-  ;;   :hook (;;(text-mode . flyspell-mode)
-  ;;          (org-mode . flyspell-mode)
-  ;;          ;;(prog-mode . flyspell-prog-mode)
-  ;;          ))
+  (use-package flyspell
+    :ensure t
+    :config
+    (setq flyspell-issue-welcome-flag nil)
+    (setq flyspell-issue-message-flag nil)
+    (setq flyspell-mark-duplications-flag nil)
+    (setq ispell-program-name "aspell")
+    (setq ispell-list-command "list")
+    (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
+    (define-key flyspell-mouse-map [mouse-3] 'undefined)
+    :hook ((text-mode . flyspell-mode)
+           (org-mode . flyspell-mode)
+           (prog-mode . flyspell-prog-mode)
+           (markdown-mode . flyspell-mode)))
 #+end_src
 
 ** Markdown
 
 #+begin_src emacs-lisp
-  (use-package ox-gfm
-    :ensure t)
+    (use-package ox-gfm
+      :ensure t)
 
-  (use-package markdown-mode
-    :ensure t
-    :mode (("\\.md\\'" . gfm-mode)
-           ("\\.markdown\\'" . gfm-mode))
-    :config
-    (auto-fill-mode t)
-    (flyspell-mode t))
+    (use-package markdown-mode
+      :ensure t
+      :mode (("\\.md\\'" . gfm-mode)
+             ("\\.markdown\\'" . gfm-mode))
+
+  )
 #+end_src
 
 ** Git
@@ -492,10 +487,10 @@ spawn. TODO. Find a keybinding
                 ("C-c C-c s" . lsp-rust-analyzer-status))
     :config
     (setq lsp-eldoc-hook nil)
-    (yas-minor-mode)
     (setq rustic-compile-command "cargo b --release")
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (add-hook 'rust-mode-hook #'eglot-ensure))
+    (add-hook 'rust-mode-hook #'eglot-ensure)
+  )
 #+end_src
 
 ** ELISP
@@ -584,9 +579,14 @@ Reset the GC threshold back to default
   (use-package string-inflection
     :ensure t)
 
-  (use-package yasnippet
-    :ensure t)
+  (use-package hurl-mode
+    :ensure t
+    :mode (("\\.hurl\\'" . hurl-mode)))
 
+  (use-package yasnippet
+    :ensure t
+    :hook
+    (rust-mode-hook . yas-minor-mode))
 #+end_src
 
 #+begin_src emacs-lisp
