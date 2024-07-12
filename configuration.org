@@ -586,7 +586,7 @@ Reset the GC threshold back to default
   (use-package yasnippet
     :ensure t
     :hook
-    (rust-mode-hook . yas-minor-mode))
+    (rust-mode . yas-minor-mode))
 #+end_src
 
 #+begin_src emacs-lisp
