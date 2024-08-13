@@ -58,7 +58,7 @@ strokes until they are second nature. You can thank me later.
   (when window-system
     ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
     ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
-    (set-frame-font "Fira Code Retina 18" nil t))
+    (set-frame-font "Fira Code Retina 20" nil t))
 
   ;; some breathing room
   (set-fringe-mode 10)
@@ -466,10 +466,14 @@ spawn. TODO. Find a keybinding
     :ensure t)
 
   (use-package lsp-mode
-    :ensure t)
+    :ensure t
+    :config
+    (add-hook 'lsp-mode-hook #'lsp-ui-mode))
 
   (use-package lsp-ui
-    :ensure t)
+    :ensure t
+    :custom
+    (lsp-ui-doc-enable nil))
 
   (use-package eglot
     :ensure t)
@@ -486,11 +490,10 @@ spawn. TODO. Find a keybinding
                 ("C-c C-c Q" . lsp-workspace-shutdown)
                 ("C-c C-c s" . lsp-rust-analyzer-status))
     :config
-    (setq lsp-eldoc-hook nil)
     (setq rustic-compile-command "cargo b --release")
     (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (add-hook 'rust-mode-hook #'eglot-ensure)
-  )
+  ;  (add-hook 'rust-mode-hook #'eglot-ensure)
+    )
 #+end_src
 
 ** ELISP
@@ -559,7 +562,9 @@ Reset the GC threshold back to default
     :ensure t)
 
   (use-package just-mode
-    :ensure t)
+    :ensure t
+    :config
+    (setq just-indent-offset 2))
 
   (use-package dockerfile-mode
     :ensure t)
