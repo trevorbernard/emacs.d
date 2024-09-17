@@ -1,0 +1,11 @@
+# name: rust_test_module
+# key: testmod
+# --
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn ${1:case_1}() {
+        $0
+    }
+}

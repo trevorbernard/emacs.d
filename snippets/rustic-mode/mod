@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: mod name { … }
+# key: mod
+# type: snippet
+# --
+mod ${1:name} {
+    ${2:()}
+}$0

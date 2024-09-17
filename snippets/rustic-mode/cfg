@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: #[cfg(option)]
+# key: cfg
+# type: snippet
+# --
+#[cfg(${1:option})]$0

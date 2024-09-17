@@ -265,14 +265,20 @@ them completely.
 ** Clojure
 
 I don't like my cider to be bleeding edge since it's caused
-compatability problems in the past so pin it to melpa-stable.
+compatibility problems in the past so pin it to melpa-stable.
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t)
 
   (use-package company
-    :ensure t)
+    :ensure t
+    :bind
+    (:map company-active-map
+          ("C-n". company-select-next)
+          ("C-p". company-select-previous)
+          ("M-<". company-select-first)
+          ("M->". company-select-last)))
 
   (use-package clojure-mode
     :ensure t
@@ -491,9 +497,7 @@ spawn. TODO. Find a keybinding
                 ("C-c C-c s" . lsp-rust-analyzer-status))
     :config
     (setq rustic-compile-command "cargo b --release")
-    (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-  ;  (add-hook 'rust-mode-hook #'eglot-ensure)
-    )
+    (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings"))
 #+end_src
 
 ** ELISP
@@ -524,6 +528,7 @@ An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 #+begin_src elisp
   (use-package nixpkgs-fmt
     :ensure t)
+
   (use-package nix-mode
     :mode ("\\.nix\\'" "\\.nix.in\\'")
     :ensure t
@@ -590,6 +595,8 @@ Reset the GC threshold back to default
 
   (use-package yasnippet
     :ensure t
+    :config
+    (yas-reload-all)
     :hook
     (rust-mode . yas-minor-mode))
 #+end_src

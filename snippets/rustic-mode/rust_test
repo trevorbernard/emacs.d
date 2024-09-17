@@ -1,0 +1,7 @@
+# name: rust_test
+# key: tc
+# --
+#[test]
+    fn ${1:case_1}() {
+        $0
+    }

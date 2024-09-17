@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: #[deriving(Trait)]
+# key: derive
+# type: snippet
+# --
+#[derive(${1:Trait})]$0
