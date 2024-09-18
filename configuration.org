@@ -92,7 +92,7 @@ Dats me.
 
 #+begin_src emacs-lisp
   (setq user-full-name "Trevor Bernard"
-        user-mail-address "trevor@bernard.gg")
+        user-mail-address "trevor.bernard@protonmail.com")
 #+end_src
 
 ** Key Bindings
