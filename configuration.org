@@ -84,6 +84,9 @@ Load theme
     :ensure t
     :config
     (load-theme 'timu-spacegrey t))
+
+  (use-package mood-line
+    :config (mood-line-mode))
 #+end_src
 
 ** Personal
