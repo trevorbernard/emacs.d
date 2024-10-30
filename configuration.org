@@ -469,7 +469,13 @@ spawn. TODO. Find a keybinding
 
 #+begin_src elisp
   (use-package ivy
-    :ensure t)
+    :ensure t
+    :config
+    (ivy-mode 1))
+
+  (use-package lsp-ivy
+    :ensure t
+    :commands lsp-ivy-workspace-symbol)
 
   (use-package lsp-mode
     :ensure t
@@ -480,9 +486,6 @@ spawn. TODO. Find a keybinding
     :ensure t
     :custom
     (lsp-ui-doc-enable nil))
-
-  (use-package eglot
-    :ensure t)
 
   (use-package rustic
     :ensure t
