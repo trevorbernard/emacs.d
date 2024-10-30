@@ -28,13 +28,8 @@ Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
 ** Emacs Initialization
 
-I use melpa and melpa stable for my packages.
-
 #+begin_src emacs-lisp
-  (require 'package)
-
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (require 'use-package)
 #+end_src
 
 Set the default GC threshold to be 100MB to increase startup
@@ -65,18 +60,6 @@ strokes until they are second nature. You can thank me later.
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+end_src
 
-Ensure =use-package= is installed.
-
-#+begin_src emacs-lisp
-  (package-initialize)
-
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-
-  (require 'use-package)
-#+end_src
-
 Load theme
 
 #+begin_src emacs-lisp
@@ -89,6 +72,17 @@ Load theme
     :config (mood-line-mode))
 #+end_src
 
+
+Experimenting with parens
+
+#+begin_src emacs-lisp
+  ;; (use-package paren
+  ;;   :config (show-paren-mode)
+  ;;   :custom (show-paren-style 'expression))
+
+  (use-package rainbow-delimiters
+    :hook ((prog-mode . rainbow-delimiters-mode)))
+#+end_src
 ** Personal
 
 Dats me.
@@ -299,7 +293,6 @@ compatibility problems in the past so pin it to melpa-stable.
 
   (use-package cider
     :ensure t
-    :pin melpa-stable
     :config
     (setq nrepl-log-messages t)
     (setq cider-repl-use-clojure-font-lock t)
@@ -470,6 +463,9 @@ spawn. TODO. Find a keybinding
 
 ** Rust
 
+Result is my language du jour. It's slowly becoming my favourite
+programming language.
+
 #+begin_src elisp
   (use-package ivy
     :ensure t
@@ -491,6 +487,7 @@ spawn. TODO. Find a keybinding
     (lsp-ui-doc-enable nil))
 
   (use-package rustic
+    :defer t
     :ensure t
     :bind (:map rustic-mode-map
                 ("M-j" . lsp-ui-imenu)
@@ -501,9 +498,10 @@ spawn. TODO. Find a keybinding
                 ("C-c C-c q" . lsp-workspace-restart)
                 ("C-c C-c Q" . lsp-workspace-shutdown)
                 ("C-c C-c s" . lsp-rust-analyzer-status))
-    :config
-    (setq rustic-compile-command "cargo b --release")
-    (setq rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings"))
+    :custom
+    (rustic-compile-command "cargo b --release")
+    (rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
+    (rust-format-on-save t))
 #+end_src
 
 ** ELISP
@@ -601,6 +599,7 @@ Reset the GC threshold back to default
 
   (use-package yasnippet
     :ensure t
+    :defer 15 ;; takes a while to load so do it async
     :config
     (yas-reload-all)
     :hook
