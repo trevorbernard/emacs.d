@@ -10,14 +10,9 @@ This is my emacs, there are many like it, but this one is mine...
 
 ** Getting Started
 
-The very first thing you need to have installed is a recent version of
-Emacs. I'm in the middle of converting my =package.el= configuration
-to =use-package=. I'm unsure what is the minimum supported version
-anymore but Emacs 29.x includes eglot and use-package.
-
-I strongly suggest you remap your cap locks key to control to help
-reduce the onset of Emacs pinky. I even go further and have a new key
-binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
+Ensure you have a recent version of Emacs installed. I currently use
+=29.x= on both Linux and Mac systems. YMMV on Windows or different
+versions of Emacs.
 
 You will need the following already installed for this configuration
 to run correctly.
@@ -25,6 +20,10 @@ to run correctly.
 Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
 a wonderful font. You will need aspell installed in order to user
 Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
+
+I strongly suggest you remap your cap locks key to control to help
+reduce the onset of Emacs pinky. I even go further and have a new key
+binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 ** Emacs Initialization
 
@@ -39,14 +38,13 @@ performance. Reset back to default at the end of file.
   (setq gc-cons-threshold (* 1024 1024 100))
 #+end_src
 
-I like to have my Emacs clean, chrisp, and minimal. Removing the menu
-bar, tool bar, and scroll bar frees some space and it helps remove
-dependency on the mouse. Protip: Learn the Emacs navigation key
-strokes until they are second nature. You can thank me later.
+I like to have my Emacs clean, chrisp, and minimal. Disable the menu
+bar, tool bar, and scroll bar.
+
+Protip: Learn the Emacs navigation key strokes until they are second
+nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
-
   (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
     (when (fboundp mode) (funcall mode -1)))
 
@@ -95,12 +93,12 @@ Dats me.
 ** Key Bindings
 
 Ignore minimize functionality when you're in a GUI because it's very
-annoying to accidently minimize your window.
+annoying to accidentally minimize your window.
 
 #+begin_src emacs-lisp
   (when window-system
-    (global-set-key "\C-z" 'ignore)
-    (global-set-key "\C-x\C-z" 'ignore))
+    (keymap-global-set "C-z" 'ignore)
+    (keymap-global-set "C-x C-z" 'ignore))
 #+end_src
 
 *** Invoke M-x without the Alt key
@@ -115,31 +113,49 @@ the home row if you have caps lock mapped to control. With some
 practice, it will become intuitive.
 
 #+begin_src emacs-lisp
-  (global-set-key "\C-x\C-m" 'execute-extended-command)
-  (global-set-key "\C-c\C-m" 'execute-extended-command)
+  (keymap-global-set "C-x C-m" 'execute-extended-command)
+  (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
 
 * Preferences
 
-** Global Preferences
+** Tidy Up: Disabling Unnecessary File Artifacts
+
+By default, Emacs creates backup files, auto-save files, and
+lockfiles, which can clutter your file system. These features are not
+necessary in modern times. Let’s disable them to keep your directories
+clean.
+
+#+begin_src emacs-lisp
+  (setq
+   make-backup-files nil
+   auto-save-default nil
+   create-lockfiles nil)
+#+end_src
 
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lisp/")
+  (setq
+   ;; Don't display the emacs apropos
+   inhibit-startup-message t
+   ;; Allow short answers 'y' or 'n'
+   use-short-answers t
+   ;; Make pgup/dn remember current line 
+   scroll-preserve-screen-position t)
 
-  (setq make-backup-files nil) ; stop creating backup~ files
-  (setq auto-save-default nil) ; stop creating #autosave# files
-  (setq interprogram-paste-function 'x-selection-value) ;
-  (global-auto-revert-mode t) ; Auto revert buffers
-  (ido-mode 1)
-  (column-number-mode 1) ; Show column number
-  (delete-selection-mode 1) ; Allow delete of selection
-  (fset 'yes-or-no-p 'y-or-n-p) ; Shorten confirmation message
-  (global-font-lock-mode 1) ; Syntax Highlighting
-  (show-paren-mode 1) ; Highlight parenthesis
+   ; Auto revert buffers
+  (global-auto-revert-mode t)
+  ;; Show column number
+  (column-number-mode 1)
+  ;; Allow delete of selection
+  (delete-selection-mode 1)
+  ;; Syntax Highlighting
+  (global-font-lock-mode 1)
+  ;; Highlight parenthesis
+  (show-paren-mode 1) 
   ;; Highlight selected Regions
   (transient-mark-mode 1)
-  ;; Make pgup/dn remember current line
-  (setq scroll-preserve-screen-position t)
+
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
@@ -227,6 +243,8 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
+    :defer t
+    :commands (magit-status magit-file-dispatch)
     :bind
     ("C-x g" . magit-status)
     ("C-c g" . magit-file-dispatch))
@@ -250,13 +268,7 @@ them completely.
           ("C-<left>" . paredit-forward-barf-sexp)
           ("C-<backspace>" . paredit-backward-kill-word)
           ("RET" . nil))
-    :hook ((emacs-lisp-mode . paredit-mode)
-           (lisp-mode . paredit-mode)
-           (lisp-interaction-mode . paredit-mode)
-           (scheme-mode . paredit-mode)
-           (clojure-mode . paredit-mode)
-           (cider-repl-mode . paredit-mode)
-           (inf-clojure-mode-hook . paredit-mode)))
+    :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode scheme-mode clojure-mode cider-repl-mode inf-clojure-mode-hook) . paredit-mode))
 #+end_src
 
 ** Clojure
@@ -265,9 +277,6 @@ I don't like my cider to be bleeding edge since it's caused
 compatibility problems in the past so pin it to melpa-stable.
 
 #+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :ensure t)
-
   (use-package company
     :ensure t
     :bind
@@ -279,6 +288,7 @@ compatibility problems in the past so pin it to melpa-stable.
 
   (use-package clojure-mode
     :ensure t
+    :defer t
     :config
     (setq show-trailing-whitespace 1)
     (setq clojure-align-forms-automatically t)
@@ -293,10 +303,12 @@ compatibility problems in the past so pin it to melpa-stable.
 
   (use-package cider
     :ensure t
+    :defer t
+    :custom
+    (nrepl-log-messages t)
+    (cider-repl-use-clojure-font-lock t)
+    (cider-repl-display-help-banner nil)
     :config
-    (setq nrepl-log-messages t)
-    (setq cider-repl-use-clojure-font-lock t)
-    (setq cider-repl-display-help-banner nil)
     (add-hook 'cider-mode-hook #'company-mode)
     (add-hook 'cider-repl-mode-hook #'company-mode)
     (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
@@ -306,7 +318,7 @@ I have long since used this key binding to jack into a repl. My
 fingers are programmed this way.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c C-j") 'cider-jack-in)
+  (keymap-global-set "C-c C-j" 'cider-jack-in)
 #+end_src
 
 When you hit =f3= at the end of the sexp in Clojure, it will copy and
