@@ -10,9 +10,8 @@ This is my emacs, there are many like it, but this one is mine...
 
 ** Getting Started
 
-Ensure you have a recent version of Emacs installed. I currently use
-=29.x= on both Linux and Mac systems. YMMV on Windows or different
-versions of Emacs.
+I currently use =29.x= on both Linux and Mac systems. YMMV on Windows
+or different versions of Emacs.
 
 You will need the following already installed for this configuration
 to run correctly.
@@ -38,47 +37,39 @@ performance. Reset back to default at the end of file.
   (setq gc-cons-threshold (* 1024 1024 100))
 #+end_src
 
-I like to have my Emacs clean, chrisp, and minimal. Disable the menu
-bar, tool bar, and scroll bar.
-
-Protip: Learn the Emacs navigation key strokes until they are second
-nature. You can thank me later.
-
 #+begin_src emacs-lisp
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode) (funcall mode -1)))
-
   (when window-system
-    ;;  (add-to-list 'default-frame-alist '(alpha . (95 . 50)))
-    ;;  (set-frame-parameter (selected-frame) 'alpha '(95 . 50))
     (set-frame-font "Fira Code Retina 20" nil t))
 
-  ;; some breathing room
-  (set-fringe-mode 10)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-#+end_src
-
-Load theme
-
-#+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
     :ensure t
     :config
     (load-theme 'timu-spacegrey t))
 
   (use-package mood-line
+    :ensure t
     :config (mood-line-mode))
 #+end_src
 
+I like to have my Emacs clean, chrisp, and minimal. Disable the menu
+bar, tool bar, and scroll Protip: Learn the Emacs navigation key
+strokes until they are second nature. You can thank me later.
+
+#+begin_src emacs-lisp
+  ;; some breathing room
+  (set-fringe-mode 10)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+end_src
 
 Experimenting with parens
 
 #+begin_src emacs-lisp
-  ;; (use-package paren
-  ;;   :config (show-paren-mode)
-  ;;   :custom (show-paren-style 'expression))
-
   (use-package rainbow-delimiters
+    :ensure t
     :hook ((prog-mode . rainbow-delimiters-mode)))
 #+end_src
 ** Personal
@@ -92,7 +83,7 @@ Dats me.
 
 ** Key Bindings
 
-Ignore minimize functionality when you're in a GUI because it's very
+Ignore minimize functionality when you're in the GUI because it's very
 annoying to accidentally minimize your window.
 
 #+begin_src emacs-lisp
@@ -107,10 +98,10 @@ M-x is one of the most wildly used key combinations in Emacs but it's
 also the most annoying. You have to scrunch your left thumb and fore
 finger in the most uncomfortable RSI inducing way.
 
-I choose to rebind M-x to C-x C-m because of an article Steve Yegge
-wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your fingers on
-the home row if you have caps lock mapped to control. With some
-practice, it will become intuitive.
+I choose to rebind =M-x= to =C-x C-m= because of an article Steve
+Yegge wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your
+fingers on the home row if you have caps lock mapped to control. With
+some practice, it will become intuitive.
 
 #+begin_src emacs-lisp
   (keymap-global-set "C-x C-m" 'execute-extended-command)
@@ -254,10 +245,10 @@ Bind projectile to =C-c p= and enable by default.
 
 Some handy dandy paredit shortcuts
 
-On mac ^-left and ^-right are bought to Misson Control. Go to System
-Preferences > Keyboard > Shortcuts > Mission Control and change the
-settings for "Move left a space" and "Move right a space" or disable
-them completely.
+On mac =^-left= and =^-right= are bought to Misson Control. Go to
+`System Preferences > Keyboard > Shortcuts > Mission Control` and
+change the settings for "Move left a space" and "Move right a space"
+or disable them completely.
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -298,12 +289,14 @@ compatibility problems in the past so pin it to melpa-stable.
 
   (use-package inf-clojure
     :ensure t
+    :defer t
     :config
     (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
 
   (use-package cider
     :ensure t
     :defer t
+    :commands cider-jack-in
     :custom
     (nrepl-log-messages t)
     (cider-repl-use-clojure-font-lock t)
