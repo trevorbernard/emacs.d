@@ -74,11 +74,19 @@ that.
 #+end_src
 
 #+begin_src emacs-lisp
+  (setq use-package-always-defer t
+        use-package-verbose t)
+
+  (eval-and-compile
+    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+#+end_src
+#+begin_src emacs-lisp
   (when window-system
     (set-frame-font "Fira Code Retina 20" nil t))
 
   (use-package timu-spacegrey-theme
     :ensure t
+    :demand t
     :config
     (load-theme 'timu-spacegrey t))
 
