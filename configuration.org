@@ -1,6 +1,7 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Trevor Bernard
 #+LANGUAGE: en
+#+PROPERTY: header-args :tangle yes
 
 * Configuration
 
@@ -24,10 +25,24 @@ I strongly suggest you remap your cap locks key to control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
 binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
-** Emacs Initialization
-
 #+begin_src emacs-lisp
   (require 'use-package)
+#+end_src
+
+** Emacs Initialization
+
+I like to have my Emacs clean, chrisp, and minimal. Disable the menu
+bar, tool bar, and scroll Protip: Learn the Emacs navigation key
+strokes until they are second nature. You can thank me later.
+
+#+begin_src emacs-lisp
+  ;; some breathing room
+  (set-fringe-mode 10)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
 #+end_src
 
 Set the default GC threshold to be 100MB to increase startup
@@ -35,6 +50,27 @@ performance. Reset back to default at the end of file.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 100))
+#+end_src
+
+** Package Settings
+
+We’re going to set the load-path ourselves and avoid calling
+(package-initilize) (for performance reasons) so we need to set
+package--init-file-ensured to true to tell package.el to not
+automatically call it on our behalf. Additionally we’re setting
+package-enable-at-startup to nil so that packages will not
+automatically be loaded for us since use-package will be handling
+that.
+
+#+begin_src emacs-lisp
+  (eval-and-compile
+    (setq load-prefer-newer t
+          package-user-dir "~/.emacs.d/elpa"
+          package--init-file-ensured t
+          package-enable-at-startup nil)
+
+    (unless (file-directory-p package-user-dir)
+      (make-directory package-user-dir t)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -51,25 +87,12 @@ performance. Reset back to default at the end of file.
     :config (mood-line-mode))
 #+end_src
 
-I like to have my Emacs clean, chrisp, and minimal. Disable the menu
-bar, tool bar, and scroll Protip: Learn the Emacs navigation key
-strokes until they are second nature. You can thank me later.
-
-#+begin_src emacs-lisp
-  ;; some breathing room
-  (set-fringe-mode 10)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-#+end_src
-
 Experimenting with parens
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
+    :defer t
     :hook ((prog-mode . rainbow-delimiters-mode)))
 #+end_src
 ** Personal
@@ -125,7 +148,7 @@ clean.
 #+end_src
 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/lisp/")
+;;  (add-to-list 'load-path "~/.emacs.d/lisp/")
   (setq
    ;; Don't display the emacs apropos
    inhibit-startup-message t
@@ -388,7 +411,7 @@ remap my brain, I'll remap it to =newline=.
 In order to export to PDF, I choose to use basictex and install
 packages only when they are missing.
 
-#+begin_src bash
+#+begin_src bash :tangle no
   brew reinstall --cask basictex
   sudo tlmgr update --self
   sudo tlmgr install wrapfig

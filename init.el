@@ -1,6 +1,13 @@
 (require 'org)
 
-(org-babel-load-file "~/.emacs.d/configuration.org")
+(let ((file-name-handler-alist nil))
+  ;; If config is pre-compiled, then load that
+  (if (file-exists-p (expand-file-name "configuration.elc" user-emacs-directory))
+      (load-file (expand-file-name "configuration.elc" user-emacs-directory))
+    ;; Otherwise use org-babel to tangle and load the configuration
+    (require 'org)
+    (org-babel-load-file (expand-file-name "configuration.org" user-emacs-directory))))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
