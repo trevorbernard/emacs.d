@@ -36,13 +36,17 @@ bar, tool bar, and scroll Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  ;; some breathing room
-  (set-fringe-mode 10)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  (when window-system
+    (set-frame-font "Fira Code Retina 20" nil t))
 
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+
+  ;; some breathing room
+  (set-fringe-mode 10)
+  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
 #+end_src
 
 Set the default GC threshold to be 100MB to increase startup
@@ -54,13 +58,13 @@ performance. Reset back to default at the end of file.
 
 ** Package Settings
 
-We’re going to set the load-path ourselves and avoid calling
-(package-initilize) (for performance reasons) so we need to set
-package--init-file-ensured to true to tell package.el to not
-automatically call it on our behalf. Additionally we’re setting
-package-enable-at-startup to nil so that packages will not
-automatically be loaded for us since use-package will be handling
-that.
+To improve startup performance, we’ll manually set up the load-path
+and avoid calling (package-initialize). By setting
+package--init-file-ensured to t, we prevent package.el from
+automatically initializing the package system. Additionally, we set
+package-enable-at-startup to nil, ensuring packages won’t load
+automatically at startup; use-package will manage package loading
+instead.
 
 #+begin_src emacs-lisp
   (eval-and-compile
@@ -80,10 +84,8 @@ that.
   (eval-and-compile
     (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
 #+end_src
-#+begin_src emacs-lisp
-  (when window-system
-    (set-frame-font "Fira Code Retina 20" nil t))
 
+#+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
     :ensure t
     :demand t
