@@ -635,10 +635,6 @@ Reset the GC threshold back to default
   (use-package string-inflection
     :ensure t)
 
-  (use-package hurl-mode
-    :ensure t
-    :mode (("\\.hurl\\'" . hurl-mode)))
-
   (use-package yasnippet
     :ensure t
     :defer 15 ;; takes a while to load so do it async
