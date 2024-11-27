@@ -27,6 +27,8 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 #+begin_src emacs-lisp
   (require 'use-package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 #+end_src
 
 ** Emacs Initialization
