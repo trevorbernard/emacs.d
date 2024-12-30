@@ -220,27 +220,17 @@ Allow functions without issuing warnings
 * Mac specific configuration
 
 #+begin_src emacs-lisp
-  ;;;###autoload
-  (defun my-mac-config ()
-    ;; Mac's ls doesn't support --dired
-    (setq dired-use-ls-dired nil)
-
-    ;; Move to trash when deleting stuff
-    (setq delete-by-moving-to-trash t
-          trash-directory "~/.Trash/emacs")
-
-    ;; Don't open files from the workspace in a new frame
-    (setq ns-pop-up-frames nil)
-
-    ;; Open up links in Google Chrome
-    (setq browse-url-browser-function 'browse-url-default-macosx-browser))
-
   (use-package exec-path-from-shell
     :ensure t
     :if (memq window-system '(mac ns))
     :config
     (exec-path-from-shell-initialize)
-    (my-mac-config))
+    (setq 
+     browse-url-browser-function 'browse-url-default-macosx-browser
+     delete-by-moving-to-trash t
+     dired-use-ls-dired nil
+     ns-pop-up-frames nil
+     trash-directory "~/.Trash/emacs"))
 #+end_src
 
 * Programming Languages
@@ -543,7 +533,8 @@ programming language.
     :custom
     (rustic-compile-command "cargo b --release")
     (rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
-    (rust-format-on-save t))
+    (rust-format-on-save t)
+    (rustic-ansi-faces ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"]))
 #+end_src
 
 ** ELISP
