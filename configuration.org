@@ -441,6 +441,17 @@ packages only when they are missing.
     (setq css-indent-offset 2))
 #+end_src
 
+** Flycheck
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode)
+    :bind (:map flycheck-mode-map
+                ("M-n" . flycheck-next-error) ; optional but recommended error navigation
+                ("M-p" . flycheck-previous-error)))
+#+end_src
+
 ** Flyspell
 
 #+begin_src emacs-lisp
