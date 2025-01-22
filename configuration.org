@@ -595,16 +595,17 @@ programming language.
   (use-package lsp-mode
     :ensure t
     :hook
-    ((lsp-mode . lsp-ui)
-     ((tsx-ts-mode
+    (((tsx-ts-mode
        typescript-ts-mode
-       js-ts-mode) . lsp-deferred))
+       js-ts-mode) . lsp-deferred)
+     (lsp-mode . lsp-ui))
     :preface
-    (setenv "LSP_USE_PLISTS" "true")
+  ;;  (setenv "LSP_USE_PLISTS" "true")
 
     (setq read-process-output-max (* 10 1024 1024)
           gc-cons-threshold 200000000
-          lsp-use-plists t)
+  ;;        lsp-use-plists t
+          )
 
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       "Try to parse bytecode instead of json."
@@ -636,11 +637,12 @@ programming language.
                   'json-read)
                 :around
                 #'lsp-booster--advice-json-parse)
-    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  )
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 
   (use-package lsp-ui
     :ensure t
+    :after lsp-mode
+    :commands lsp-ui-mode
     :custom
     (lsp-ui-doc-enable nil))
 
