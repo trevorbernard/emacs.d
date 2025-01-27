@@ -573,16 +573,15 @@ spawn. TODO. Find a keybinding
     (os/setup-install-grammars))
 
 #+end_src
+
 ** Rust
 
-Result is my language du jour. It's slowly becoming my favourite
+Rust is my language du jour. It's slowly becoming my favourite
 programming language.
 
-#+begin_src elisp
-  (use-package lsp-eslint
-    :demand t
-    :after lsp-mode)
+** TODO Move LSP specific configuration in it's own section
 
+#+begin_src elisp
   (use-package ivy
     :ensure t
     :config
@@ -592,19 +591,24 @@ programming language.
     :ensure t
     :commands lsp-ivy-workspace-symbol)
 
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-doc-enable nil))
+
   (use-package lsp-mode
     :ensure t
+    :commands (lsp lsp-deferred)
     :hook
-    (((tsx-ts-mode
-       typescript-ts-mode
-       js-ts-mode) . lsp-deferred)
-     (lsp-mode . lsp-ui))
+    ((tsx-ts-mode typescript-ts-mode js-ts-mode) . lsp-deferred)
     :preface
   ;;  (setenv "LSP_USE_PLISTS" "true")
 
     (setq read-process-output-max (* 10 1024 1024)
-          gc-cons-threshold 200000000
-  ;;        lsp-use-plists t
+          ;; gc-cons-threshold 200000000
+          ;; lsp-use-plists t
           )
 
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
@@ -638,13 +642,6 @@ programming language.
                 :around
                 #'lsp-booster--advice-json-parse)
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
-
-  (use-package lsp-ui
-    :ensure t
-    :after lsp-mode
-    :commands lsp-ui-mode
-    :custom
-    (lsp-ui-doc-enable nil))
 
   (use-package rustic
     :defer t
