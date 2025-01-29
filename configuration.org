@@ -493,17 +493,6 @@ Use diff-mode when editing a git commit message
   (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+end_src
 
-** Terminal Emulation
-
-Calling =M-x ansi-term= will prompt you for which shell you want to
-spawn. TODO. Find a keybinding
-
-#+begin_src elisp
-  (defun my/term ()
-    (interactive)
-    (term "/bin/zsh"))
-#+end_src
-
 ** Web Development
 
 #+begin_src emacs-lisp
