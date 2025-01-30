@@ -591,7 +591,7 @@ programming language.
     :ensure t
     :commands (lsp lsp-deferred)
     :hook
-    ((tsx-ts-mode typescript-ts-mode js-ts-mode) . lsp-deferred)
+    ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode) . lsp-deferred)
     :preface
   ;;  (setenv "LSP_USE_PLISTS" "true")
 
