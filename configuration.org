@@ -145,6 +145,15 @@ some practice, it will become intuitive.
   (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
 
+
+* Development
+
+Create a shortcut to the compile command
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c C-c") 'compile)
+#+end_src
+
 * Preferences
 
 ** Tidy Up: Disabling Unnecessary File Artifacts
