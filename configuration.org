@@ -100,7 +100,9 @@ instead.
 
   (use-package mood-line
     :ensure t
-    :config (mood-line-mode))
+    :config (mood-line-mode)
+    :custom
+    (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
 
 Experimenting with parens
