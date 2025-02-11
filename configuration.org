@@ -229,10 +229,11 @@ Allow functions without issuing warnings
 
 * Mac specific configuration
 
+
 #+begin_src emacs-lisp
   (use-package exec-path-from-shell
+    :if (eq system-type 'darwin)
     :ensure t
-    :if (memq window-system '(mac ns))
     :config
     (exec-path-from-shell-initialize)
     (setq 
