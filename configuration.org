@@ -755,9 +755,11 @@ Reset the GC threshold back to default
     :defer 15 ;; takes a while to load so do it async
     :config
     (yas-reload-all)
-    :hook
-    (rust-mode . yas-minor-mode))
+    :hook ((prog-mode . yas-minor-mode-on)
+           (org-mode . yas-minor-mode-on)))
 #+end_src
+
+Reset the garbage collection threshold.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 800000)
