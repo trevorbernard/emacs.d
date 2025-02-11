@@ -174,7 +174,6 @@ clean.
 #+end_src
 
 #+begin_src emacs-lisp
-;;  (add-to-list 'load-path "~/.emacs.d/lisp/")
   (setq
    ;; Don't display the emacs apropos
    inhibit-startup-message t
