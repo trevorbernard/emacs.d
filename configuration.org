@@ -155,6 +155,7 @@ Create a shortcut to the compile command
 
 #+begin_src emacs-lisp
   (keymap-global-set "C-c C-c" 'compile)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
 * Preferences
@@ -194,8 +195,6 @@ clean.
   (show-paren-mode 1) 
   ;; Highlight selected Regions
   (transient-mark-mode 1)
-
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
 Use spaces in favour of tabs because they are evil. But when there are
