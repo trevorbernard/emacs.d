@@ -65,8 +65,8 @@ performance. Reset back to default at the end of file.
 ** Package Settings
 
 To improve startup performance, we’ll manually set up the load-path
-and avoid calling (package-initialize). By setting
-package--init-file-ensured to t, we prevent package.el from
+and avoid calling =(package-initialize)=. By setting
+=package--init-file-ensured= to t, we prevent =package.el= from
 automatically initializing the package system. Additionally, we set
 package-enable-at-startup to nil, ensuring packages won’t load
 automatically at startup; use-package will manage package loading
@@ -133,27 +133,26 @@ annoying to accidentally minimize your window.
 
 *** Invoke M-x without the Alt key
 
-M-x is one of the most wildly used key combinations in Emacs but it's
-also the most annoying. You have to scrunch your left thumb and fore
-finger in the most uncomfortable RSI inducing way.
+=M-x= is one of the most wildly used key combinations in Emacs but
+it's also the most annoying. You have to scrunch your left thumb and
+fore finger in the most uncomfortable RSI inducing way.
 
 I choose to rebind =M-x= to =C-x C-m= because of an article Steve
 Yegge wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your
 fingers on the home row if you have caps lock mapped to control. With
-some practice, it will become intuitive.
+some practice, it will become second-nature.
 
 #+begin_src emacs-lisp
   (keymap-global-set "C-x C-m" 'execute-extended-command)
   (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
 
-
 * Development
 
 Create a shortcut to the compile command
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-c C-c") 'compile)
+  (keymap-global-set "C-c C-c" 'compile)
 #+end_src
 
 * Preferences
@@ -182,7 +181,7 @@ clean.
    ;; Make pgup/dn remember current line 
    scroll-preserve-screen-position t)
 
-   ; Auto revert buffers
+  ;; Auto revert buffers
   (global-auto-revert-mode t)
   ;; Show column number
   (column-number-mode 1)
