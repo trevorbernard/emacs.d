@@ -524,6 +524,7 @@ Use diff-mode when editing a git commit message
       (interactive)
       (dolist (grammar
                '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
+                 (scss . ("https://github.com/serenadeai/tree-sitter-scss"))
                  (bash "https://github.com/tree-sitter/tree-sitter-bash")
                  (html . ("https://github.com/tree-sitter/tree-sitter-html" "v0.20.1"))
                  (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript" "v0.21.2" "src"))
@@ -556,6 +557,7 @@ Use diff-mode when editing a git commit message
     (dolist (mapping
              '((python-mode . python-ts-mode)
                (css-mode . css-ts-mode)
+               (scss-mode . scss-ts-mode)
                (typescript-mode . typescript-ts-mode)
                (js-mode . typescript-ts-mode)
                (js2-mode . typescript-ts-mode)
