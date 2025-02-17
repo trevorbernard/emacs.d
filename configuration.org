@@ -151,6 +151,16 @@ some practice, it will become second-nature.
 
 * Development
 
+** Terminals
+
+Let's try vterm to see if we like it
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :defer t
+    :ensure t)
+#+end_src
+
 Create a shortcut to the compile command
 
 #+begin_src emacs-lisp
