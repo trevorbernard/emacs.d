@@ -151,6 +151,17 @@ some practice, it will become second-nature.
 
 * Development
 
+** Programming Modes
+
+When in programming mode bind =C-c C-c= to run ='compile=.
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :bind (:map prog-mode-map
+           ("C-c C-c" . compile))
+    :hook (prog-mode . display-line-numbers-mode))
+#+end_src
+
 ** Terminals
 
 Let's try vterm to see if we like it
@@ -159,13 +170,6 @@ Let's try vterm to see if we like it
   (use-package vterm
     :defer t
     :ensure t)
-#+end_src
-
-Create a shortcut to the compile command
-
-#+begin_src emacs-lisp
-  (keymap-global-set "C-c C-c" 'compile)
-  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+end_src
 
 * Preferences
