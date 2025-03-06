@@ -18,10 +18,10 @@ You will need the following already installed for this configuration
 to run correctly.
 
 Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
-a wonderful font. You will need aspell installed in order to user
+a wonderful font. You will need aspell installed in order to use
 Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
-I strongly suggest you remap your cap locks key to control to help
+I strongly suggest you remap your Caps Lock key to Control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
 binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
@@ -37,8 +37,8 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 ** Emacs Initialization
 
-I like to have my Emacs clean, chrisp, and minimal. Disable the menu
-bar, tool bar, and scroll Protip: Learn the Emacs navigation key
+I like to have my Emacs clean, crisp, and minimal. Disable the menu
+bar, tool bar, and scroll bar. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
@@ -56,7 +56,7 @@ strokes until they are second nature. You can thank me later.
 #+end_src
 
 Set the default GC threshold to be 100MB to increase startup
-performance. Reset back to default at the end of file.
+performance. We'll reset it back to default at the end of the file.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 100))
@@ -115,7 +115,7 @@ Experimenting with parens
 #+end_src
 ** Personal
 
-Dats me.
+That's me.
 
 #+begin_src emacs-lisp
   (setq user-full-name "Trevor Bernard"
@@ -135,13 +135,13 @@ annoying to accidentally minimize your window.
 
 *** Invoke M-x without the Alt key
 
-=M-x= is one of the most wildly used key combinations in Emacs but
+=M-x= is one of the most widely used key combinations in Emacs but
 it's also the most annoying. You have to scrunch your left thumb and
-fore finger in the most uncomfortable RSI inducing way.
+forefinger in the most uncomfortable RSI-inducing way.
 
 I choose to rebind =M-x= to =C-x C-m= because of an article Steve
 Yegge wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your
-fingers on the home row if you have caps lock mapped to control. With
+fingers on the home row if you have Caps Lock mapped to Control. With
 some practice, it will become second-nature.
 
 #+begin_src emacs-lisp
@@ -293,7 +293,7 @@ Bind projectile to =C-c p= and enable by default.
 
 Some handy dandy paredit shortcuts
 
-On mac =^-left= and =^-right= are bought to Misson Control. Go to
+On Mac, =^-left= and =^-right= are bound to Mission Control. Go to
 `System Preferences > Keyboard > Shortcuts > Mission Control` and
 change the settings for "Move left a space" and "Move right a space"
 or disable them completely.
@@ -406,8 +406,8 @@ function but it might be useful to someone eventually.
 ** Org Mode
 
 I almost exclusively use =C-j= in place of hitting the enter key. The
-problem is that it's bound to =org-return-indent= function. This is
-very annoying in when you are in =org-mode=. So instead of trying to
+problem is that it's bound to the =org-return-indent= function. This is
+very annoying when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
@@ -711,7 +711,7 @@ programming language.
 
 ** ELISP
 
-An Interactice Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
+An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src elisp
   (use-package ielm
