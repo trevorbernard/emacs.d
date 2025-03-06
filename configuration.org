@@ -153,18 +153,22 @@ some practice, it will become second-nature.
 
 ** Programming Modes
 
-When in programming mode bind =C-c C-c= to run ='compile=.
+When in programming mode, I bind =C-c C-c= to run ='compile=. This is a
+huge time-saver when working on projects - just hit the key combo and
+watch your code build.
 
 #+begin_src emacs-lisp
   (use-package prog-mode
     :bind (:map prog-mode-map
-           ("C-c C-c" . compile))
+                ("C-c C-c" . compile))
     :hook (prog-mode . display-line-numbers-mode))
 #+end_src
 
 ** Terminals
 
-Let's try vterm to see if we like it
+Let's try vterm to see if we like it. It's supposedly better than the
+built-in term/ansi-term because it's a fully-fledged terminal emulator
+that handles escape sequences properly.
 
 #+begin_src emacs-lisp
   (use-package vterm
@@ -173,20 +177,6 @@ Let's try vterm to see if we like it
 #+end_src
 
 * Preferences
-
-** Tidy Up: Disabling Unnecessary File Artifacts
-
-By default, Emacs creates backup files, auto-save files, and
-lockfiles, which can clutter your file system. These features are not
-necessary in modern times. Let’s disable them to keep your directories
-clean.
-
-#+begin_src emacs-lisp
-  (setq
-   make-backup-files nil
-   auto-save-default nil
-   create-lockfiles nil)
-#+end_src
 
 #+begin_src emacs-lisp
   (setq
@@ -209,6 +199,21 @@ clean.
   (show-paren-mode 1) 
   ;; Highlight selected Regions
   (transient-mark-mode 1)
+#+end_src
+
+** Tidy Up: Disabling Unnecessary File Artifacts
+
+By default, Emacs generates backup files, auto-save files, and
+lockfiles. While once essential for crash recovery, these artifacts
+are often redundant today, especially with modern system stability and
+version control. Instead of cluttering your workspace, let's turn them
+off:
+
+#+begin_src emacs-lisp
+  (setq
+   make-backup-files nil    ; No backup~ files
+   auto-save-default nil    ; No #autosave# files
+   create-lockfiles nil)    ; No .#lock files
 #+end_src
 
 Use spaces in favour of tabs because they are evil. But when there are
@@ -311,7 +316,15 @@ or disable them completely.
           ("C-<left>" . paredit-forward-barf-sexp)
           ("C-<backspace>" . paredit-backward-kill-word)
           ("RET" . nil))
-    :hook ((emacs-lisp-mode lisp-mode lisp-interaction-mode scheme-mode clojure-mode cider-repl-mode inf-clojure-mode-hook) . paredit-mode))
+    :hook ((cider-repl-mode
+            clojure-mode
+            emacs-lisp-mode
+            eval-expression-minibuffer-setup
+            ielm-mode
+            inf-clojure-mode-hook
+            lisp-interaction-mode
+            lisp-mode
+            scheme-mode) . paredit-mode))
 #+end_src
 
 ** Clojure
@@ -368,18 +381,23 @@ fingers are programmed this way.
 
 When you hit =f3= at the end of the sexp in Clojure, it will copy and
 evaluate the function into the current repl. I no longer use this
-function but it might be useful to someone eventually.
+function but it might be useful to someone eventually. It's a quick
+way to send code to the REPL without having to select and copy it
+manually.
 
 #+begin_src emacs-lisp
   ;;;###autoload
   (defun my-last-expression ()
-    "Return the last sexp."
+    "Return the last sexp (S-expression) before point.
+  This grabs the Clojure/Lisp expression that your cursor is positioned after."
     (buffer-substring-no-properties
      (save-excursion (backward-sexp) (point))
      (point)))
 
-  ;;;###autoload
+    ;;;###autoload
   (defun cider-execute-in-current-repl (expr)
+    "Send the expression EXPR to the currently active REPL and evaluate it.
+  If there's no active connection, show a message instead."
     (if (not (get-buffer (cider-current-connection)))
         (message "No active nREPL connection.")
       (progn
@@ -388,11 +406,13 @@ function but it might be useful to someone eventually.
         (insert expr)
         (cider-repl-return))))
 
-  ;;;###autoload
+    ;;;###autoload
   (defun cider-eval-expression-at-point-in-repl ()
+    "Evaluate the expression at point in the active REPL.
+  This grabs the expression, cleans up whitespace, and sends it to the REPL."
     (interactive)
     (let ((form (my-last-expression)))
-      ;; Eat white
+      ;; Eat whitespace from beginning and end
       (while (string-match "\\`\s+\\|\n+\\'" form)
         (setq form (replace-match "" t t form)))
       (cider-execute-in-current-repl form)))
@@ -547,6 +567,12 @@ Use diff-mode when editing a git commit message
 
 ** Web Development
 
+Tree-sitter is a game-changer for syntax highlighting and code
+navigation. It's a parser generator tool that builds concrete syntax
+trees for source files, which enables much more accurate syntax
+highlighting and structural editing than regex-based modes. Emacs 29+
+has built-in support for it.
+
 #+begin_src emacs-lisp
   (use-package treesit
     :mode (("\\.tsx\\'" . tsx-ts-mode)
@@ -561,7 +587,9 @@ Use diff-mode when editing a git commit message
            ("\\.Dockerfile\\'" . dockerfile-ts-mode))
     :preface
     (defun os/setup-install-grammars ()
-      "Install Tree-sitter grammars if they are absent."
+      "Install Tree-sitter grammars if they are absent.
+  This function checks if each grammar is already installed before downloading it,
+  which saves time during initialization."
       (interactive)
       (dolist (grammar
                '((css . ("https://github.com/tree-sitter/tree-sitter-css" "v0.20.0"))
@@ -589,12 +617,8 @@ Use diff-mode when editing a git commit message
         (unless (treesit-language-available-p (car grammar))
           (treesit-install-language-grammar (car grammar)))))
 
-    ;; Optional, but recommended. Tree-sitter enabled major modes are
-    ;; distinct from their ordinary counterparts.
-    ;;
-    ;; You can remap major modes with `major-mode-remap-alist'. Note
-    ;; that this does *not* extend to hooks! Make sure you migrate them
-    ;; also
+    ;; Remap traditional modes to tree-sitter modes
+    ;; This is a huge improvement for syntax highlighting
     (dolist (mapping
              '((python-mode . python-ts-mode)
                (css-mode . css-ts-mode)
@@ -617,45 +641,50 @@ Use diff-mode when editing a git commit message
 
 #+end_src
 
-** Rust
+** Language Server Protocol (LSP)
 
-Rust is my language du jour. It's slowly becoming my favourite
-programming language.
-
-** TODO Move LSP specific configuration in it's own section
+LSP is a game-changer for IDE-like features in Emacs. It provides code
+completion, go-to-definition, find references, and much more. I use it
+for most of my programming languages.
 
 #+begin_src elisp
+  ;; Ivy integration for LSP
   (use-package ivy
     :ensure t
     :config
-    (ivy-mode 1))
+    (ivy-mode 1))  ; Ivy is my preferred completion framework
 
+  ;; LSP + Ivy integration for symbol search
   (use-package lsp-ivy
     :ensure t
-    :commands lsp-ivy-workspace-symbol)
+    :commands lsp-ivy-workspace-symbol)  ; Search for symbols across the workspace
 
+  ;; UI enhancements for LSP
   (use-package lsp-ui
     :ensure t
     :commands lsp-ui-mode
     :hook (lsp-mode . lsp-ui-mode)
     :config
-    (setq lsp-ui-doc-enable nil))
+    (setq lsp-ui-doc-enable nil))  ; I prefer to trigger docs manually
 
+  ;; The main LSP mode package
   (use-package lsp-mode
     :ensure t
-    :commands (lsp lsp-deferred)
+    :commands (lsp lsp-deferred)  ; Only load when needed
     :hook
+    ;; Automatically start LSP when opening these file types
     ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode) . lsp-deferred)
     :preface
-  ;;  (setenv "LSP_USE_PLISTS" "true")
-
-    (setq read-process-output-max (* 10 1024 1024)
-          ;; gc-cons-threshold 200000000
-          ;; lsp-use-plists t
+    ;; Performance tweaks for LSP
+    (setq read-process-output-max (* 10 1024 1024)  ; 10MB - Increase read chunk size for better performance
+          ;; gc-cons-threshold 200000000           ; Uncomment to increase GC threshold
+          ;; lsp-use-plists t                      ; Uncomment to use plists instead of hashtables
           )
 
+    ;; LSP-booster integration for better performance
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
-      "Try to parse bytecode instead of json."
+      "Try to parse bytecode instead of json.
+  This dramatically improves performance when receiving large JSON responses."
       (or
        (when (equal (following-char) ?#)
          (let ((bytecode (read (current-buffer))))
@@ -664,7 +693,8 @@ programming language.
        (apply old-fn args)))
 
     (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-      "Prepend emacs-lsp-booster command to lsp CMDR."
+      "Prepend emacs-lsp-booster command to LSP server command.
+  This uses the external emacs-lsp-booster tool to speed up JSON parsing."
       (let ((orig-result (funcall old-fn cmd test?)))
         (if (and (not test?)                             ;; for check lsp-server-present?
                  (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
@@ -678,14 +708,7 @@ programming language.
               (cons "emacs-lsp-booster" orig-result))
           orig-result)))
     :init
-    ;; (require 'lsp-mode)
-    ;; ;; might need to register custom notificiton handlers
-    ;; (lsp-register-client
-    ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("odoo_ls_server"))
-    ;;                   :major-modes '(python-mode python-ts-mode)
-    ;;                   :server-id 'odoo-ls
-    ;;                   :priority 10))
-
+    ;; Apply our advice functions to speed up LSP
     (advice-add (if (progn (require 'json)
                            (fboundp 'json-parse-buffer))
                     'json-parse-buffer
@@ -693,7 +716,15 @@ programming language.
                 :around
                 #'lsp-booster--advice-json-parse)
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+#+end_src
 
+** Rust
+
+Rust is my language du jour. It's slowly becoming my favourite
+programming language. The rustic package provides excellent
+integration with rust-analyzer (via LSP) and cargo.
+
+#+begin_src elisp
   (use-package rustic
     :defer t
     :ensure t
@@ -770,8 +801,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package terraform-mode
     :ensure t)
 #+end_src
-
-Reset the GC threshold back to default
 
 ** Misc
 
