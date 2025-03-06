@@ -411,11 +411,16 @@ very annoying in when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
   (use-package ob-rust
     :ensure t)
 
   (use-package org
-    :ensure ob-rust
+    :ensure t
     :bind
     (:map
      org-mode-map
@@ -425,6 +430,28 @@ remap my brain, I'll remap it to =newline=.
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
     :config
+    (setq org-hide-emphasis-markers t)
+    (let* ((variable-tuple
+            (cond ((x-list-fonts "ETBembo")         '(:font "ETBembo"))
+                  ((x-list-fonts "Source Sans Pro") '(:font "Source Sans Pro"))
+                  ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+                  ((x-list-fonts "Verdana")         '(:font "Verdana"))
+                  ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+                  (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+           (base-font-color     (face-foreground 'default nil 'default))
+           (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+      (custom-theme-set-faces
+       'user
+       `(org-level-8 ((t (,@headline ,@variable-tuple))))
+       `(org-level-7 ((t (,@headline ,@variable-tuple))))
+       `(org-level-6 ((t (,@headline ,@variable-tuple))))
+       `(org-level-5 ((t (,@headline ,@variable-tuple))))
+       `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+       `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+       `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+       `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+       `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
     (turn-on-auto-fill)
     (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
@@ -647,6 +674,14 @@ programming language.
               (cons "emacs-lsp-booster" orig-result))
           orig-result)))
     :init
+    ;; (require 'lsp-mode)
+    ;; ;; might need to register custom notificiton handlers
+    ;; (lsp-register-client
+    ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("odoo_ls_server"))
+    ;;                   :major-modes '(python-mode python-ts-mode)
+    ;;                   :server-id 'odoo-ls
+    ;;                   :priority 10))
+
     (advice-add (if (progn (require 'json)
                            (fboundp 'json-parse-buffer))
                     'json-parse-buffer
