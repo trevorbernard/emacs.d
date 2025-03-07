@@ -1,5 +1,3 @@
-(require 'org)
-
 (let ((file-name-handler-alist nil))
   ;; If config is pre-compiled, then load that
   (if (file-exists-p (expand-file-name "configuration.elc" user-emacs-directory))
