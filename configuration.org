@@ -257,6 +257,8 @@ watch your code build.
   (use-package prog-mode
     :bind (:map prog-mode-map
                 ("C-c C-c" . compile))
+    :config
+    (setq show-trailing-whitespace t)
     :hook (prog-mode . display-line-numbers-mode))
 #+end_src
 
