@@ -159,7 +159,7 @@ some practice, it will become second-nature.
    inhibit-startup-message t
    ;; Allow short answers 'y' or 'n'
    use-short-answers t
-   ;; Make pgup/dn remember current line 
+   ;; Make pgup/dn remember current line
    scroll-preserve-screen-position t)
 
   ;; Auto revert buffers
@@ -171,7 +171,7 @@ some practice, it will become second-nature.
   ;; Syntax Highlighting
   (global-font-lock-mode 1)
   ;; Highlight parenthesis
-  (show-paren-mode 1) 
+  (show-paren-mode 1)
   ;; Highlight selected Regions
   (transient-mark-mode 1)
 #+end_src
@@ -236,12 +236,12 @@ options.
    ;; Mac file handling - move files to dedicated Emacs trash
    (setq delete-by-moving-to-trash t)
    (setq trash-directory "~/.Trash/emacs")
- 
+
    ;; Display preferences for macOS
    (setq ns-use-native-fullscreen t)
    (setq ns-use-thin-smoothing t)
    (setq ns-pop-up-frames nil)
- 
+
    ;; Avoid dired issues specific to macOS
    (setq dired-use-ls-dired nil))
 
