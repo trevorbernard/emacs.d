@@ -666,34 +666,33 @@ completion, go-to-definition, find references, and much more. I use it
 for most of my programming languages.
 
 #+begin_src elisp
-  ;; Ivy integration for LSP
   (use-package ivy
     :ensure t
     :config
-    (ivy-mode 1))  ; Ivy is my preferred completion framework
+    (ivy-mode 1))
 
-  ;; LSP + Ivy integration for symbol search
+  (use-package counsel
+    :ensure t
+    :after ivy
+    :config (counsel-mode))
+
   (use-package lsp-ivy
     :ensure t
-    :commands lsp-ivy-workspace-symbol)  ; Search for symbols across the workspace
+    :commands lsp-ivy-workspace-symbol)
 
-  ;; UI enhancements for LSP
   (use-package lsp-ui
     :ensure t
     :commands lsp-ui-mode
     :hook (lsp-mode . lsp-ui-mode)
     :config
-    (setq lsp-ui-doc-enable nil))  ; I prefer to trigger docs manually
+    (setq lsp-ui-doc-enable nil))
 
-  ;; The main LSP mode package
   (use-package lsp-mode
     :ensure t
-    :commands (lsp lsp-deferred)  ; Only load when needed
+    :commands (lsp lsp-deferred)
     :hook
-    ;; Automatically start LSP when opening these file types
     ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode) . lsp-deferred)
     :preface
-    ;; Performance tweaks for LSP
     (setq read-process-output-max (* 10 1024 1024)  ; 10MB - Increase read chunk size for better performance
           ;; gc-cons-threshold 200000000           ; Uncomment to increase GC threshold
           ;; lsp-use-plists t                      ; Uncomment to use plists instead of hashtables
