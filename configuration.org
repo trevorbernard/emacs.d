@@ -223,19 +223,28 @@ Allow functions without issuing warnings
 
 * Mac specific configuration
 
+Load environment variables from shell and set Mac-specific
+options.
 
 #+begin_src emacs-lisp
-  (use-package exec-path-from-shell
-    :if (eq system-type 'darwin)
-    :ensure t
-    :config
-    (exec-path-from-shell-initialize)
-    (setq 
-     browse-url-browser-function 'browse-url-default-macosx-browser
-     delete-by-moving-to-trash t
-     dired-use-ls-dired nil
-     ns-pop-up-frames nil
-     trash-directory "~/.Trash/emacs"))
+  (when (eq system-type 'darwin)
+   (use-package exec-path-from-shell
+     :ensure t
+     :config
+     (exec-path-from-shell-initialize))
+
+   ;; Mac file handling - move files to dedicated Emacs trash
+   (setq delete-by-moving-to-trash t)
+   (setq trash-directory "~/.Trash/emacs")
+ 
+   ;; Display preferences for macOS
+   (setq ns-use-native-fullscreen t)
+   (setq ns-use-thin-smoothing t)
+   (setq ns-pop-up-frames nil)
+ 
+   ;; Avoid dired issues specific to macOS
+   (setq dired-use-ls-dired nil))
+
 #+end_src
 
 * Development
