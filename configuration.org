@@ -283,11 +283,11 @@ Bind projectile to =C-c p= and enable by default.
     :ensure t
     :diminish projectile-mode
     :init
-    (setq projectile-project-search-path '("~/p/"))
-    (setq projectile-completion-system 'ivy)
-    (setq projectile-enable-caching t)
-    (setq projectile-indexing-method 'alien)
-    (setq projectile-sort-order 'recently-active)
+    (setq projectile-project-search-path '("~/p/")
+          projectile-completion-system 'ivy
+          projectile-enable-caching t
+          projectile-indexing-method 'alien
+          projectile-sort-order 'recently-active)
     :config
     (projectile-mode +1)
     :bind-keymap
