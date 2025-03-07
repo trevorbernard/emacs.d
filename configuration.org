@@ -27,6 +27,7 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
+  (setq gc-cons-threshold (* 1024 1024 100))
 
   (require 'package)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -52,25 +53,25 @@ strokes until they are second nature. You can thank me later.
   ;; some breathing room
   (set-fringe-mode 10)
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-#+end_src
-
-Set the default GC threshold to be 100MB to increase startup
-performance. We'll reset it back to default at the end of the file.
-
-#+begin_src emacs-lisp
-  (setq gc-cons-threshold (* 1024 1024 100))
 #+end_src
 
 ** Package Settings
 
-To improve startup performance, we’ll manually set up the load-path
-and avoid calling =(package-initialize)=. By setting
-=package--init-file-ensured= to t, we prevent =package.el= from
-automatically initializing the package system. Additionally, we set
-package-enable-at-startup to nil, ensuring packages won’t load
-automatically at startup; use-package will manage package loading
-instead.
+To improve startup performance, we'll manually set up the load-path
+and avoid calling =(package-initialize)=. This custom setup consists of
+several key settings:
+
+Setting =load-prefer-newer= to t, ensuring newer versions of elisp files
+are preferred Defining =package-user-dir= explicitly as
+"~/.emacs.d/elpa" Setting =package--init-file-ensured= to t, which
+prevents =package.el= from automatically initializing Setting
+=package-enable-at-startup= to nil to prevent automatic package loading
+at startup
+
+We also create the package directory if it doesn't exist yet, then add
+all package directories to the load path. With this configuration,
+=use-package= will handle package loading instead of the default
+mechanisms.
 
 #+begin_src emacs-lisp
   (eval-and-compile
@@ -80,15 +81,16 @@ instead.
           package-enable-at-startup nil)
 
     (unless (file-directory-p package-user-dir)
-      (make-directory package-user-dir t)))
+      (make-directory package-user-dir t))
+
+    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
 #+end_src
+
+Lazy load packages by default
 
 #+begin_src emacs-lisp
   (setq use-package-always-defer t
         use-package-verbose t)
-
-  (eval-and-compile
-    (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -147,33 +149,6 @@ some practice, it will become second-nature.
 #+begin_src emacs-lisp
   (keymap-global-set "C-x C-m" 'execute-extended-command)
   (keymap-global-set "C-c C-m" 'execute-extended-command)
-#+end_src
-
-* Development
-
-** Programming Modes
-
-When in programming mode, I bind =C-c C-c= to run ='compile=. This is a
-huge time-saver when working on projects - just hit the key combo and
-watch your code build.
-
-#+begin_src emacs-lisp
-  (use-package prog-mode
-    :bind (:map prog-mode-map
-                ("C-c C-c" . compile))
-    :hook (prog-mode . display-line-numbers-mode))
-#+end_src
-
-** Terminals
-
-Let's try vterm to see if we like it. It's supposedly better than the
-built-in term/ansi-term because it's a fully-fledged terminal emulator
-that handles escape sequences properly.
-
-#+begin_src emacs-lisp
-  (use-package vterm
-    :defer t
-    :ensure t)
 #+end_src
 
 * Preferences
@@ -263,20 +238,45 @@ Allow functions without issuing warnings
      trash-directory "~/.Trash/emacs"))
 #+end_src
 
-* Programming Languages
+* Development
 
-Bind projectile to =C-c p= and enable by default.
+When in programming mode, I bind =C-c C-c= to run ='compile=. This is a
+huge time-saver when working on projects - just hit the key combo and
+watch your code build.
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :bind (:map prog-mode-map
+                ("C-c C-c" . compile))
+    :hook (prog-mode . display-line-numbers-mode))
+#+end_src
+
+** Terminals
+
+Let's try vterm to see if we like it. It's supposedly better than the
+built-in term/ansi-term because it's a fully-fledged terminal emulator
+that handles escape sequences properly.
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :defer t
+    :ensure t)
+#+end_src
 
 ** Projectile Mode
+
+Bind projectile to =C-c p= and enable by default.
 
 #+begin_src emacs-lisp
   (use-package projectile
     :ensure t
-    :commands (projectile-mode projectile-command-map)
+    :diminish projectile-mode
     :init
     (setq projectile-project-search-path '("~/p/"))
-    (setq projectile-keymap-prefix (kbd "C-c p"))
     (setq projectile-completion-system 'ivy)
+    (setq projectile-enable-caching t)
+    (setq projectile-indexing-method 'alien)
+    (setq projectile-sort-order 'recently-active)
     :config
     (projectile-mode +1)
     :bind-keymap
