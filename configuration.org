@@ -33,7 +33,11 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
   (require 'use-package)
+
 #+end_src
 
 ** Emacs Initialization
@@ -294,6 +298,18 @@ Bind projectile to =C-c p= and enable by default.
     ("C-c p" . projectile-command-map))
 #+end_src
 
+** Company
+
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :bind
+    (:map company-active-map
+          ("C-n". company-select-next)
+          ("C-p". company-select-previous)
+          ("M-<". company-select-first)
+          ("M->". company-select-last)))
+#+end_src
 ** Magit
 
 =C-c= is reserved for the user. Add a more friendly binding for
@@ -344,15 +360,6 @@ I don't like my cider to be bleeding edge since it's caused
 compatibility problems in the past so pin it to melpa-stable.
 
 #+begin_src emacs-lisp
-  (use-package company
-    :ensure t
-    :bind
-    (:map company-active-map
-          ("C-n". company-select-next)
-          ("C-p". company-select-previous)
-          ("M-<". company-select-first)
-          ("M->". company-select-last)))
-
   (use-package clojure-mode
     :ensure t
     :defer t
