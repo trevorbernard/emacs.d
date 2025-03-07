@@ -297,7 +297,9 @@ Bind projectile to =C-c p= and enable by default.
     :config
     (projectile-mode +1)
     :bind-keymap
-    ("C-c p" . projectile-command-map))
+    ("C-c p" . projectile-command-map)
+    :bind (:map projectile-command-map
+                ("C" . projectile-invalidate-cache)))
 #+end_src
 
 ** Company
