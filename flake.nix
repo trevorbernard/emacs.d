@@ -23,6 +23,7 @@
           devShells.default = pkgs.mkShell {
             buildInputs = [
               pkgs.emacs29
+              pkgs.cmake
             ];
             shellHook = ''
               echo "Welcome to the Emacs development environment"
