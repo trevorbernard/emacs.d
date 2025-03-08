@@ -262,10 +262,12 @@ watch your code build.
 #+begin_src emacs-lisp
   (use-package prog-mode
     :bind (:map prog-mode-map
-                ("C-c C-c" . compile))
+                ("C-c C-c" . compile)
+                ("M-n" . highlight-symbol-next)
+                ("M-p" . highlight-symbol-prev))
     :config
     (setq show-trailing-whitespace t)
-    :hook (prog-mode . display-line-numbers-mode))
+    :hook ((prog-mode . display-line-numbers-mode)))
 #+end_src
 
 ** Terminals
@@ -312,7 +314,8 @@ Bind projectile to =C-c p= and enable by default.
           ("C-n". company-select-next)
           ("C-p". company-select-previous)
           ("M-<". company-select-first)
-          ("M->". company-select-last)))
+          ("M->". company-select-last))
+    :hook (prog-mode . company-mode))
 #+end_src
 ** Magit
 
@@ -368,11 +371,9 @@ compatibility problems in the past so pin it to melpa-stable.
     :ensure t
     :defer t
     :config
-    (setq show-trailing-whitespace 1)
     (setq clojure-align-forms-automatically t)
     (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-    (add-hook 'clojure-mode-hook #'subword-mode)
-    (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+    (add-hook 'clojure-mode-hook #'subword-mode))
 
   (use-package inf-clojure
     :ensure t
@@ -387,11 +388,7 @@ compatibility problems in the past so pin it to melpa-stable.
     :custom
     (nrepl-log-messages t)
     (cider-repl-use-clojure-font-lock t)
-    (cider-repl-display-help-banner nil)
-    :config
-    (add-hook 'cider-mode-hook #'company-mode)
-    (add-hook 'cider-repl-mode-hook #'company-mode)
-    (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
+    (cider-repl-display-help-banner nil))
 #+end_src
 
 I have long since used this key binding to jack into a repl. My
