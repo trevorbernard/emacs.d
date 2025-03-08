@@ -854,11 +854,12 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
   (use-package yasnippet
     :ensure t
-    :defer 15 ;; takes a while to load so do it async
+    :defer t
+    :diminish yas-minor-mode
+    :hook ((prog-mode . yas-minor-mode)
+           (org-mode . yas-minor-mode))
     :config
-    (yas-reload-all)
-    :hook ((prog-mode . yas-minor-mode-on)
-           (org-mode . yas-minor-mode-on)))
+    (yas-reload-all))
 #+end_src
 
 Reset the garbage collection threshold.
