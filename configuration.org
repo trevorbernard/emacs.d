@@ -36,8 +36,9 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
-  (require 'use-package)
 
+  (eval-when-compile
+    (require 'use-package))
 #+end_src
 
 ** Emacs Initialization
