@@ -30,8 +30,9 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
   (setq gc-cons-threshold (* 1024 1024 100))
 
   (require 'package)
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                           ("melpa-stable" . "https://stable.melpa.org/packages/")
+                           ("gnu" . "https://elpa.gnu.org/packages/")))
 
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
@@ -39,6 +40,12 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
   (eval-when-compile
     (require 'use-package))
+
+  ;; general use-package settings
+
+  (setq use-package-always-defer t
+        use-package-verbose nil  ; Set to t for debugging, nil for performance
+        use-package-minimum-reported-time 0.1)
 #+end_src
 
 ** Emacs Initialization
@@ -48,16 +55,17 @@ bar, tool bar, and scroll bar. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  (when window-system
-    (set-frame-font "Fira Code Retina 20" nil t))
-
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-  (scroll-bar-mode -1)
-
-  ;; some breathing room
-  (set-fringe-mode 10)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+  ;; after-init-hook - runs after loading init.el (earlier)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (load-theme 'timu-spacegrey t)
+              (when window-system
+                (set-frame-font "Fira Code Retina 20" nil t))
+              (set-fringe-mode 10)
+              (menu-bar-mode -1)
+              (tool-bar-mode -1)
+              (scroll-bar-mode -1)
+              (mood-line-mode)))
 #+end_src
 
 ** Package Settings
@@ -79,7 +87,7 @@ all package directories to the load path. With this configuration,
 mechanisms.
 
 #+begin_src emacs-lisp
-  (eval-and-compile
+  (eval-when-compile
     (setq load-prefer-newer t
           package-user-dir "~/.emacs.d/elpa"
           package--init-file-ensured t
@@ -93,28 +101,17 @@ mechanisms.
         (add-to-list 'load-path dir))))
 #+end_src
 
-Lazy load packages by default
-
+** Theme
 #+begin_src emacs-lisp
-  (setq use-package-always-defer t
-        use-package-verbose t)
-#+end_src
-
-#+begin_src emacs-lisp
-  (use-package timu-spacegrey-theme
-    :ensure t
-    :demand t
-    :config
-    (load-theme 'timu-spacegrey t))
+  (use-package timu-spacegrey-theme :ensure t)
 
   (use-package mood-line
     :ensure t
-    :config (mood-line-mode)
     :custom
     (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
 
-Experimenting with parens
+** Rainbow Delimiters
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
@@ -122,6 +119,7 @@ Experimenting with parens
     :defer t
     :hook ((prog-mode . rainbow-delimiters-mode)))
 #+end_src
+
 ** Personal
 
 That's me.
@@ -137,9 +135,12 @@ Ignore minimize functionality when you're in the GUI because it's very
 annoying to accidentally minimize your window.
 
 #+begin_src emacs-lisp
-  (when window-system
-    (keymap-global-set "C-z" 'ignore)
-    (keymap-global-set "C-x C-z" 'ignore))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (when window-system
+                (keymap-global-set "C-z" 'ignore)
+                (keymap-global-set "C-x C-z" 'ignore))
+              (add-to-list 'initial-frame-alist '(fullscreen . maximized))))
 #+end_src
 
 *** Invoke M-x without the Alt key
@@ -154,8 +155,10 @@ fingers on the home row if you have Caps Lock mapped to Control. With
 some practice, it will become second-nature.
 
 #+begin_src emacs-lisp
-  (keymap-global-set "C-x C-m" 'execute-extended-command)
-  (keymap-global-set "C-c C-m" 'execute-extended-command)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (keymap-global-set "C-x C-m" 'execute-extended-command)
+              (keymap-global-set "C-c C-m" 'execute-extended-command)))
 #+end_src
 
 * Preferences
@@ -293,18 +296,16 @@ Bind projectile to =C-c p= and enable by default.
   (use-package projectile
     :ensure t
     :diminish projectile-mode
-    :init
-    (setq projectile-project-search-path '("~/p/")
-          projectile-completion-system 'ivy
-          projectile-enable-caching t
-          projectile-indexing-method 'alien
-          projectile-sort-order 'recently-active)
-    :config
-    (projectile-mode +1)
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
+    :custom
+    (projectile-project-search-path '("~/p/"))
+    (projectile-completion-system 'ivy)
+    (projectile-enable-caching t)
+    (projectile-indexing-method 'alien)
+    (projectile-sort-order 'recently-active)
+    :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
-                ("C" . projectile-invalidate-cache)))
+                ("C" . projectile-invalidate-cache))
+    :hook (after-init . projectile-mode))
 #+end_src
 
 ** Company
@@ -551,18 +552,17 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (use-package flyspell
     :ensure t
-    :config
-    (setq flyspell-issue-welcome-flag nil)
-    (setq flyspell-issue-message-flag nil)
-    (setq flyspell-mark-duplications-flag nil)
-    (setq ispell-program-name "aspell")
-    (setq ispell-list-command "list")
-    (define-key flyspell-mouse-map [down-mouse-3] 'flyspell-correct-word)
-    (define-key flyspell-mouse-map [mouse-3] 'undefined)
-    :hook ((text-mode . flyspell-mode)
-           (org-mode . flyspell-mode)
-           (prog-mode . flyspell-prog-mode)
-           (markdown-mode . flyspell-mode)))
+    :custom
+    (flyspell-issue-welcome-flag nil)
+    (flyspell-issue-message-flag nil)
+    (flyspell-mark-duplications-flag nil)
+    (ispell-program-name "aspell")
+    (ispell-list-command "list")
+    :bind (:map flyspell-mouse-map
+                ([down-mouse-3] . flyspell-correct-word)
+                ([mouse-3] . undefined))
+    :hook ((text-mode org-mode markdown-mode . flyspell-mode)
+           (prog-mode . flyspell-prog-mode)))
 #+end_src
 
 ** Markdown
@@ -856,16 +856,12 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
   (use-package yasnippet
     :ensure t
-    :defer t
     :diminish yas-minor-mode
-    :hook ((prog-mode . yas-minor-mode)
-           (org-mode . yas-minor-mode))
-    :config
-    (yas-reload-all))
+    :hook (after-init . yas-global-mode))
 #+end_src
 
 Reset the garbage collection threshold.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 800000)
-#+end_src
+#+end_SEC
