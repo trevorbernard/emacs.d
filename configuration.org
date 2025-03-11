@@ -829,7 +829,9 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package yasnippet
     :ensure t
     :diminish yas-minor-mode
-    :hook (after-init . yas-global-mode))
+    :commands (yas-minor-mode yas-global-mode)
+    :hook ((prog-mode . yas-minor-mode)
+           (org-mode . yas-minor-mode)))
 #+end_src
 
 Reset the garbage collection threshold.
