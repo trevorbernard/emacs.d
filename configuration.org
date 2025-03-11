@@ -521,6 +521,7 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (use-package flyspell
     :ensure t
+    :defer t
     :commands (flyspell-mode flyspell-prog-mode)
     :custom
     (flyspell-issue-welcome-flag nil)
@@ -533,6 +534,7 @@ packages only when they are missing.
                 ([mouse-3] . undefined))
     :hook (((text-mode org-mode markdown-mode) . flyspell-mode)
            (prog-mode . flyspell-prog-mode)))
+
 #+end_src
 
 ** Markdown
