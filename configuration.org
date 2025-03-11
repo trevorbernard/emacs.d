@@ -71,12 +71,7 @@ strokes until they are second nature. You can thank me later.
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
-    (set-fringe-mode 10)
-    :hook
-    (window-setup . (lambda ()
-                      (when window-system
-                        (set-frame-font "Fira Code Retina 20" nil t)))))
-
+    (set-fringe-mode 10))
 #+end_src
 
 ** Package Settings
