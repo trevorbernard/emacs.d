@@ -25,12 +25,16 @@ I strongly suggest you remap your Caps Lock key to Control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
 binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
-** General user-package settings
+** Preamble
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
   (setq gc-cons-threshold (* 1024 1024 100))
+#+end_src
 
+** General user-package settings
+
+#+begin_src emacs-lisp
   (require 'package)
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -41,11 +45,12 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
     (package-install 'use-package))
 
   (eval-when-compile
+    (setq use-package-always-defer t
+          use-package-verbose nil  ; Set to t for debugging, nil for performance
+          use-package-minimum-reported-time 0.1)
     (require 'use-package))
 
-  (setq use-package-always-defer t
-        use-package-verbose nil  ; Set to t for debugging, nil for performance
-        use-package-minimum-reported-time 0.1)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
 
 ** Emacs Initialization
@@ -56,14 +61,16 @@ strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
   (use-package emacs
+    :config
+    (menu-bar-mode -1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1)
+    (set-fringe-mode 10)
     :hook
-    (after-init . (lambda ()
-                    (when window-system
-                      (set-frame-font "Fira Code Retina 20" nil t))
-                    (set-fringe-mode 10)
-                    (menu-bar-mode -1)
-                    (tool-bar-mode -1)
-                    (scroll-bar-mode -1))))
+    (window-setup . (lambda ()
+                      (when window-system
+                        (set-frame-font "Fira Code Retina 20" nil t)))))
+
 #+end_src
 
 ** Package Settings
@@ -140,8 +147,7 @@ annoying to accidentally minimize your window.
             (lambda ()
               (when window-system
                 (keymap-global-set "C-z" 'ignore)
-                (keymap-global-set "C-x C-z" 'ignore))
-              (add-to-list 'initial-frame-alist '(fullscreen . maximized))))
+                (keymap-global-set "C-x C-z" 'ignore))))
 #+end_src
 
 *** Invoke M-x without the Alt key
@@ -575,9 +581,7 @@ packages only when they are missing.
   (use-package markdown-mode
     :ensure t
     :mode (("\\.md\\'" . gfm-mode)
-           ("\\.markdown\\'" . gfm-mode))
-
-    )
+           ("\\.markdown\\'" . gfm-mode)))
 #+end_src
 
 ** Git
