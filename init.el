@@ -23,6 +23,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#2b303b" :foreground "#c0c5ce" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 200 :width normal :foundry "nil" :family "Fira Code"))))
  '(org-document-title ((t (:inherit default :weight bold :foreground "#c0c5ce" :font "ETBembo" :height 2.0 :underline nil))))
  '(org-level-1 ((t (:inherit default :weight bold :foreground "#c0c5ce" :font "ETBembo" :height 1.75))))
  '(org-level-2 ((t (:inherit default :weight bold :foreground "#c0c5ce" :font "ETBembo" :height 1.5))))
