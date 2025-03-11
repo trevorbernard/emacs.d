@@ -27,12 +27,18 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 ** Preamble
 
+Use lexical bindings and set the =gc-cons-threshold= to something usable for the
+startup process.
+
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
   (setq gc-cons-threshold (* 1024 1024 100))
 #+end_src
 
-** General user-package settings
+** General use-package settings
+
+Also, include melpa and melpa-stable repositories. Ensure that =use-package= is
+installed and configured.
 
 #+begin_src emacs-lisp
   (require 'package)
@@ -409,48 +415,6 @@ fingers are programmed this way.
   (keymap-global-set "C-c C-j" 'cider-jack-in)
 #+end_src
 
-When you hit =f3= at the end of the sexp in Clojure, it will copy and
-evaluate the function into the current repl. I no longer use this
-function but it might be useful to someone eventually. It's a quick
-way to send code to the REPL without having to select and copy it
-manually.
-
-#+begin_src emacs-lisp
-  ;;;###autoload
-  (defun my-last-expression ()
-    "Return the last sexp (S-expression) before point.
-  This grabs the Clojure/Lisp expression that your cursor is positioned after."
-    (buffer-substring-no-properties
-     (save-excursion (backward-sexp) (point))
-     (point)))
-
-    ;;;###autoload
-  (defun cider-execute-in-current-repl (expr)
-    "Send the expression EXPR to the currently active REPL and evaluate it.
-  If there's no active connection, show a message instead."
-    (if (not (get-buffer (cider-current-connection)))
-        (message "No active nREPL connection.")
-      (progn
-        (set-buffer (cider-current-repl))
-        (goto-char (point-max))
-        (insert expr)
-        (cider-repl-return))))
-
-    ;;;###autoload
-  (defun cider-eval-expression-at-point-in-repl ()
-    "Evaluate the expression at point in the active REPL.
-  This grabs the expression, cleans up whitespace, and sends it to the REPL."
-    (interactive)
-    (let ((form (my-last-expression)))
-      ;; Eat whitespace from beginning and end
-      (while (string-match "\\`\s+\\|\n+\\'" form)
-        (setq form (replace-match "" t t form)))
-      (cider-execute-in-current-repl form)))
-
-  (with-eval-after-load 'cider-repl-mode-hook
-    (local-set-key '[f3] 'cider-eval-expression-at-point-in-repl))
-#+end_src
-
 ** Elisp
 
 #+begin_src emacs-lisp
@@ -467,8 +431,8 @@ remap my brain, I'll remap it to =newline=.
 #+begin_src emacs-lisp
   (use-package org-bullets
     :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    :after org
+    :hook (org-mode . org-bullets-mode))
 
   (use-package ob-rust
     :ensure t)
@@ -483,6 +447,8 @@ remap my brain, I'll remap it to =newline=.
      ("C-c l" . org-store-link)
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
+    :custom
+    (org-hide-emphasis-markers t)
     :config
     (when window-system
       (let* ((variable-tuple
@@ -506,7 +472,6 @@ remap my brain, I'll remap it to =newline=.
          `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
          `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
          `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil)))))))
-    (setq org-hide-emphasis-markers t)
     (turn-on-auto-fill)
     (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
@@ -551,7 +516,9 @@ packages only when they are missing.
     :init (global-flycheck-mode)
     :bind (:map flycheck-mode-map
                 ("M-n" . flycheck-next-error) ; optional but recommended error navigation
-                ("M-p" . flycheck-previous-error)))
+                ("M-p" . flycheck-previous-error))
+    :hook ((prog-mode . flycheck-mode)
+           (text-mode . flycheck-mode)))
 #+end_src
 
 ** Flyspell
@@ -559,6 +526,7 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (use-package flyspell
     :ensure t
+    :commands (flyspell-mode flyspell-prog-mode)
     :custom
     (flyspell-issue-welcome-flag nil)
     (flyspell-issue-message-flag nil)
@@ -676,13 +644,12 @@ for most of my programming languages.
 #+begin_src elisp
   (use-package ivy
     :ensure t
-    :config
-    (ivy-mode 1))
+    :hook (after-init . ivy-mode))
 
   (use-package counsel
     :ensure t
     :after ivy
-    :config (counsel-mode))
+    :hook (ivy-mode . counsel-mode))
 
   (use-package lsp-ivy
     :ensure t
@@ -869,4 +836,4 @@ Reset the garbage collection threshold.
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold 800000)
-#+end_SEC
+#+end_src
