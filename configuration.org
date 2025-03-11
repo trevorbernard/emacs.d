@@ -25,6 +25,8 @@ I strongly suggest you remap your Caps Lock key to Control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
 binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
+** General user-package settings
+
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
   (setq gc-cons-threshold (* 1024 1024 100))
@@ -41,8 +43,6 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
   (eval-when-compile
     (require 'use-package))
 
-  ;; general use-package settings
-
   (setq use-package-always-defer t
         use-package-verbose nil  ; Set to t for debugging, nil for performance
         use-package-minimum-reported-time 0.1)
@@ -55,17 +55,15 @@ bar, tool bar, and scroll bar. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
 
 #+begin_src emacs-lisp
-  ;; after-init-hook - runs after loading init.el (earlier)
-  (add-hook 'after-init-hook
-            (lambda ()
-              (load-theme 'timu-spacegrey t)
-              (when window-system
-                (set-frame-font "Fira Code Retina 20" nil t))
-              (set-fringe-mode 10)
-              (menu-bar-mode -1)
-              (tool-bar-mode -1)
-              (scroll-bar-mode -1)
-              (mood-line-mode)))
+  (use-package emacs
+    :hook
+    (after-init . (lambda ()
+                    (when window-system
+                      (set-frame-font "Fira Code Retina 20" nil t))
+                    (set-fringe-mode 10)
+                    (menu-bar-mode -1)
+                    (tool-bar-mode -1)
+                    (scroll-bar-mode -1))))
 #+end_src
 
 ** Package Settings
@@ -103,10 +101,13 @@ mechanisms.
 
 ** Theme
 #+begin_src emacs-lisp
-  (use-package timu-spacegrey-theme :ensure t)
+  (use-package timu-spacegrey-theme
+    :ensure t
+    :hook (after-init . (lambda () (load-theme 'timu-spacegrey t))))
 
   (use-package mood-line
     :ensure t
+    :hook (after-init . mood-line-mode)
     :custom
     (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
@@ -561,7 +562,7 @@ packages only when they are missing.
     :bind (:map flyspell-mouse-map
                 ([down-mouse-3] . flyspell-correct-word)
                 ([mouse-3] . undefined))
-    :hook ((text-mode org-mode markdown-mode . flyspell-mode)
+    :hook (((text-mode org-mode markdown-mode) . flyspell-mode)
            (prog-mode . flyspell-prog-mode)))
 #+end_src
 
