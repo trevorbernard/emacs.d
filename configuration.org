@@ -71,7 +71,7 @@ strokes until they are second nature. You can thank me later.
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
-    (set-fringe-mode 10))
+    (set-fringe-mode nil))
 #+end_src
 
 ** Package Settings
@@ -172,6 +172,8 @@ some practice, it will become second-nature.
 * Preferences
 
 #+begin_src emacs-lisp
+  (setq frame-resize-pixelwise t
+        frame-inhibit-implied-resize t)
   (setq
    ;; Don't display the emacs apropos
    inhibit-startup-message t
@@ -829,6 +831,8 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :commands (yas-minor-mode yas-global-mode)
     :hook ((prog-mode . yas-minor-mode)
            (org-mode . yas-minor-mode)))
+
+  (use-package dotenv-mode :ensure t)
 #+end_src
 
 Reset the garbage collection threshold.
