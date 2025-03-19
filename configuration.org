@@ -793,16 +793,22 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :ensure t)
 #+end_src
 
+** Justfile
+
+#+begin_src emacs-lisp
+  (use-package just-ts-mode
+    :ensure t
+    :config
+    (setq-local
+     just-ts-indent-offset 2
+     tab-width 2))
+#+end_src
+
 ** Misc
 
 #+begin_src emacs-lisp
   (use-package csv-mode
     :ensure t)
-
-  (use-package just-mode
-    :ensure t
-    :config
-    (setq just-indent-offset 2))
 
   (use-package dockerfile-mode
     :ensure t)
