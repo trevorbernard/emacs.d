@@ -18,3 +18,4 @@ tree-sitter/
 .cache/
 request/
 *.elc
+tramp
