@@ -22,7 +22,7 @@
         rec {
           devShells.default = pkgs.mkShell {
             buildInputs = [
-              pkgs.emacs29
+              pkgs.emacs
               pkgs.cmake
             ];
             shellHook = ''
