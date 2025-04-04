@@ -23,7 +23,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(just-ts-mode dotenv-mode direnv org-bullets vterm which-key treemacs mood-line lsp-ivy yafolding robe exec-path-from-shell yasnippet string-inflection ag htmlize bnf-mode yaml-mode dockerfile-mode csv-mode terraform-mode nix-mode nixpkgs-fmt tuareg rustic lsp-ui lsp-mode ivy markdown-mode ox-gfm ob-rust paredit cider inf-clojure clojure-mode company rainbow-delimiters magit projectile timu-spacegrey-theme hurl-mode))
+   '(ag bnf-mode cider clojure-mode company csv-mode dhall-mode direnv
+        dockerfile-mode dotenv-mode exec-path-from-shell htmlize hurl-mode
+        inf-clojure ivy just-ts-mode lsp-ivy lsp-mode lsp-ui magit markdown-mode
+        mood-line nix-mode nixfmt nixpkgs-fmt ob-rust org-bullets ox-gfm paredit
+        projectile rainbow-delimiters robe rustic string-inflection
+        terraform-mode timu-spacegrey-theme treemacs tuareg vterm which-key
+        yafolding yaml-mode yasnippet))
  '(safe-local-variable-values
    '((eval with-eval-after-load 'lsp-mode
            (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cargo\\'")
