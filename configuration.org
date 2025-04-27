@@ -68,6 +68,12 @@ strokes until they are second nature. You can thank me later.
 #+begin_src emacs-lisp
   (use-package emacs
     :config
+    (when window-system
+      (cond
+       ((eq system-type 'darwin)
+        (set-frame-font "Fira Code Retina 20" nil t))
+       ((eq system-type 'gnu/linux)
+        (set-frame-font "Fira Code 11" nil t))))
     (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
