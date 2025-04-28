@@ -161,8 +161,6 @@ some practice, it will become second-nature.
 * Preferences
 
 #+begin_src emacs-lisp
-  (setq frame-resize-pixelwise t
-        frame-inhibit-implied-resize t)
   (setq
    ;; Allow short answers 'y' or 'n'
    use-short-answers t
@@ -748,29 +746,20 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 ** Nix
 
 #+begin_src elisp
-  (use-package nixpkgs-fmt
-    :ensure t)
+  (use-package lsp-nix
+    :ensure lsp-mode
+    :after (lsp-mode)
+    :demand t
+    :custom
+    (lsp-nix-nil-formatter ["alejandra"]))
 
   (use-package nix-mode
-    :mode ("\\.nix\\'" "\\.nix.in\\'")
     :ensure t
-    :bind
-    (:map nix-mode-map
-          ("C-c C-f" . nixpkgs-fmt))
-    :config
-    (nixpkgs-fmt-on-save-mode))
+    :hook (nix-mode . lsp-deferred))
 
-  (use-package nix-drv-mode
+  (use-package nixpkgs-fmt
     :ensure nix-mode
-    :mode "\\.drv\\'")
-
-  (use-package nix-shell
-    :ensure nix-mode
-    :commands (nix-shell-unpack nix-shell-configure nix-shell-build))
-
-  (use-package nix-repl
-    :ensure nix-mode
-    :commands (nix-repl))
+    :after (nix-mode))
 #+end_src
 
 ** Terraform
