@@ -14,7 +14,7 @@
       scroll-bar-mode nil
       set-fringe-mode nil)
 
-;; (menu-bar-mode -1)
+(menu-bar-mode -1)
 ;; (tool-bar-mode -1)
 ;; (scroll-bar-mode -1)
 ;; (set-fringe-mode nil)
@@ -28,6 +28,8 @@
       inhibit-startup-echo-area-message t
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
+
+(setenv "LSP_USE_PLISTS" "true")
 
 (provide 'early-init)
 

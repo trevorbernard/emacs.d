@@ -652,9 +652,10 @@ for most of my programming languages.
     :hook
     ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode) . lsp-deferred)
     :preface
+    (setq lsp-log-io nil)
     (setq read-process-output-max (* 10 1024 1024)  ; 10MB - Increase read chunk size for better performance
           ;; gc-cons-threshold 200000000           ; Uncomment to increase GC threshold
-          ;; lsp-use-plists t                      ; Uncomment to use plists instead of hashtables
+          lsp-use-plists t                      ; Uncomment to use plists instead of hashtables
           )
 
     ;; LSP-booster integration for better performance
