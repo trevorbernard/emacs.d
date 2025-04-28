@@ -55,8 +55,6 @@ installed and configured.
           use-package-verbose nil  ; Set to t for debugging, nil for performance
           use-package-minimum-reported-time 0.1)
     (require 'use-package))
-
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
 #+end_src
 
 ** Emacs Initialization
@@ -64,21 +62,6 @@ installed and configured.
 I like to have my Emacs clean, crisp, and minimal. Disable the menu
 bar, tool bar, and scroll bar. Protip: Learn the Emacs navigation key
 strokes until they are second nature. You can thank me later.
-
-#+begin_src emacs-lisp
-  (use-package emacs
-    :config
-    (when window-system
-      (cond
-       ((eq system-type 'darwin)
-        (set-frame-font "Fira Code Retina 20" nil t))
-       ((eq system-type 'gnu/linux)
-        (set-frame-font "Fira Code 11" nil t))))
-    (menu-bar-mode -1)
-    (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (set-fringe-mode nil))
-#+end_src
 
 ** Package Settings
 
@@ -181,8 +164,6 @@ some practice, it will become second-nature.
   (setq frame-resize-pixelwise t
         frame-inhibit-implied-resize t)
   (setq
-   ;; Don't display the emacs apropos
-   inhibit-startup-message t
    ;; Allow short answers 'y' or 'n'
    use-short-answers t
    ;; Make pgup/dn remember current line
