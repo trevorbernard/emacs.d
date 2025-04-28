@@ -1,35 +1,24 @@
 {
-  description = "An Emacs development environment";
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+
+  outputs = { self, nixpkgs, ... }: let
+    supportedSystems = ["x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin"];
+    forEachSupportedSystem = f:
+      nixpkgs.lib.genAttrs supportedSystems (system:
+        f {
+          pkgs = import nixpkgs { inherit system; };
+        });
+  in {
+    devShells = forEachSupportedSystem ({ pkgs }: {
+      default = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          emacs
+          cmake
+        ];
+        shellHook = ''
+          echo "Welcome to the Emacs development environment"
+        '';
+      };
+    });
   };
-
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
-    ...
-  }:
-    flake-utils.lib.eachSystem
-    [
-      "aarch64-darwin"
-      "x86_64-linux"
-    ]
-    (
-      system: let
-        pkgs = import nixpkgs { inherit system; };
-      in
-        rec {
-          devShells.default = pkgs.mkShell {
-            buildInputs = [
-              pkgs.emacs
-              pkgs.cmake
-            ];
-            shellHook = ''
-              echo "Welcome to the Emacs development environment"
-            '';
-          };
-
-        }
-    );
 }
