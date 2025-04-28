@@ -1,14 +1,15 @@
 ;;; -*- lexical-binding: t -*-
-
 (cond
  ((eq system-type 'darwin)
   (set-face-attribute 'default nil :font "Fira Code Retina-20"))
  ((eq system-type 'gnu/linux)
   (set-face-attribute 'default nil :font "Fira Code-11")))
 
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(set-fringe-mode nil)
+
 (push '(fullscreen . maximized) initial-frame-alist)
 (push '(ns-transparent-titlebar . t) default-frame-alist)
 
