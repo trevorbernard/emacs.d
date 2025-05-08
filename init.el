@@ -23,13 +23,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(ag bnf-mode cider clojure-mode company csv-mode dhall-mode direnv
-        dockerfile-mode dotenv-mode exec-path-from-shell htmlize hurl-mode
-        inf-clojure ivy just-ts-mode lsp-ivy lsp-mode lsp-ui magit markdown-mode
-        mood-line nix-mode nixfmt nixpkgs-fmt ob-rust org-bullets ox-gfm paredit
-        projectile rainbow-delimiters robe rustic string-inflection
-        terraform-mode timu-spacegrey-theme treemacs tuareg vterm which-key
-        yafolding yaml-mode yasnippet))
+   '(ag bnf-mode cider company counsel csv-mode direnv dockerfile-mode dotenv-mode
+        exec-path-from-shell flycheck htmlize hurl-mode inf-clojure just-ts-mode
+        lsp-ivy lsp-ui magit mood-line nix-mode ob-rust org-bullets ox-gfm
+        paredit projectile rainbow-delimiters rustic string-inflection
+        terraform-mode timu-spacegrey-theme tuareg vterm yaml-mode yasnippet))
+ '(package-vc-selected-packages
+   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(safe-local-variable-values
    '((eval with-eval-after-load 'lsp-mode
            (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cargo\\'")
@@ -40,13 +40,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#2b303b" :foreground "#c0c5ce" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 200 :width normal :foundry "nil" :family "Fira Code"))))
- '(org-document-title ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo" :height 2.0 :underline nil))))
- '(org-level-1 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo" :height 1.75))))
- '(org-level-2 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo" :height 1.5))))
- '(org-level-3 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo" :height 1.25))))
- '(org-level-4 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo" :height 1.1))))
- '(org-level-5 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo"))))
- '(org-level-6 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo"))))
- '(org-level-7 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo"))))
- '(org-level-8 ((t (:inherit default :weight bold :foreground "Black" :font "ETBembo")))))
+ '(org-document-title ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif" :height 2.0 :underline nil))))
+ '(org-level-1 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif" :height 1.75))))
+ '(org-level-2 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif" :height 1.5))))
+ '(org-level-3 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif" :height 1.25))))
+ '(org-level-4 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif" :height 1.1))))
+ '(org-level-5 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif"))))
+ '(org-level-6 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif"))))
+ '(org-level-7 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif"))))
+ '(org-level-8 ((t (:inherit default :weight bold :foreground "black" :family "Sans Serif")))))
