@@ -135,6 +135,8 @@ annoying to accidentally minimize your window.
 #+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
+              (when (not (display-graphic-p))
+                (xterm-mouse-mode t))
               (when window-system
                 (keymap-global-set "C-z" 'ignore)
                 (keymap-global-set "C-x C-z" 'ignore))))
