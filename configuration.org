@@ -261,16 +261,17 @@ huge time-saver when working on projects - just hit the key combo and
 watch your code build.
 
 #+begin_src emacs-lisp
-  (use-package prog-mode
-    :bind (:map prog-mode-map
-                ("C-c C-c" . compile)
-                ;; These conflict with flycheck
-                ;; ("M-n" . highlight-symbol-next)
-                ;; ("M-p" . highlight-symbol-prev)
-                )
-    :config
-    (setq show-trailing-whitespace t)
-    :hook ((prog-mode . display-line-numbers-mode)))
+    (use-package prog-mode
+      :bind (:map prog-mode-map
+                  ("C-c C-c" . compile)
+                  ;; These conflict with flycheck
+                  ;; ("M-n" . highlight-symbol-next)
+                  ;; ("M-p" . highlight-symbol-prev)
+                  )
+      :config
+      (setq show-trailing-whitespace t)
+      (setq display-line-numbers-type 'relative)
+      :hook ((prog-mode . display-line-numbers-mode)))
 #+end_src
 
 ** Terminals
