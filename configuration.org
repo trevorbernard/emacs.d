@@ -135,7 +135,7 @@ annoying to accidentally minimize your window.
 #+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (when (not (display-graphic-p))
+              (unless (display-graphic-p)
                 (xterm-mouse-mode t))
               (when window-system
                 (keymap-global-set "C-z" 'ignore)
@@ -591,7 +591,7 @@ has built-in support for it.
                  (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))
                  (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
                  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
-                 (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))))
+                 (rust . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.20.3" "src"))))
         (add-to-list 'treesit-language-source-alist grammar)
         ;; Only install `grammar' if we don't already have it
         ;; installed. However, if you want to *update* a grammar then
