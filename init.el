@@ -22,12 +22,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ag bnf-mode cider company counsel csv-mode direnv dockerfile-mode dotenv-mode
-        exec-path-from-shell flycheck htmlize hurl-mode inf-clojure just-ts-mode
-        lsp-ivy lsp-ui magit mood-line nix-mode ob-rust org-bullets ox-gfm
-        paredit projectile rainbow-delimiters rustic string-inflection
-        terraform-mode timu-spacegrey-theme tuareg vterm yaml-mode yasnippet))
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(safe-local-variable-values
