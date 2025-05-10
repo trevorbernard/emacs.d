@@ -705,6 +705,17 @@ programming language. The rustic package provides excellent
 integration with rust-analyzer (via LSP) and cargo.
 
 #+begin_src elisp
+  ;; ;; Enable paredit-like functionality with tree-sitter
+  ;; (use-package combobulate
+  ;;    :custom
+  ;;    ;; You can customize Combobulate's key prefix here.
+  ;;    ;; Note that you may have to restart Emacs for this to take effect!
+  ;;    (combobulate-key-prefix "C-c o")
+  ;;    :hook ((prog-mode . combobulate-mode))
+  ;;    ;; Amend this to the directory where you keep Combobulate's source
+  ;;    ;; code.
+  ;;    :load-path ("path-to-git-checkout-of-combobulate"))
+
   (use-package rust-mode
     :ensure t
     :init
