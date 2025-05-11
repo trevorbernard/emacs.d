@@ -1,8 +1,6 @@
 ;;; compile.el --- tangle configuration.org -*- lexical-binding: t -*-
 (require 'org)
 
-(org-babel-tangle-file "configuration.org")
-
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 (if (and (fboundp 'native-comp-available-p)

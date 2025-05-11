@@ -23,15 +23,15 @@ clean:
 	@rm -f $(GENERATED_FILES)
 	@find . -type f -name '*.eln' -delete
 
-compile: init.el configuration.org clean
+compile: init.el tangle
 	@echo "Compiling Emacs configuration (byte compilation)..."
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
 
-compile-native: init.el configuration.org
+compile-native: init.el tangle
 	@echo "Compiling Emacs configuration with native compilation..."
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)' --eval "(setq comp-deferred-compilation t)"
 
-tangle:
+tangle: configuration.org
 	@echo "Tangling configuration.org..."
 	@$(EMACS) $(EMACS_FLAGS) --eval "(require 'org)" \
 		--eval "(org-babel-tangle-file \"configuration.org\")"
