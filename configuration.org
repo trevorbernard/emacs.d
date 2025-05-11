@@ -779,8 +779,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :hook (nix-mode . lsp-deferred))
 
   (use-package nixpkgs-fmt
-    :ensure nix-mode
-    :after (nix-mode))
+    :ensure t)
 #+end_src
 
 ** Terraform
