@@ -6,7 +6,7 @@ ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
 
 .DEFAULT_GOAL := all
 
-.PHONY: all clean compile compile-native check-native-comp help
+.PHONY: all clean compile compile-native check-native-comp tangle help
 
 all: check-native-comp
 
@@ -31,10 +31,16 @@ compile-native: init.el configuration.org
 	@echo "Compiling Emacs configuration with native compilation..."
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)' --eval "(setq comp-deferred-compilation t)"
 
+tangle:
+	@echo "Tangling configuration.org..."
+	@$(EMACS) $(EMACS_FLAGS) --eval "(require 'org)" \
+		--eval "(org-babel-tangle-file \"configuration.org\")"
+
 help:
 	@echo "Available targets:"
 	@echo "  all             - Default target, detects and uses native compilation if available"
 	@echo "  compile         - Compile Emacs configuration files with byte compilation"
 	@echo "  compile-native  - Compile Emacs configuration files with native compilation"
 	@echo "  clean           - Remove generated files and native compilation cache"
+	@echo "  tangle          - Tangle Emacs configuration org file"
 	@echo "  help            - Display this help message"
