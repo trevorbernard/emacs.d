@@ -21,15 +21,14 @@ check-native-comp:
 clean:
 	@echo "Cleaning generated files..."
 	@rm -f $(GENERATED_FILES)
-	@[ -d "$(ELN_CACHE_DIR)" ] && echo "Cleaning native compiled files..." && rm -rf $(ELN_CACHE_DIR)/* || true
+	@find . -type f -name '*.eln' -delete
 
 compile: init.el configuration.org clean
 	@echo "Compiling Emacs configuration (byte compilation)..."
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
 
-compile-native: init.el configuration.org clean
+compile-native: init.el configuration.org
 	@echo "Compiling Emacs configuration with native compilation..."
-	@mkdir -p $(ELN_CACHE_DIR)
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)' --eval "(setq comp-deferred-compilation t)"
 
 help:
