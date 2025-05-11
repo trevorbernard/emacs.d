@@ -26,6 +26,12 @@
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
+(when (and (fboundp 'native-comp-available-p)
+         (native-comp-available-p))
+  (setq native-comp-async-report-warnings-errors nil
+        comp-deferred-compilation t
+        native-comp-speed 2))
+
 (setenv "LSP_USE_PLISTS" "true")
 
 (provide 'early-init)
