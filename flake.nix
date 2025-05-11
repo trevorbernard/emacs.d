@@ -12,7 +12,9 @@
     devShells = forEachSupportedSystem ({ pkgs }: {
       default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          emacs
+          (emacs.override {
+            withNativeCompilation = true;
+          })
           cmake
         ];
         shellHook = ''
