@@ -23,8 +23,12 @@
 (set-face-attribute 'default nil :background "#2b303b" :foreground "#c0c5ce")
 
 (menu-bar-mode -1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
+
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 
 (setq inhibit-startup-message t
       inhibit-startup-echo-area-message t
