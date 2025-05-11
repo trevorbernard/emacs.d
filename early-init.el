@@ -5,7 +5,12 @@
       (append default-frame-alist
               '((background-color . "#2b303b")
                 (foreground-color . "#c0c5ce")
-                (fullscreen . maximized))))
+                (fullscreen . maximized)
+                (menu-bar-lines . 0)
+                (tool-bar-lines . 0)
+                (vertical-scroll-bars)
+                (horizontal-scroll-bars)
+                (internal-border-width . 0))))
 
 ;; Set font based on system type
 (cond
