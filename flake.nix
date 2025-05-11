@@ -12,7 +12,7 @@
     devShells = forEachSupportedSystem ({ pkgs }: {
       default = pkgs.mkShell {
         buildInputs = with pkgs; [
-          (emacs.override {
+          (emacs-nox.override {
             withNativeCompilation = true;
           })
           cmake
