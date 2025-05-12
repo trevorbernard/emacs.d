@@ -35,6 +35,9 @@
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
+;; enable smooth scrolling
+(pixel-scroll-precision-mode t)
+
 (when (and (fboundp 'native-comp-available-p)
          (native-comp-available-p))
   (setq native-comp-async-report-warnings-errors nil
