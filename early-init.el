@@ -1,5 +1,7 @@
 ;;; -*- lexical-binding: t -*-
 
+(set-display-table-slot standard-display-table 'vertical-border ?|)
+
 ;; Set frame parameters before frame creation
 (setq default-frame-alist
       (append default-frame-alist
@@ -18,9 +20,6 @@
   (add-to-list 'default-frame-alist '(font . "Fira Code Retina-20")))
  ((eq system-type 'gnu/linux)
   (add-to-list 'default-frame-alist '(font . "Fira Code-16"))))
-
-;; Set the background to so we don't see a flicker
-(set-face-attribute 'default nil :background "#2b303b" :foreground "#c0c5ce")
 
 (menu-bar-mode -1)
 
