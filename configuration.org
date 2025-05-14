@@ -110,15 +110,6 @@ mechanisms.
   (with-eval-after-load 'timu-spacegrey-theme
     (set-face-attribute 'default nil :background "unspecified"))
 
-  ;; ;;;###autoload
-  ;; (defun set-background-for-terminal (&optional frame)
-  ;;   (or frame (setq frame (selected-frame)))
-  ;;   "unsets the background color in terminal mode"
-  ;;   (unless (display-graphic-p frame)
-  ;;     (set-face-background 'default "unspecified-bg" frame)))
-  ;; (add-hook 'after-make-frame-functions 'set-background-for-terminal)
-  ;; (add-hook 'window-setup-hook 'set-background-for-terminal)
-
   (use-package mood-line
     :ensure t
     :hook (after-init . mood-line-mode)
@@ -152,6 +143,25 @@ annoying to accidentally minimize your window.
 #+begin_src emacs-lisp
   (add-hook 'emacs-startup-hook
             (lambda ()
+              (when (getenv "WAYLAND_DISPLAY")
+                ;; Without this, copy and pasting from other wayland apps into
+                ;; emacs-pgtk doesn't work.
+                ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
+                (setq wl-copy-process nil)
+                (defun wl-copy (text)
+                  (setq wl-copy-process (make-process :name "wl-copy"
+                                                      :buffer nil
+                                                      :command '("wl-copy" "-f" "-n")
+                                                      :connection-type 'pipe
+                                                      :noquery t))
+                  (process-send-string wl-copy-process text)
+                  (process-send-eof wl-copy-process))
+                (defun wl-paste ()
+                  (if (and wl-copy-process (process-live-p wl-copy-process))
+                      nil ; should return nil if we're the current paste owner
+                    (shell-command-to-string "wl-paste -n | tr -d \r")))
+                (setq interprogram-cut-function 'wl-copy)
+                (setq interprogram-paste-function 'wl-paste))
               (unless (display-graphic-p)
                 (xterm-mouse-mode t))
               (when window-system
