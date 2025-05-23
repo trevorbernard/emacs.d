@@ -301,6 +301,14 @@ watch your code build.
       :hook ((prog-mode . display-line-numbers-mode)))
 #+end_src
 
+Experiment with indent-bars
+
+#+begin_src emacs-lisp
+  (use-package indent-bars
+    :ensure t
+    :hook ((prog-mode . indent-bars-mode)))
+#+end_src
+
 ** Terminals
 
 Let's try vterm to see if we like it. It's supposedly better than the
@@ -813,7 +821,8 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src emacs-lisp
   (use-package terraform-mode
-    :ensure t)
+    :ensure t
+    :hook (terraform-mode . lsp-deferred))
 #+end_src
 
 ** Justfile
