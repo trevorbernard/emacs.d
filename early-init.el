@@ -14,6 +14,9 @@
                 (horizontal-scroll-bars)
                 (internal-border-width . 0))))
 
+
+(set-face-attribute 'mode-line nil :background 'unspecified)
+
 ;; Set font based on system type
 (cond
  ((eq system-type 'darwin)
