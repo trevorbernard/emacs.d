@@ -318,7 +318,9 @@ that handles escape sequences properly.
 #+begin_src emacs-lisp
   (use-package vterm
     :defer t
-    :ensure t)
+    :ensure t
+    :custom
+    (vterm-always-compile-module t))
 #+end_src
 
 ** Projectile Mode
