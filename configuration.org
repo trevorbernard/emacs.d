@@ -309,39 +309,6 @@ Experiment with indent-bars
     :hook ((prog-mode . indent-bars-mode)))
 #+end_src
 
-#+begin_src emacs-lisp
-  (require 'flycheck)
-
-  (flycheck-define-checker python-ruff
-    "A Python syntax and style checker using the ruff utility.
-  To override the path to the ruff executable, set
-  `flycheck-python-ruff-executable'.
-  See URL `http://pypi.python.org/pypi/ruff'."
-    :command ("ruff"
-              "check"
-              "--output-format=text"
-              (eval (when buffer-file-name
-                      (concat "--stdin-filename=" buffer-file-name)))
-              "-")
-    :standard-input t
-    :error-filter (lambda (errors)
-                    (let ((errors (flycheck-sanitize-errors errors)))
-                      (seq-map #'flycheck-flake8-fix-error-level errors)))
-    :error-patterns
-    ((warning line-start
-              (file-name) ":" line ":" (optional column ":") " "
-              (id (one-or-more (any alpha)) (one-or-more digit)) " "
-              (message (one-or-more not-newline))
-              line-end))
-    :modes (python-mode python-ts-mode))
-
-  (add-hook 'python-mode-hook
-            (lambda ()
-               (unless (bound-and-true-p org-src-mode)
-                 (when (buffer-file-name)
-                   (setq-local flycheck-checkers '(python-ruff))
-                   (flycheck-mode)))))
-#+end_src
 ** Terminals
 
 Let's try vterm to see if we like it. It's supposedly better than the
@@ -564,14 +531,44 @@ packages only when they are missing.
 ** Flycheck
 
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :init (global-flycheck-mode)
-    :bind (:map flycheck-mode-map
-                ("M-n" . flycheck-next-error) ; optional but recommended error navigation
-                ("M-p" . flycheck-previous-error))
-    :hook ((prog-mode . flycheck-mode)
-           (text-mode . flycheck-mode)))
+    (use-package flycheck
+      :ensure t
+      :preface
+      (flycheck-define-checker python-ruff
+        "A Python syntax and style checker using the ruff utility.
+    To override the path to the ruff executable, set
+    `flycheck-python-ruff-executable'.
+    See URL `http://pypi.python.org/pypi/ruff'."
+        :command ("ruff"
+                  "check"
+                  "--output-format=text"
+                  (eval (when buffer-file-name
+                          (concat "--stdin-filename=" buffer-file-name)))
+                  "-")
+        :standard-input t
+        :error-filter (lambda (errors)
+                        (let ((errors (flycheck-sanitize-errors errors)))
+                          (seq-map #'flycheck-flake8-fix-error-level errors)))
+        :error-patterns
+        ((warning line-start
+                  (file-name) ":" line ":" (optional column ":") " "
+                  (id (one-or-more (any alpha)) (one-or-more digit)) " "
+                  (message (one-or-more not-newline))
+                  line-end))
+        :modes (python-mode python-ts-mode))
+
+      :hook (python-mode . (lambda ()
+                             (unless (bound-and-true-p org-src-mode)
+                               (when (buffer-file-name)
+                                 (setq-local flycheck-checkers '(python-ruff))
+                                 (flycheck-mode)))))
+
+      :bind (:map flycheck-mode-map
+                  ("M-n" . flycheck-next-error)
+                  ("M-p" . flycheck-previous-error))
+
+      :hook ((prog-mode . flycheck-mode)
+             (text-mode . flycheck-mode)))
 #+end_src
 
 ** Flyspell
@@ -654,7 +651,7 @@ has built-in support for it.
                  (make "https://github.com/alemuller/tree-sitter-make")
                  (elisp "https://github.com/Wilfred/tree-sitter-elisp")
                  (cmake "https://github.com/uyha/tree-sitter-cmake")
-                 (c "https://github.com/tree-sitter/tree-sitter-c")
+                 (c . ("https://github.com/tree-sitter/tree-sitter-c" "v0.20.7"))
                  (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
                  (toml "https://github.com/tree-sitter/tree-sitter-toml")
                  (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src"))

@@ -40,11 +40,39 @@
 ;; enable smooth scrolling
 (pixel-scroll-precision-mode t)
 
+;; Native compilation configuration - consolidated here to avoid race conditions
 (when (and (fboundp 'native-comp-available-p)
-         (native-comp-available-p))
-  (setq native-comp-async-report-warnings-errors nil
-        comp-deferred-compilation t
-        native-comp-speed 2))
+           (native-comp-available-p))
+  (let ((eln-cache-dir (expand-file-name "eln-cache/" user-emacs-directory)))
+    (condition-case err
+        (progn
+          ;; Ensure eln-cache directory exists and is writable
+          (unless (file-directory-p eln-cache-dir)
+            (make-directory eln-cache-dir t))
+
+          ;; Only add to path if directory is actually writable
+          (when (and (boundp 'native-comp-eln-load-path)
+                     (file-writable-p eln-cache-dir))
+            (add-to-list 'native-comp-eln-load-path eln-cache-dir))
+
+          ;; Configure native compilation settings
+          (setq native-comp-speed 2
+                comp-deferred-compilation t
+                native-comp-jit-compilation t
+                ;; Dynamic async jobs based on CPU cores (max 4, min 1)
+                native-comp-async-jobs-number (min 4 (max 1 (/ (num-processors) 2)))
+                ;; Enable warnings only for debugging - set to t if compilation fails
+                native-comp-async-report-warnings-errors nil)
+
+          (message "Native compilation configured: %d async jobs, cache: %s"
+                   native-comp-async-jobs-number eln-cache-dir))
+
+      (error
+       (message "Native compilation setup failed: %s - falling back to defaults" err)
+       ;; Minimal fallback configuration
+       (setq native-comp-speed 1
+             comp-deferred-compilation nil
+             native-comp-async-report-warnings-errors t)))))
 
 (setenv "LSP_USE_PLISTS" "true")
 

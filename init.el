@@ -1,14 +1,6 @@
 ;;; -*- lexical-binding: t -*-
 
-(when (and (fboundp 'native-comp-available-p)
-           (native-comp-available-p))
-  (setq native-comp-async-report-warnings-errors nil)
-  (setq native-comp-speed 2)
-  (setq native-comp-jit-compilation t)
-  (when (boundp 'native-comp-eln-load-path)
-    (add-to-list 'native-comp-eln-load-path
-                 (expand-file-name "eln-cache/" user-emacs-directory)))
-  (setq native-comp-async-jobs-number 4))
+;; Native compilation is now configured in early-init.el
 
 (let ((file-name-handler-alist nil))
   ;; If config is pre-compiled, then load that
@@ -27,7 +19,13 @@
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
  '(safe-local-variable-values
-   '((eval with-eval-after-load 'lsp-mode
+   '((eval progn
+           (when
+               (and (fboundp 'lsp-workspace-folders-remove) (lsp-workspace-root))
+             (lsp-workspace-folders-remove (lsp-workspace-root)))
+           (when (fboundp 'lsp-workspace-folders-add)
+             (lsp-workspace-folders-add default-directory)))
+     (eval with-eval-after-load 'lsp-mode
            (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cargo\\'")
            (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\ops\\'")
            (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\docs\\'")))))
