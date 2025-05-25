@@ -840,7 +840,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :after (lsp-mode)
     :demand t
     :custom
-    (lsp-nix-nil-formatter ["alejandra"]))
+    (lsp-nix-nil-formatter ["nixfmt"]))
 
   (use-package nix-mode
     :ensure t
