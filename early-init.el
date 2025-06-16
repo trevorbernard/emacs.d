@@ -82,16 +82,13 @@
                          ("melpa-stable" . "https://stable.melpa.org/packages/")
                          ("gnu" . "https://elpa.gnu.org/packages/")))
 
-;; Initialize package system if not already done
 (unless package--initialized
   (package-initialize))
 
-;; Install use-package if not present
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; Configure use-package for optimal performance
 (eval-when-compile
   (setq use-package-always-defer t
         use-package-verbose nil  ; Set to t for debugging, nil for performance
