@@ -11,7 +11,7 @@ This is my emacs, there are many like it, but this one is mine...
 
 ** Getting Started
 
-I currently use =29.x= on both Linux and Mac systems. YMMV on Windows
+I currently use =30.1= on both Linux and Mac systems. YMMV on Windows
 or different versions of Emacs.
 
 You will need the following already installed for this configuration
@@ -33,6 +33,10 @@ startup process.
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
   (setq gc-cons-threshold (* 1024 1024 100))
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq treemacs-no-load-time-warnings t)
 #+end_src
 
 ** General use-package settings
