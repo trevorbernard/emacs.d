@@ -53,35 +53,13 @@ strokes until they are second nature. You can thank me later.
 
 ** Package Settings
 
-To improve startup performance, we'll manually set up the load-path
-and avoid calling =(package-initialize)=. This custom setup consists of
-several key settings:
-
-Setting =load-prefer-newer= to t, ensuring newer versions of elisp files
-are preferred Defining =package-user-dir= explicitly as
-"~/.emacs.d/elpa" Setting =package--init-file-ensured= to t, which
-prevents =package.el= from automatically initializing Setting
-=package-enable-at-startup= to nil to prevent automatic package loading
-at startup
-
-We also create the package directory if it doesn't exist yet, then add
-all package directories to the load path. With this configuration,
-=use-package= will handle package loading instead of the default
-mechanisms.
+Package system is now handled entirely in early-init.el for optimal startup
+performance. The package bootstrap, load-path setup, and use-package 
+configuration are all done before the main configuration loads.
 
 #+begin_src emacs-lisp
-  (eval-when-compile
-    (setq load-prefer-newer t
-          package-user-dir "~/.emacs.d/elpa"
-          package--init-file-ensured t
-          package-enable-at-startup nil)
-
-    (unless (file-directory-p package-user-dir)
-      (make-directory package-user-dir t))
-
-    (dolist (dir (directory-files package-user-dir t "^[^.]" t))
-      (when (file-directory-p dir)
-        (add-to-list 'load-path dir))))
+  ;; Only set load-prefer-newer since package system is handled in early-init.el
+  (setq load-prefer-newer t)
 #+end_src
 
 ** Theme
@@ -523,7 +501,7 @@ packages only when they are missing.
 #+begin_src emacs-lisp
     (use-package flycheck
       :ensure t
-      :preface
+      :config
       (flycheck-define-checker python-ruff
         "A Python syntax and style checker using the ruff utility.
     To override the path to the ruff executable, set

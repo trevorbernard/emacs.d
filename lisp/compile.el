@@ -1,6 +1,9 @@
 ;;; compile.el --- tangle configuration.org -*- lexical-binding: t -*-
 (require 'org)
 
+;; Load early-init.el to set up package system for compilation
+(load-file (expand-file-name "early-init.el" user-emacs-directory))
+
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 (if (and (fboundp 'native-comp-available-p)
