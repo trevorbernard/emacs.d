@@ -20,3 +20,5 @@ request/
 *.elc
 tramp
 workspace
+.dap-breakpoints
+eclipse.jdt.ls
