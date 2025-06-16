@@ -107,32 +107,35 @@ Ignore minimize functionality when you're in the GUI because it's very
 annoying to accidentally minimize your window.
 
 #+begin_src emacs-lisp
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (when (getenv "WAYLAND_DISPLAY")
-                ;; Without this, copy and pasting from other wayland apps into
-                ;; emacs-pgtk doesn't work.
-                ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
-                (setq wl-copy-process nil)
-                (defun wl-copy (text)
-                  (setq wl-copy-process (make-process :name "wl-copy"
-                                                      :buffer nil
-                                                      :command '("wl-copy" "-f" "-n")
-                                                      :connection-type 'pipe
-                                                      :noquery t))
-                  (process-send-string wl-copy-process text)
-                  (process-send-eof wl-copy-process))
-                (defun wl-paste ()
-                  (if (and wl-copy-process (process-live-p wl-copy-process))
-                      nil ; should return nil if we're the current paste owner
-                    (shell-command-to-string "wl-paste -n | tr -d \r")))
-                (setq interprogram-cut-function 'wl-copy)
-                (setq interprogram-paste-function 'wl-paste))
-              (unless (display-graphic-p)
-                (xterm-mouse-mode t))
-              (when window-system
-                (keymap-global-set "C-z" 'ignore)
-                (keymap-global-set "C-x C-z" 'ignore))))
+  ;; Configure Wayland clipboard integration immediately if needed
+  (when (getenv "WAYLAND_DISPLAY")
+    ;; Without this, copy and pasting from other wayland apps into
+    ;; emacs-pgtk doesn't work.
+    ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
+    (setq wl-copy-process nil)
+    (defun wl-copy (text)
+      (setq wl-copy-process (make-process :name "wl-copy"
+                                          :buffer nil
+                                          :command '("wl-copy" "-f" "-n")
+                                          :connection-type 'pipe
+                                          :noquery t))
+      (process-send-string wl-copy-process text)
+      (process-send-eof wl-copy-process))
+    (defun wl-paste ()
+      (if (and wl-copy-process (process-live-p wl-copy-process))
+          nil ; should return nil if we're the current paste owner
+        (shell-command-to-string "wl-paste -n | tr -d \r")))
+    (setq interprogram-cut-function 'wl-copy)
+    (setq interprogram-paste-function 'wl-paste))
+
+  ;; Enable mouse support in terminal immediately
+  (unless (display-graphic-p)
+    (xterm-mouse-mode t))
+
+  ;; Disable minimize keys in GUI immediately
+  (when window-system
+    (keymap-global-set "C-z" 'ignore)
+    (keymap-global-set "C-x C-z" 'ignore))
 #+end_src
 
 *** Invoke M-x without the Alt key
@@ -147,10 +150,9 @@ fingers on the home row if you have Caps Lock mapped to Control. With
 some practice, it will become second-nature.
 
 #+begin_src emacs-lisp
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (keymap-global-set "C-x C-m" 'execute-extended-command)
-              (keymap-global-set "C-c C-m" 'execute-extended-command)))
+  ;; Set up M-x alternatives immediately
+  (keymap-global-set "C-x C-m" 'execute-extended-command)
+  (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
 
 * Preferences
@@ -314,6 +316,7 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
+    :defer t
     :bind
     (:map company-active-map
           ("C-n". company-select-next)
@@ -406,7 +409,8 @@ fingers are programmed this way.
 ** Elisp
 
 #+begin_src emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook #'eldoc-mode)
+  ;; eldoc-mode is enabled by default in emacs-lisp-mode since Emacs 25
+  ;; No need to explicitly add hook
 #+end_src
 
 ** Org Mode
@@ -483,6 +487,7 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (use-package js
     :ensure t
+    :defer t
     :config
     (setq js-indent-level 2))
 #+end_src
@@ -492,6 +497,7 @@ packages only when they are missing.
 #+begin_src emacs-lisp
   (use-package css-mode
     :ensure t
+    :defer t
     :config
     (setq css-indent-level 2))
 #+end_src
@@ -853,6 +859,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 #+begin_src emacs-lisp
   (use-package just-ts-mode
     :ensure t
+    :defer t
     :config
     (setq-local
      just-ts-indent-offset 2
