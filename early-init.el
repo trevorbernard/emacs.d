@@ -76,6 +76,28 @@
 
 (setenv "LSP_USE_PLISTS" "true")
 
+;; Bootstrap package system and use-package for better startup performance
+(require 'package)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("melpa-stable" . "https://stable.melpa.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
+
+;; Initialize package system if not already done
+(unless package--initialized
+  (package-initialize))
+
+;; Install use-package if not present
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+;; Configure use-package for optimal performance
+(eval-when-compile
+  (setq use-package-always-defer t
+        use-package-verbose nil  ; Set to t for debugging, nil for performance
+        use-package-minimum-reported-time 0.1)
+  (require 'use-package))
+
 (provide 'early-init)
 
 ;;; early-init.el ends here

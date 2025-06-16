@@ -37,25 +37,9 @@ startup process.
 
 ** General use-package settings
 
-Also, include melpa and melpa-stable repositories. Ensure that =use-package= is
-installed and configured.
-
-#+begin_src emacs-lisp
-  (require 'package)
-  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                           ("melpa-stable" . "https://stable.melpa.org/packages/")
-                           ("gnu" . "https://elpa.gnu.org/packages/")))
-
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-
-  (eval-when-compile
-    (setq use-package-always-defer t
-          use-package-verbose nil  ; Set to t for debugging, nil for performance
-          use-package-minimum-reported-time 0.1)
-    (require 'use-package))
-#+end_src
+Package system and use-package are now bootstrapped in early-init.el for
+better startup performance. This ensures use-package is available before
+the main configuration loads.
 
 ** Emacs Initialization
 
