@@ -74,6 +74,11 @@
 
 (setenv "LSP_USE_PLISTS" "true")
 
+(setq read-process-output-max (* 10 1024 1024)) ; 10MB
+
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name)
+
 ;; Bootstrap package system and use-package for better startup performance
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
