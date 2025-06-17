@@ -1,7 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 
-(set-display-table-slot standard-display-table 'vertical-border ?|)
-
 ;; Set frame parameters before frame creation
 (setq default-frame-alist
       (append default-frame-alist
