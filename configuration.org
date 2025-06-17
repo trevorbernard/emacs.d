@@ -131,7 +131,7 @@ annoying to accidentally minimize your window.
   ;; Enable mouse support in terminal immediately
   (unless (display-graphic-p)
     (xterm-mouse-mode t)
-    (set-face-inverse-video-p 'vertical-border nil)
+    (set-face-inverse-video 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default)))
 
   ;; Disable minimize keys in GUI immediately
