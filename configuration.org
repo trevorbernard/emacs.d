@@ -34,6 +34,8 @@ and handle frame appearance for better startup performance.
 #+begin_src emacs-lisp :tangle early-init.el
   ;;; -*- lexical-binding: t -*-
 
+  (setq process-adaptive-read-buffering nil)
+
   (add-hook 'emacs-startup-hook
             (lambda () (message "Emacs ready in %s with %d garbage collections."
                                 (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
@@ -56,7 +58,6 @@ and handle frame appearance for better startup performance.
                   (horizontal-scroll-bars)
                   (internal-border-width . 0))))
 
-
   (set-face-attribute 'mode-line nil :background 'unspecified)
 
   ;; Set font based on system type
@@ -74,7 +75,8 @@ and handle frame appearance for better startup performance.
   (when (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
-  (defun display-startup-echo-area-message ())  ; suppresses the message
+  ;; suppresses the message
+  (defun display-startup-echo-area-message ())
 
   (setq inhibit-startup-message t
         inhibit-startup-echo-area-message "tbernard")
@@ -121,10 +123,9 @@ and handle frame appearance for better startup performance.
 
   (setenv "LSP_USE_PLISTS" "true")
 
-  (setq read-process-output-max (* 10 1024 1024)) ; 10MB
-
   ;; Bootstrap package system and use-package for better startup performance
   (require 'package)
+
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
                            ("gnu" . "https://elpa.gnu.org/packages/")))
@@ -149,6 +150,8 @@ and handle frame appearance for better startup performance.
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
+  (setq read-process-output-max (* 10 1024 1024))
+  (setq process-adaptive-read-buffering nil)
 
   (setq treemacs-no-load-time-warnings t)
 #+end_src
