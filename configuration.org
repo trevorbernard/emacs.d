@@ -71,7 +71,10 @@ configuration are all done before the main configuration loads.
     :ensure t
     :custom
     (timu-spacegrey-transparent-background t)
-    :hook (after-init . (lambda () (load-theme 'timu-spacegrey t))))
+    :hook
+    (after-init . (lambda ()
+                    (run-with-timer 0.1 nil
+                                    (lambda () (load-theme 'timu-spacegrey t))))))
 
   (with-eval-after-load 'timu-spacegrey-theme
     (set-face-attribute 'default nil :background "unspecified"))
@@ -325,7 +328,8 @@ Bind projectile to =C-c p= and enable by default.
           ("C-p". company-select-previous)
           ("M-<". company-select-first)
           ("M->". company-select-last))
-    :hook (prog-mode . company-mode))
+    :hook ((prog-mode . (lambda ()
+                          (run-with-idle-timer 0.5 nil #'company-mode)))))
 #+end_src
 ** Magit
 
@@ -725,7 +729,8 @@ has built-in support for it.
                (typescript-mode . typescript-ts-mode)))
       (add-to-list 'major-mode-remap-alist mapping))
     :config
-    (os/setup-install-grammars))
+    (add-hook 'prog-mode-hook
+              (lambda () (run-with-idle-timer 1.0 nil #'os/setup-install-grammars)) nil t))
 #+end_src
 
 ** Language Server Protocol (LSP)
@@ -746,10 +751,12 @@ for most of my programming languages.
 
   (use-package lsp-ivy
     :ensure t
+    :after (lsp-mode ivy)
     :commands lsp-ivy-workspace-symbol)
 
   (use-package lsp-ui
     :ensure t
+    :after lsp-mode
     :commands lsp-ui-mode
     :hook (lsp-mode . lsp-ui-mode)
     :config
