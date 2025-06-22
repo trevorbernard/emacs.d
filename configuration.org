@@ -427,34 +427,8 @@ very annoying when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :after org
-    :hook (org-mode . org-bullets-mode))
-
-  (use-package ob-rust
-    :ensure t)
-
-  (use-package org
-    :ensure t
-    :bind
-    (:map
-     org-mode-map
-     ("C-j" . org-return)
-     ("C-c ]" . org-ref-insert-link)
-     ("C-c l" . org-store-link)
-     ("C-c a" . org-agenda)
-     ("C-c c" . org-capture))
-    :custom
-    (org-hide-emphasis-markers t)
-    (org-startup-indented t)
-    (org-pretty-entities t)
-    (org-ellipsis "⤵")
-    :config
-    ;; Set up variable-pitch mode for org-mode
-    (add-hook 'org-mode-hook 'variable-pitch-mode)
-    (add-hook 'org-mode-hook 'visual-line-mode)
-    
+  (defun os/setup-org-fonts ()
+    "Configure fonts for org-mode with variable-pitch typography."
     (when window-system
       (let* ((variable-tuple
               (cond ((x-list-fonts "Iosevka Aile")     '(:font "Iosevka Aile"))
@@ -509,6 +483,37 @@ remap my brain, I'll remap it to =newline=.
          ;; Improve list and quote readability
          `(org-quote ((t (:inherit variable-pitch :slant italic :foreground "#8a8a8a"))))
          `(org-verse ((t (:inherit variable-pitch :slant italic)))))))
+    (variable-pitch-mode 1)
+    (visual-line-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :after org
+    :hook (org-mode . org-bullets-mode))
+
+  (use-package ob-rust
+    :ensure t)
+
+  (use-package org
+    :ensure t
+    :bind
+    (:map
+     org-mode-map
+     ("C-j" . org-return)
+     ("C-c ]" . org-ref-insert-link)
+     ("C-c l" . org-store-link)
+     ("C-c a" . org-agenda)
+     ("C-c c" . org-capture))
+    :custom
+    (org-hide-emphasis-markers t)
+    (org-startup-indented t)
+    (org-pretty-entities t)
+    (org-ellipsis "⤵")
+    :hook
+    (org-mode . (lambda () (run-with-idle-timer 0.5 nil 'os/setup-org-fonts)))
+    :config
     (turn-on-auto-fill)
     (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
