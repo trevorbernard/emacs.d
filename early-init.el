@@ -5,7 +5,7 @@
                               (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
                               gcs-done)))
 
-(setq gc-cons-threshold (* 1024 1024 256))
+(setq gc-cons-threshold (* 1024 1024 1024))
 
 (set-display-table-slot standard-display-table 'vertical-border ?|)
 

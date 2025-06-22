@@ -67,9 +67,7 @@ configuration are all done before the main configuration loads.
     :custom
     (timu-spacegrey-transparent-background t)
     :hook
-    (after-init . (lambda ()
-                    (run-with-timer 0.1 nil
-                                    (lambda () (load-theme 'timu-spacegrey t))))))
+    (after-init . (lambda () (load-theme 'timu-spacegrey t))))
 
   (with-eval-after-load 'timu-spacegrey-theme
     (set-face-attribute 'default nil :background "unspecified"))
