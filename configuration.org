@@ -39,7 +39,8 @@ and handle frame appearance for better startup performance.
                                 (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
                                 gcs-done)))
 
-  (setq gc-cons-threshold (* 1024 1024 1024))
+  (setq gc-cons-threshold most-positive-fixnum
+        gc-cons-percentage 0.9)
 
   (set-display-table-slot standard-display-table 'vertical-border ?|)
 
@@ -1089,5 +1090,5 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 Reset the garbage collection threshold.
 
 #+begin_src emacs-lisp
-  (setq gc-cons-threshold 800000)
+  (setq gc-cons-threshold (* 1024 1024 2))
 #+end_src
