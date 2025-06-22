@@ -32,9 +32,12 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
+(defun display-startup-echo-area-message ())  ; suppresses the message
+
 (setq inhibit-startup-message t
-      inhibit-startup-echo-area-message "tbernard"
-      frame-inhibit-implied-resize t
+      inhibit-startup-echo-area-message "tbernard")
+
+(setq frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
 ;; enable smooth scrolling
