@@ -167,7 +167,7 @@ strokes until they are second nature. You can thank me later.
 ** Package Settings
 
 Package system is now handled entirely in early-init.el for optimal startup
-performance. The package bootstrap, load-path setup, and use-package 
+performance. The package bootstrap, load-path setup, and use-package
 configuration are all done before the main configuration loads.
 
 #+begin_src emacs-lisp
@@ -533,9 +533,16 @@ very annoying when you are in =org-mode=. So instead of trying to
 remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
+  (defvar os/org-fonts-configured nil
+    "Cache variable to track if org fonts have been configured.")
+
   (defun os/setup-org-fonts ()
-    "Configure fonts for org-mode with variable-pitch typography."
-    (when window-system
+    "Configure fonts for org-mode with variable-pitch typography.
+Uses caching to avoid repeated font configuration - only runs once per session
+or when explicitly called interactively."
+    (when (and (or (called-interactively-p 'any)
+                   (not os/org-fonts-configured))
+               window-system)
       (let* ((variable-tuple
               (cond ((x-list-fonts "Iosevka Aile")     '(:font "Iosevka Aile"))
                     ((x-list-fonts "Source Sans Pro")   '(:font "Source Sans Pro"))
@@ -558,7 +565,7 @@ remap my brain, I'll remap it to =newline=.
          'user
          ;; Set the default variable-pitch face for org-mode
          `(variable-pitch ((t (,@variable-tuple :height 1.1))))
-         
+
          ;; Keep code blocks, tables, and source in monospace
          `(org-block ((t (:inherit fixed-pitch ,@fixed-tuple :height 0.9))))
          `(org-block-begin-line ((t (:inherit fixed-pitch ,@fixed-tuple :height 0.8 :foreground "#7c7c75"))))
@@ -570,7 +577,7 @@ remap my brain, I'll remap it to =newline=.
          `(org-property-value ((t (:inherit fixed-pitch ,@fixed-tuple :height 0.9))))
          `(org-special-keyword ((t (:inherit fixed-pitch ,@fixed-tuple :height 0.9))))
          `(org-drawer ((t (:inherit fixed-pitch ,@fixed-tuple :height 0.9))))
-         
+
          ;; Headlines with better typography
          `(org-level-8 ((t (,@headline ,@variable-tuple :height 1.05))))
          `(org-level-7 ((t (,@headline ,@variable-tuple :height 1.1))))
@@ -581,14 +588,19 @@ remap my brain, I'll remap it to =newline=.
          `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.6))))
          `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.8))))
          `(org-document-title ((t (,@headline ,@variable-tuple :height 2.2 :underline nil))))
-         
+
          ;; Better emphasis faces
          `(org-bold ((t (:inherit variable-pitch :weight bold))))
          `(org-italic ((t (:inherit variable-pitch :slant italic))))
-         
+
          ;; Improve list and quote readability
          `(org-quote ((t (:inherit variable-pitch :slant italic :foreground "#8a8a8a"))))
-         `(org-verse ((t (:inherit variable-pitch :slant italic)))))))
+         `(org-verse ((t (:inherit variable-pitch :slant italic))))))
+
+      ;; Mark as configured to avoid repeated work
+      (setq os/org-fonts-configured t))
+
+    ;; Always enable these modes for org buffers
     (variable-pitch-mode 1)
     (visual-line-mode 1))
 #+end_src
