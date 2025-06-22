@@ -862,7 +862,7 @@ LSP is a game-changer for IDE-like features in Emacs. It provides code
 completion, go-to-definition, find references, and much more. I use it
 for most of my programming languages.
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package ivy
     :ensure t
     :hook (after-init . ivy-mode))
@@ -939,7 +939,7 @@ Rust is my language du jour. It's slowly becoming my favourite
 programming language. The rustic package provides excellent
 integration with rust-analyzer (via LSP) and cargo.
 
-#+begin_src elisp
+#+begin_src emacs-lisp
 
   (use-package rust-mode
     :ensure t
@@ -969,7 +969,7 @@ integration with rust-analyzer (via LSP) and cargo.
 
 An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package ielm
     :ensure t
     :bind
@@ -983,14 +983,14 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 ** OCaml
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package tuareg
     :ensure t)
 #+end_src
 
 ** Nix
 
-#+begin_src elisp
+#+begin_src emacs-lisp
   (use-package lsp-nix
     :ensure lsp-mode
     :after (lsp-mode)
