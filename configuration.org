@@ -27,15 +27,10 @@ binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
 
 ** Preamble
 
-Use lexical bindings and set the =gc-cons-threshold= to something usable for the
-startup process.
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
-  (setq gc-cons-threshold (* 1024 1024 100))
-#+end_src
 
-#+begin_src emacs-lisp
   (setq treemacs-no-load-time-warnings t)
 #+end_src
 
