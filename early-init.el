@@ -33,7 +33,7 @@
   (scroll-bar-mode -1))
 
 (setq inhibit-startup-message t
-      inhibit-startup-echo-area-message t
+      inhibit-startup-echo-area-message "tbernard"
       frame-inhibit-implied-resize t
       frame-resize-pixelwise t)
 
@@ -77,9 +77,6 @@
 (setenv "LSP_USE_PLISTS" "true")
 
 (setq read-process-output-max (* 10 1024 1024)) ; 10MB
-
-(setq inhibit-startup-message t
-      inhibit-startup-echo-area-message user-login-name)
 
 ;; Bootstrap package system and use-package for better startup performance
 (require 'package)
