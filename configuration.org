@@ -374,11 +374,6 @@ watch your code build.
 
 #+begin_src emacs-lisp
     (use-package prog-mode
-      :bind (:map prog-mode-map
-                  ;; These conflict with flycheck
-                  ;; ("M-n" . highlight-symbol-next)
-                  ;; ("M-p" . highlight-symbol-prev)
-                  )
       :config
       (setq show-trailing-whitespace t)
       (setq display-line-numbers-type 'relative)
@@ -886,8 +881,7 @@ for most of my programming languages.
     :preface
     (setq lsp-log-io nil)
     (setq read-process-output-max (* 10 1024 1024)  ; 10MB - Increase read chunk size for better performance
-          ;; gc-cons-threshold 200000000           ; Uncomment to increase GC threshold
-          lsp-use-plists t                      ; Uncomment to use plists instead of hashtables
+          lsp-use-plists t                      ; Use plists instead of hashtables
           )
 
     ;; LSP-booster integration for better performance
@@ -934,16 +928,6 @@ programming language. The rustic package provides excellent
 integration with rust-analyzer (via LSP) and cargo.
 
 #+begin_src elisp
-  ;; ;; Enable paredit-like functionality with tree-sitter
-  ;; (use-package combobulate
-  ;;    :custom
-  ;;    ;; You can customize Combobulate's key prefix here.
-  ;;    ;; Note that you may have to restart Emacs for this to take effect!
-  ;;    (combobulate-key-prefix "C-c o")
-  ;;    :hook ((prog-mode . combobulate-mode))
-  ;;    ;; Amend this to the directory where you keep Combobulate's source
-  ;;    ;; code.
-  ;;    :load-path ("path-to-git-checkout-of-combobulate"))
 
   (use-package rust-mode
     :ensure t
