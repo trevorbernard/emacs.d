@@ -1077,6 +1077,11 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package string-inflection
     :ensure t)
 
+  (use-package envrc
+    :ensure t
+    :bind-keymap ("C-c e" . envrc-command-map)
+    :hook (after-init . envrc-global-mode))
+
   (use-package direnv
     :ensure t)
 
