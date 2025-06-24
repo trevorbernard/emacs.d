@@ -15,7 +15,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages nil)
  '(package-vc-selected-packages
-   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")))
+   '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")
+     (timu-spacegrey-theme :vc-backend Git :url "https://github.com/trevorbernard/timu-spacegrey-theme.git")))
  '(safe-local-variable-values
    '((eval progn
            (when

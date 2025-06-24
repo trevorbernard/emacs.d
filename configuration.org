@@ -181,9 +181,6 @@ configuration are all done before the main configuration loads.
 
 ** Theme
 #+begin_src emacs-lisp
-  (unless (package-installed-p 'timu-spacegrey-theme)
-    (package-vc-install "https://github.com/trevorbernard/timu-spacegrey-theme.git"))
-
   (use-package timu-spacegrey-theme
     :ensure t
     :custom
@@ -964,8 +961,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 ** Hurl mode
 
 #+begin_src emacs-lisp
-  (unless (package-installed-p 'hurl-mode)
-    (package-vc-install "https://github.com/JasZhe/hurl-mode"))
   (use-package hurl-mode
     :ensure t
     :mode "\\.hurl\\'")
