@@ -697,6 +697,10 @@ has built-in support for it.
     (defvar os/treesit-grammars-installed nil
       "Cache variable to track if tree-sitter grammars have been checked/installed.")
 
+    (defvar os/treesit-grammar-cache-file
+      (expand-file-name "treesit-grammars-installed" user-emacs-directory)
+      "File to persist tree-sitter grammar installation status.")
+
     (defun os/setup-install-grammars ()
       "Install Tree-sitter grammars if they are absent.
   Uses caching to avoid checking on every startup - only runs once per session
@@ -705,7 +709,8 @@ has built-in support for it.
       (when (and (fboundp 'treesit-available-p)
                  (treesit-available-p)
                  (or (called-interactively-p 'any)
-                     (not os/treesit-grammars-installed)))
+                     (not os/treesit-grammars-installed)
+                     (not (file-exists-p os/treesit-grammar-cache-file))))
         ;; Ensure treesit-language-source-alist is bound
         (unless (boundp 'treesit-language-source-alist)
           (setq treesit-language-source-alist nil))
@@ -746,8 +751,10 @@ has built-in support for it.
                   (treesit-install-language-grammar (car grammar))
                 (error (message "Failed to install grammar %s: %s" (car grammar) err)))))
 
-          ;; Mark as completed
+          ;; Mark as completed and persist to file
           (setq os/treesit-grammars-installed t)
+          (with-temp-file os/treesit-grammar-cache-file
+            (insert (format "Last checked: %s\n" (current-time-string))))
           (when (called-interactively-p 'any)
             (message "Tree-sitter grammar check completed.")))))
 
@@ -771,8 +778,9 @@ has built-in support for it.
                (typescript-mode . typescript-ts-mode)))
       (add-to-list 'major-mode-remap-alist mapping))
     :config
-    (add-hook 'prog-mode-hook
-              (lambda () (run-with-idle-timer 1.0 nil #'os/setup-install-grammars)) nil t))
+    ;; Check grammars once after init, not on every prog-mode buffer
+    (add-hook 'after-init-hook
+              (lambda () (run-with-idle-timer 2.0 nil #'os/setup-install-grammars))))
 #+end_src
 
 ** Language Server Protocol (LSP)
