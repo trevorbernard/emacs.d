@@ -423,7 +423,9 @@ Bind projectile to =C-c p= and enable by default.
     :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
-    :hook (after-init . projectile-mode))
+    :commands (projectile-find-file projectile-switch-project projectile-command-map)
+    :config
+    (projectile-mode))
 #+end_src
 
 ** Company
