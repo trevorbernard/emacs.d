@@ -60,18 +60,10 @@ and handle frame appearance for better startup performance.
 
   (set-face-attribute 'mode-line nil :background 'unspecified)
 
-  ;; Set font based on system type
-  (cond
-   ((eq system-type 'darwin)
-    (add-to-list 'default-frame-alist '(font . "Fira Code Retina-20")))
-   ((eq system-type 'gnu/linux)
-    (add-to-list 'default-frame-alist '(font . "Fira Code-16"))))
 
   (menu-bar-mode -1)
-
   (when (fboundp 'tool-bar-mode)
     (tool-bar-mode -1))
-
   (when (fboundp 'scroll-bar-mode)
     (scroll-bar-mode -1))
 
@@ -793,9 +785,6 @@ for most of my programming languages.
   (use-package ivy
     :ensure t
     :commands (ivy-mode)
-    :bind (("C-s" . swiper)
-           ("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file))
     :config
     (ivy-mode))
 
