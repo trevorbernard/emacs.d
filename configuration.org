@@ -366,11 +366,11 @@ huge time-saver when working on projects - just hit the key combo and
 watch your code build.
 
 #+begin_src emacs-lisp
-    (use-package prog-mode
-      :config
-      (setq show-trailing-whitespace t)
-      (setq display-line-numbers-type 'relative)
-      :hook ((prog-mode . display-line-numbers-mode)))
+  (use-package prog-mode
+    :custom
+    (show-trailing-whitespace t)
+    (display-line-numbers-type 'relative)
+    :hook (prog-mode . display-line-numbers-mode))
 #+end_src
 
 Experiment with indent-bars
@@ -420,16 +420,15 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
-    :defer t
     :bind
     (:map company-active-map
           ("C-n". company-select-next)
           ("C-p". company-select-previous)
           ("M-<". company-select-first)
           ("M->". company-select-last))
-    :hook ((prog-mode . (lambda ()
-                          (run-with-idle-timer 0.5 nil #'company-mode)))))
+    :hook (prog-mode . #'company))
 #+end_src
+
 ** Magit
 
 =C-c= is reserved for the user. Add a more friendly binding for
@@ -438,7 +437,6 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
-    :defer t
     :commands (magit-status magit-file-dispatch)
     :bind
     ("C-x g" . magit-status)
