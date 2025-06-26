@@ -401,10 +401,9 @@ Bind projectile to =C-c p= and enable by default.
 
 #+begin_src emacs-lisp
   (use-package projectile
-    :ensure t
     :diminish projectile-mode
     :custom
-    (projectile-project-search-path '("~/p/"))
+    (projectile-project-search-path '("~/p/" "~/code/" "~/.emacs.d/"))
     (projectile-completion-system 'ivy)
     (projectile-enable-caching t)
     (projectile-indexing-method 'alien)
@@ -413,8 +412,7 @@ Bind projectile to =C-c p= and enable by default.
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
     :commands (projectile-find-file projectile-switch-project projectile-command-map)
-    :config
-    (projectile-mode))
+    :hook (after-init . projectile-mode))
 #+end_src
 
 ** Company
