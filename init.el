@@ -16,9 +16,11 @@
  '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((hurl-mode :vc-backend Git :url "https://github.com/JasZhe/hurl-mode")
-     (timu-spacegrey-theme :vc-backend Git :url "https://github.com/trevorbernard/timu-spacegrey-theme.git")))
+     (timu-spacegrey-theme :vc-backend Git :url
+                           "https://github.com/trevorbernard/timu-spacegrey-theme.git")))
  '(safe-local-variable-values
-   '((eval progn
+   '((eval setq lsp-yaml-max-items-computed 10000)
+     (eval progn
            (when
                (and (fboundp 'lsp-workspace-folders-remove) (lsp-workspace-root))
              (lsp-workspace-folders-remove (lsp-workspace-root)))
