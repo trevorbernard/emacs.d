@@ -185,7 +185,9 @@ configuration are all done before the main configuration loads.
 
   (use-package mood-line
     :ensure t
-    :hook (after-init . mood-line-mode)
+    :hook (after-init . (lambda()
+                          (defun x-hide-tip () "No-op fallback for missing x-hide-tip." nil)
+                          (mood-line-mode)))
     :custom
     (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
