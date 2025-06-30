@@ -146,6 +146,9 @@ and handle frame appearance for better startup performance.
   (setq process-adaptive-read-buffering nil)
 
   (setq treemacs-no-load-time-warnings t)
+
+  (unless (boundp 'image-scaling-factor)
+    (setq image-scaling-factor 1.0))
 #+end_src
 
 ** General use-package settings
@@ -183,13 +186,9 @@ configuration are all done before the main configuration loads.
   (with-eval-after-load 'timu-spacegrey-theme
     (set-face-attribute 'default nil :background "unspecified"))
 
-  (use-package mood-line
+  (use-package doom-modeline
     :ensure t
-    :hook (after-init . (lambda()
-                          (defun x-hide-tip () "No-op fallback for missing x-hide-tip." nil)
-                          (mood-line-mode)))
-    :custom
-    (mood-line-glyph-alist mood-line-glyphs-fira-code))
+    :hook (after-init . doom-modeline-mode))
 #+end_src
 
 ** Rainbow Delimiters
@@ -806,18 +805,15 @@ for most of my programming languages.
   (use-package lsp-mode
     :ensure t
     :commands (lsp lsp-deferred)
-    :hook
-    ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
-    :preface
-    (setq lsp-log-io nil)
-    (setq read-process-output-max (* 10 1024 1024)  ; 10MB - Increase read chunk size for better performance
-          lsp-use-plists t                      ; Use plists instead of hashtables
-          )
-
-    ;; LSP-booster integration for better performance
+    :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
+    :init
+    ;; Set variables early, before package is loaded
+    (setq lsp-log-io nil
+          read-process-output-max (* 10 1024 1024)
+          lsp-use-plists t)
+    :config
+    ;; Booster patch
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
-      "Try to parse bytecode instead of json.
-  This dramatically improves performance when receiving large JSON responses."
       (or
        (when (equal (following-char) ?#)
          (let ((bytecode (read (current-buffer))))
@@ -826,28 +822,21 @@ for most of my programming languages.
        (apply old-fn args)))
 
     (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-      "Prepend emacs-lsp-booster command to LSP server command.
-  This uses the external emacs-lsp-booster tool to speed up JSON parsing."
       (let ((orig-result (funcall old-fn cmd test?)))
-        (if (and (not test?)                             ;; for check lsp-server-present?
-                 (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+        (if (and (not test?)
+                 (not (file-remote-p default-directory))
                  lsp-use-plists
-                 (not (functionp 'json-rpc-connection))  ;; native json-rpc
+                 (not (functionp 'json-rpc-connection))
                  (executable-find "emacs-lsp-booster"))
             (progn
-              (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-                (setcar orig-result command-from-exec-path))
+              (when-let ((resolved (executable-find (car orig-result))))
+                (setcar orig-result resolved))
               (message "Using emacs-lsp-booster for %s!" orig-result)
               (cons "emacs-lsp-booster" orig-result))
           orig-result)))
-    :config
-    ;; Apply our advice functions to speed up LSP - only when LSP is loaded
-    (advice-add (if (progn (require 'json)
-                           (fboundp 'json-parse-buffer))
-                    'json-parse-buffer
-                  'json-read)
-                :around
-                #'lsp-booster--advice-json-parse)
+
+    (advice-add (if (fboundp 'json-parse-buffer) 'json-parse-buffer 'json-read)
+                :around #'lsp-booster--advice-json-parse)
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 #+end_src
 
