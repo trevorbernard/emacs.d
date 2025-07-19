@@ -241,7 +241,10 @@ annoying to accidentally minimize your window.
     (xterm-mouse-mode t)
     (set-face-inverse-video 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default))
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│)))
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
+    ;; Define x-hide-tip as no-op for terminal mode
+    (unless (fboundp 'x-hide-tip)
+      (defun x-hide-tip ())))
 
   ;; Disable minimize keys in GUI immediately
   (when window-system
@@ -473,6 +476,17 @@ or disable them completely.
             lisp-interaction-mode
             lisp-mode
             scheme-mode) . paredit-mode))
+#+end_src
+
+** OSC-52 support
+
+I do most of my work in a terminal over SSH. This enables me to yank in my
+session and it becomes available on my host machine.
+
+#+begin_src emacs-lisp
+  (use-package clipetty
+    :ensure t
+    :hook (after-init . global-clipetty-mode))
 #+end_src
 
 ** Clojure
