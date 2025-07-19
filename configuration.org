@@ -486,7 +486,7 @@ session and it becomes available on my host machine.
 #+begin_src emacs-lisp
   (use-package clipetty
     :ensure t
-    :hook (after-init . global-clipetty-mode))
+    :bind ("M-w" . clipetty-kill-ring-save))
 #+end_src
 
 ** Clojure
