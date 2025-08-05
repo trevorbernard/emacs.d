@@ -9,6 +9,18 @@
 This is my emacs, there are many like it, but this one is mine...
 #+END_QUOTE
 
+** Table of Contents
+- [[#getting-started][Getting Started]]
+- [[#early-initialization][Early Initialization]]
+- [[#package-settings][Package Settings]]
+- [[#ui--appearance][UI & Appearance]]
+- [[#platform-specific-configuration][Platform-Specific Configuration]]
+- [[#terminal--clipboard-integration][Terminal & Clipboard Integration]]
+- [[#key-bindings][Key Bindings]]
+- [[#editor-behavior--preferences][Editor Behavior & Preferences]]
+- [[#development][Development]]
+- [[#language-configurations][Language Configurations]]
+
 ** Getting Started
 
 I currently use =30.1= on both Linux and Mac systems. YMMV on Windows
@@ -16,10 +28,6 @@ or different versions of Emacs.
 
 You will need the following already installed for this configuration
 to run correctly.
-
-Install the [[https://github.com/tonsky/FiraCode][Fira Code Retina]] font because it's beautiful and makes for
-a wonderful font. You will need aspell installed in order to use
-Flymake mode. Clojure mode requires [[https://leiningen.org/][leiningen]].
 
 I strongly suggest you remap your Caps Lock key to Control to help
 reduce the onset of Emacs pinky. I even go further and have a new key
@@ -174,7 +182,13 @@ configuration are all done before the main configuration loads.
   (setq load-prefer-newer t)
 #+end_src
 
-** Theme
+** UI & Appearance
+
+Visual configuration for a clean, modern Emacs experience with consistent
+theming and helpful visual indicators.
+
+*** Theme Configuration
+
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
     :ensure t
@@ -185,19 +199,50 @@ configuration are all done before the main configuration loads.
 
   (with-eval-after-load 'timu-spacegrey-theme
     (set-face-attribute 'default nil :background "unspecified"))
+#+end_src
 
+*** Mode Line
+
+#+begin_src emacs-lisp
   (use-package doom-modeline
     :ensure t
     :hook (after-init . doom-modeline-mode))
 #+end_src
 
-** Rainbow Delimiters
+*** Visual Indicators
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
     :defer t
     :hook ((prog-mode . rainbow-delimiters-mode)))
+#+end_src
+
+** Platform-Specific Configuration
+
+Different operating systems and display environments require specific
+configurations for optimal Emacs integration.
+
+*** macOS Configuration
+
+#+begin_src emacs-lisp
+  (when (eq system-type 'darwin)
+   (use-package exec-path-from-shell
+     :ensure t
+     :config
+     (exec-path-from-shell-initialize))
+
+   ;; Mac file handling - move files to dedicated Emacs trash
+   (setq delete-by-moving-to-trash t)
+   (setq trash-directory "~/.Trash/emacs")
+
+   ;; Display preferences for macOS
+   (setq ns-use-native-fullscreen t)
+   (setq ns-use-thin-smoothing t)
+   (setq ns-pop-up-frames nil)
+
+   ;; Avoid dired issues specific to macOS
+   (setq dired-use-ls-dired nil))
 #+end_src
 
 ** Personal
@@ -209,10 +254,13 @@ That's me.
         user-mail-address "trevor.bernard@pm.me")
 #+end_src
 
-** Key Bindings
+** Terminal & Clipboard Integration
 
-Ignore minimize functionality when you're in the GUI because it's very
-annoying to accidentally minimize your window.
+Modern Emacs needs seamless integration between terminal and GUI environments,
+especially when working over SSH or in mixed Wayland/X11 setups. This section
+consolidates all terminal-specific configurations and clipboard handling.
+
+*** Wayland Clipboard Integration
 
 #+begin_src emacs-lisp
   ;; Configure Wayland clipboard integration immediately if needed
@@ -235,7 +283,11 @@ annoying to accidentally minimize your window.
         (shell-command-to-string "wl-paste -n | tr -d \r")))
     (setq interprogram-cut-function 'wl-copy)
     (setq interprogram-paste-function 'wl-paste))
+#+end_src
 
+*** Terminal Mouse & Display Support
+
+#+begin_src emacs-lisp
   ;; Enable mouse support in terminal immediately
   (unless (display-graphic-p)
     (xterm-mouse-mode t)
@@ -245,7 +297,39 @@ annoying to accidentally minimize your window.
     ;; Define x-hide-tip as no-op for terminal mode
     (unless (fboundp 'x-hide-tip)
       (defun x-hide-tip ())))
+#+end_src
 
+*** Terminal Emulator
+
+vterm provides a fully-fledged terminal emulator that handles escape
+sequences properly, making it superior to the built-in term/ansi-term.
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :defer t
+    :ensure t
+    :custom
+    (vterm-always-compile-module t))
+#+end_src
+
+*** OSC-52 Clipboard Support
+
+When working in a terminal over SSH, OSC-52 allows yanked text in Emacs
+to become available on the host machine's clipboard.
+
+#+begin_src emacs-lisp
+  (use-package clipetty
+    :ensure t
+    :bind ("M-w" . clipetty-kill-ring-save))
+#+end_src
+
+** Key Bindings
+
+Global key bindings and keyboard shortcuts for improved ergonomics.
+
+*** Basic Key Bindings
+
+#+begin_src emacs-lisp
   ;; Disable minimize keys in GUI immediately
   (when window-system
     (keymap-global-set "C-z" 'ignore)
@@ -269,36 +353,51 @@ some practice, it will become second-nature.
   (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
 
-* Preferences
+*** Development Bindings
+
+#+begin_src emacs-lisp
+  ;; Cider REPL jack-in - long-time habit
+  (keymap-global-set "C-c C-j" 'cider-jack-in)
+
+  ;; Magit bindings for git operations
+  (keymap-global-set "C-x g" 'magit-status)
+  (keymap-global-set "C-c g" 'magit-file-dispatch)
+#+end_src
+
+** Editor Behavior & Preferences
+
+Core Emacs settings that affect how the editor behaves and feels during
+everyday use.
+
+*** Basic Editor Behavior
 
 #+begin_src emacs-lisp
   (setq
    ;; Allow short answers 'y' or 'n'
    use-short-answers t
    ;; Make pgup/dn remember current line
-   scroll-preserve-screen-position t)
+   scroll-preserve-screen-position t
+   ;; Disable the annoying bell
+   ring-bell-function 'ignore)
 
-  ;; Auto revert buffers
+  ;; Auto revert buffers when files change on disk
   (global-auto-revert-mode t)
-  ;; Show column number
+  ;; Show column number in mode line
   (column-number-mode 1)
-  ;; Allow delete of selection
+  ;; Allow delete of selection when typing
   (delete-selection-mode 1)
-  ;; Syntax Highlighting
+  ;; Syntax highlighting everywhere
   (global-font-lock-mode 1)
-  ;; Highlight parenthesis
+  ;; Highlight matching parentheses
   (show-paren-mode 1)
-  ;; Highlight selected Regions
+  ;; Highlight selected regions
   (transient-mark-mode 1)
 #+end_src
 
-** Tidy Up: Disabling Unnecessary File Artifacts
+*** File Handling & Backup Preferences
 
-By default, Emacs generates backup files, auto-save files, and
-lockfiles. While once essential for crash recovery, these artifacts
-are often redundant today, especially with modern system stability and
-version control. Instead of cluttering your workspace, let's turn them
-off:
+By default, Emacs generates backup files, auto-save files, and lockfiles.
+With modern system stability and version control, these are often redundant.
 
 #+begin_src emacs-lisp
   (setq
@@ -307,61 +406,28 @@ off:
    create-lockfiles nil)    ; No .#lock files
 #+end_src
 
-Use spaces in favour of tabs because they are evil. But when there are
-tabs show them as 8 spaces.
+*** Indentation & Formatting
 
 #+begin_src emacs-lisp
+  ;; Use spaces instead of tabs
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
   (setq-default tab-width 8)
-#+end_src
 
-Limit the default fill mode to 80 characters
-
-#+begin_src emacs-lisp
+  ;; Text width and line handling
   (setq-default fill-column 80)
   (setq-default truncate-lines nil)
 #+end_src
 
-Ignore the stupid ring bell feature.
+*** Enable Useful Functions
 
 #+begin_src emacs-lisp
-  (setq ring-bell-function 'ignore)
-#+end_src
-
-Allow functions without issuing warnings
-
-#+begin_src emacs-lisp
+  ;; Allow these functions without confirmation warnings
   (put 'downcase-region 'disabled nil)
   (put 'narrow-to-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
 #+end_src
 
-* Mac specific configuration
-
-Load environment variables from shell and set Mac-specific
-options.
-
-#+begin_src emacs-lisp
-  (when (eq system-type 'darwin)
-   (use-package exec-path-from-shell
-     :ensure t
-     :config
-     (exec-path-from-shell-initialize))
-
-   ;; Mac file handling - move files to dedicated Emacs trash
-   (setq delete-by-moving-to-trash t)
-   (setq trash-directory "~/.Trash/emacs")
-
-   ;; Display preferences for macOS
-   (setq ns-use-native-fullscreen t)
-   (setq ns-use-thin-smoothing t)
-   (setq ns-pop-up-frames nil)
-
-   ;; Avoid dired issues specific to macOS
-   (setq dired-use-ls-dired nil))
-
-#+end_src
 
 * Development
 
@@ -383,20 +449,6 @@ Experiment with indent-bars
   (use-package indent-bars
     :load-path "~/code/indent-bars"
     :hook ((prog-mode . indent-bars-mode)))
-#+end_src
-
-** Terminals
-
-Let's try vterm to see if we like it. It's supposedly better than the
-built-in term/ansi-term because it's a fully-fledged terminal emulator
-that handles escape sequences properly.
-
-#+begin_src emacs-lisp
-  (use-package vterm
-    :defer t
-    :ensure t
-    :custom
-    (vterm-always-compile-module t))
 #+end_src
 
 ** Projectile Mode
@@ -442,10 +494,7 @@ Bind projectile to =C-c p= and enable by default.
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
-    :commands (magit-status magit-file-dispatch)
-    :bind
-    ("C-x g" . magit-status)
-    ("C-c g" . magit-file-dispatch))
+    :commands (magit-status magit-file-dispatch))
 #+end_src
 
 ** Paredit
@@ -477,16 +526,9 @@ or disable them completely.
             scheme-mode) . paredit-mode))
 #+end_src
 
-** OSC-52 support
+* Language Configurations
 
-I do most of my work in a terminal over SSH. This enables me to yank in my
-session and it becomes available on my host machine.
-
-#+begin_src emacs-lisp
-  (use-package clipetty
-    :ensure t
-    :bind ("M-w" . clipetty-kill-ring-save))
-#+end_src
+Programming language-specific configurations and integrations.
 
 ** Clojure
 
@@ -520,10 +562,6 @@ compatibility problems in the past so pin it to melpa-stable.
 
 I have long since used this key binding to jack into a repl. My
 fingers are programmed this way.
-
-#+begin_src emacs-lisp
-  (keymap-global-set "C-c C-j" 'cider-jack-in)
-#+end_src
 
 ** Elisp
 
