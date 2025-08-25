@@ -130,6 +130,10 @@ and handle frame appearance for better startup performance.
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
                            ("gnu" . "https://elpa.gnu.org/packages/")))
 
+  ;; pin projectile to melpa-stable
+  (setq package-pinned-packages
+        '((projectile . "melpa-stable")))
+
   (unless package--initialized
     (package-initialize))
 
@@ -952,19 +956,23 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 ** Nix
 
 #+begin_src emacs-lisp
-  (use-package lsp-nix
-    :ensure lsp-mode
-    :after (lsp-mode)
-    :demand t
-    :custom
-    (lsp-nix-nil-formatter ["nixfmt"]))
+    (use-package lsp-nix
+      :ensure lsp-mode
+      :after (lsp-mode)
+      :demand t
+      :custom
+      (lsp-nix-nil-formatter ["nixfmt"]))
 
-  (use-package nix-mode
-    :ensure t
-    :hook (nix-mode . lsp-deferred))
+    (use-package nix-mode
+      :ensure t
+      :hook (nix-mode . lsp-deferred))
 
-  (use-package nixpkgs-fmt
-    :ensure t)
+    (use-package nixfmt
+      :ensure t
+      :bind
+      (:map
+       nix-mode-map
+       ("C-c C-f" . nixpkgs-fmt-buffer)))
 #+end_src
 
 ** Terraform
