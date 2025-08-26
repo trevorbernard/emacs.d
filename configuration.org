@@ -782,7 +782,8 @@ has built-in support for it.
                                  (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src"))
                                  (yaml . ("https://github.com/ikatyang/tree-sitter-yaml" "v0.5.0"))
                                  (rust . ("https://github.com/tree-sitter/tree-sitter-rust" "v0.20.3" "src"))
-                                 (just "https://github.com/IndianBoy42/tree-sitter-just"))))
+                                 (just "https://github.com/IndianBoy42/tree-sitter-just")
+                                 (ruby "https://github.com/tree-sitter/tree-sitter-ruby"))))
 
           ;; First pass: add all grammars to source list and collect missing ones
           (dolist (grammar grammar-sources)
@@ -822,6 +823,7 @@ has built-in support for it.
                (scss-mode . scss-ts-mode)
                (sh-base-mode . bash-ts-mode)
                (sh-mode . bash-ts-mode)
+               (ruby-mode . ruby-ts-mode)
                (typescript-mode . typescript-ts-mode)))
       (add-to-list 'major-mode-remap-alist mapping))
     :config
@@ -896,6 +898,19 @@ for most of my programming languages.
     (advice-add (if (fboundp 'json-parse-buffer) 'json-parse-buffer 'json-read)
                 :around #'lsp-booster--advice-json-parse)
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+#+end_src
+
+** Ruby
+
+#+begin_src emacs-lisp
+  (use-package ruby-ts-mode
+    :ensure t
+    :mode "\\.rb\\'"
+    :mode "Rakefile\\'"
+    :mode "Gemfile\\'"
+    :custom
+    (ruby-indent-level 2)
+    (ruby-indent-tabs-mode nil))
 #+end_src
 
 ** Rust
