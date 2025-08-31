@@ -368,6 +368,16 @@ some practice, it will become second-nature.
   (keymap-global-set "C-c g" 'magit-file-dispatch)
 #+end_src
 
+
+** Evil Mode
+
+VIM motions are clearly the superior way to edit text but I'm hardcoded to Emacs
+text editting. This will be a long transition.
+
+#+begin_src emacs-lisp
+  (use-package evil :ensure t)
+#+end_src
+
 ** Editor Behavior & Preferences
 
 Core Emacs settings that affect how the editor behaves and feels during
