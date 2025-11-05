@@ -303,18 +303,18 @@ consolidates all terminal-specific configurations and clipboard handling.
       (defun x-hide-tip ())))
 #+end_src
 
-*** Terminal Emulator
+# *** Terminal Emulator
 
-vterm provides a fully-fledged terminal emulator that handles escape
-sequences properly, making it superior to the built-in term/ansi-term.
+# vterm provides a fully-fledged terminal emulator that handles escape
+# sequences properly, making it superior to the built-in term/ansi-term.
 
-#+begin_src emacs-lisp
-  (use-package vterm
-    :defer t
-    :ensure t
-    :custom
-    (vterm-always-compile-module t))
-#+end_src
+# #+begin_src emacs-lisp
+#   (use-package vterm
+#     :defer t
+#     :ensure t
+#     :custom
+#     (vterm-always-compile-module t))
+# #+end_src
 
 *** OSC-52 Clipboard Support
 
