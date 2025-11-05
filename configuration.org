@@ -1033,14 +1033,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package dap-java :after (lsp-java))
 #+end_src
 
-** Hurl mode
-
-#+begin_src emacs-lisp
-  (use-package hurl-mode
-    :ensure t
-    :mode "\\.hurl\\'")
-#+end_src
-
 ** Misc
 
 #+begin_src emacs-lisp
