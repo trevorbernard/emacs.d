@@ -461,7 +461,6 @@ Experiment with indent-bars
 
 #+begin_src emacs-lisp
   (use-package indent-bars
-    :load-path "~/code/indent-bars"
     :hook ((prog-mode . indent-bars-mode)))
 #+end_src
 
