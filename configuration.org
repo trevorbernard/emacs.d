@@ -275,21 +275,20 @@ consolidates all terminal-specific configurations and clipboard handling.
     ;; Without this, copy and pasting from other wayland apps into
     ;; emacs-pgtk doesn't work.
     ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
-    (setq wl-copy-process nil)
-    (defun wl-copy (text)
-      (setq wl-copy-process (make-process :name "wl-copy"
-                                          :buffer nil
-                                          :command '("wl-copy" "-f" "-n")
-                                          :connection-type 'pipe
-                                          :noquery t))
-      (process-send-string wl-copy-process text)
-      (process-send-eof wl-copy-process))
-    (defun wl-paste ()
-      (if (and wl-copy-process (process-live-p wl-copy-process))
-          nil ; should return nil if we're the current paste owner
+    (setq tb/wl-copy-process nil)
+    (defun tb/wl-copy (text)
+      (setq tb/wl-copy-process (make-process :name "wl-copy"
+                                             :buffer nil
+                                             :command '("wl-copy" "-f" "-n")
+                                             :connection-type 'pipe
+                                             :noquery t))
+      (process-send-string tb/wl-copy-process text)
+      (process-send-eof tb/wl-copy-process))
+    (defun tb/wl-paste ()
+      (unless (and tb/wl-copy-process (process-live-p tb/wl-copy-process))
         (shell-command-to-string "wl-paste -n | tr -d \r")))
-    (setq interprogram-cut-function 'wl-copy)
-    (setq interprogram-paste-function 'wl-paste))
+    (setq interprogram-cut-function 'tb/wl-copy)
+    (setq interprogram-paste-function 'tb/wl-paste))
 #+end_src
 
 *** Terminal Mouse & Display Support
@@ -303,7 +302,8 @@ consolidates all terminal-specific configurations and clipboard handling.
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     ;; Define x-hide-tip as no-op for terminal mode
     (unless (fboundp 'x-hide-tip)
-      (defun x-hide-tip ())))
+      (defun tb/x-hide-tip ())
+      (defalias 'x-hide-tip #'tb/x-hide-tip)))
 #+end_src
 
 # *** Terminal Emulator
@@ -556,16 +556,16 @@ compatibility problems in the past so pin it to melpa-stable.
   (use-package clojure-mode
     :ensure t
     :defer t
+    :hook (clojure-mode . subword-mode)
+    :custom
+    (clojure-align-forms-automatically t)
     :config
-    (setq clojure-align-forms-automatically t)
-    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round)
-    (add-hook 'clojure-mode-hook #'subword-mode))
+    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
 
   (use-package inf-clojure
     :ensure t
     :defer t
-    :config
-    (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
+    :hook (inf-clojure-mode . rainbow-delimiters-mode))
 
   (use-package cider
     :ensure t
@@ -637,8 +637,8 @@ packages only when they are missing.
   (use-package js
     :ensure t
     :defer t
-    :config
-    (setq js-indent-level 2))
+    :custom
+    (js-indent-level 2))
 #+end_src
 
 ** CSS
@@ -647,51 +647,53 @@ packages only when they are missing.
   (use-package css-mode
     :ensure t
     :defer t
-    :config
-    (setq css-indent-level 2))
+    :custom
+    (css-indent-level 2))
 #+end_src
 
 ** Flycheck
 
 #+begin_src emacs-lisp
-    (use-package flycheck
-      :ensure t
-      :config
-      (flycheck-define-checker python-ruff
-        "A Python syntax and style checker using the ruff utility.
+  (defun tb/python-ruff-setup ()
+    "Configure ruff as the Python checker unless in org-src-mode."
+    (unless (bound-and-true-p org-src-mode)
+      (when (buffer-file-name)
+        (setq-local flycheck-checkers '(python-ruff))
+        (flycheck-mode))))
+
+  (use-package flycheck
+    :ensure t
+    :config
+    (flycheck-define-checker python-ruff
+      "A Python syntax and style checker using the ruff utility.
     To override the path to the ruff executable, set
     `flycheck-python-ruff-executable'.
     See URL `http://pypi.python.org/pypi/ruff'."
-        :command ("ruff"
-                  "check"
-                  "--output-format=text"
-                  (eval (when buffer-file-name
-                          (concat "--stdin-filename=" buffer-file-name)))
-                  "-")
-        :standard-input t
-        :error-filter (lambda (errors)
-                        (let ((errors (flycheck-sanitize-errors errors)))
-                          (seq-map #'flycheck-flake8-fix-error-level errors)))
-        :error-patterns
-        ((warning line-start
-                  (file-name) ":" line ":" (optional column ":") " "
-                  (id (one-or-more (any alpha)) (one-or-more digit)) " "
-                  (message (one-or-more not-newline))
-                  line-end))
-        :modes (python-mode python-ts-mode))
+      :command ("ruff"
+                "check"
+                "--output-format=text"
+                (eval (when buffer-file-name
+                        (concat "--stdin-filename=" buffer-file-name)))
+                "-")
+      :standard-input t
+      :error-filter (lambda (errors)
+                      (let ((errors (flycheck-sanitize-errors errors)))
+                        (seq-map #'flycheck-flake8-fix-error-level errors)))
+      :error-patterns
+      ((warning line-start
+                (file-name) ":" line ":" (optional column ":") " "
+                (id (one-or-more (any alpha)) (one-or-more digit)) " "
+                (message (one-or-more not-newline))
+                line-end))
+      :modes (python-mode python-ts-mode))
 
-      :hook (python-mode . (lambda ()
-                             (unless (bound-and-true-p org-src-mode)
-                               (when (buffer-file-name)
-                                 (setq-local flycheck-checkers '(python-ruff))
-                                 (flycheck-mode)))))
+    :hook ((python-mode . tb/python-ruff-setup)
+           (prog-mode . flycheck-mode)
+           (text-mode . flycheck-mode))
 
-      :bind (:map flycheck-mode-map
-                  ("M-n" . flycheck-next-error)
-                  ("M-p" . flycheck-previous-error))
-
-      :hook ((prog-mode . flycheck-mode)
-             (text-mode . flycheck-mode)))
+    :bind (:map flycheck-mode-map
+                ("M-n" . flycheck-next-error)
+                ("M-p" . flycheck-previous-error)))
 #+end_src
 
 ** Flyspell
@@ -968,13 +970,12 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 #+begin_src emacs-lisp
   (use-package ielm
     :ensure t
+    :hook ((ielm-mode . rainbow-delimiters-mode)
+           (ielm-mode . paredit-mode))
     :bind
     (:map ielm-map
           ("C-m" . 'ielm-return)
-          ("<return>" . 'ielm-return))
-    :config
-    (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode)
-    (add-hook 'ielm-mode-hook #'paredit-mode))
+          ("<return>" . 'ielm-return)))
 #+end_src
 
 ** OCaml
@@ -1032,8 +1033,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package lsp-java
     :ensure t
     :after lsp-mode
-    :config
-    (add-hook 'java-ts-mode-hook #'lsp))
+    :hook (java-ts-mode . lsp))
 
   (use-package dap-java :after (lsp-java))
 #+end_src
