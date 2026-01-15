@@ -45,9 +45,12 @@ and handle frame appearance for better startup performance.
   (setq process-adaptive-read-buffering nil)
 
   (add-hook 'emacs-startup-hook
-            (lambda () (message "Emacs ready in %s with %d garbage collections."
-                                (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
-                                gcs-done)))
+            (lambda ()
+              (setq gc-cons-threshold 16777216
+                    gc-cons-percentage 0.1)
+              (message "Emacs ready in %s with %d garbage collections."
+                       (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
+                       gcs-done)))
 
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.9)
@@ -67,7 +70,7 @@ and handle frame appearance for better startup performance.
                   (internal-border-width . 0))))
 
   (set-face-attribute 'mode-line nil :background 'unspecified)
-
+  (set-face-attribute 'header-line nil :background 'unspecified)
 
   (menu-bar-mode -1)
   (when (fboundp 'tool-bar-mode)
@@ -607,6 +610,9 @@ remap my brain, I'll remap it to =newline=.
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
     :config
+    (set-face-attribute 'org-block nil :background 'unspecified)
+    (set-face-attribute 'org-block-begin-line nil :background 'unspecified)
+    (set-face-attribute 'org-block-end-line nil :background 'unspecified)
     (turn-on-auto-fill)
     (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
@@ -1014,10 +1020,9 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package just-ts-mode
     :ensure t
     :defer t
-    :config
-    (setq-local
-     just-ts-indent-offset 2
-     tab-width 2))
+    :hook (just-ts-mode . (lambda ()
+                            (setq-local just-ts-indent-offset 2
+                                        tab-width 2))))
 #+end_src
 
 
