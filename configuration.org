@@ -72,11 +72,9 @@ and handle frame appearance for better startup performance.
   (set-face-attribute 'mode-line nil :background 'unspecified)
   (set-face-attribute 'header-line nil :background 'unspecified)
 
-  (menu-bar-mode -1)
-  (when (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1))
-  (when (fboundp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
+  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
+    (when (fboundp mode)
+      (funcall mode -1)))
 
   ;; suppresses the message
   (defun display-startup-echo-area-message ())
