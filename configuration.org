@@ -60,10 +60,7 @@ and handle frame appearance for better startup performance.
   ;; Set frame parameters before frame creation
   (setq default-frame-alist
         (append default-frame-alist
-                '((background-color . "#2b303b")
-                  (foreground-color . "#c0c5ce")
-                  (fullscreen . maximized)
-                  (menu-bar-lines . 0)
+                '((menu-bar-lines . 0)
                   (tool-bar-lines . 0)
                   (vertical-scroll-bars)
                   (horizontal-scroll-bars)
