@@ -194,6 +194,7 @@ theming and helpful visual indicators.
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
     :ensure t
+    :load-path "~/code/timu-spacegrey-theme"
     :custom
     (timu-spacegrey-transparent-background t)
     :hook
@@ -837,6 +838,7 @@ has built-in support for it.
                (sh-base-mode . bash-ts-mode)
                (sh-mode . bash-ts-mode)
                (ruby-mode . ruby-ts-mode)
+               (rust-mode . rust-ts-mode)
                (typescript-mode . typescript-ts-mode)))
       (add-to-list 'major-mode-remap-alist mapping))
     :config
@@ -1021,7 +1023,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
                                         tab-width 2))))
 #+end_src
 
-
 ** Java
 
 #+begin_src emacs-lisp
@@ -1036,6 +1037,12 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 ** Misc
 
 #+begin_src emacs-lisp
+  (use-package combobulate
+     :custom
+     (combobulate-key-prefix "C-c o")
+     :hook ((prog-mode . combobulate-mode))
+     :load-path "~/code/combobulate")
+
   (use-package csv-mode
     :ensure t)
 
@@ -1073,6 +1080,14 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
            (org-mode . yas-minor-mode)))
 
   (use-package dotenv-mode :ensure t)
+
+  (use-package pest-mode
+    :ensure t
+    :mode "\\.pest\\'"
+    :hook (pest-mode . flymake-mode))
+
+  (use-package flymake-pest :ensure t)
+  (use-package flycheck-pest :ensure t)
 #+end_src
 
 Reset the garbage collection threshold.
