@@ -137,10 +137,10 @@ and handle frame appearance for better startup performance.
   (unless package--initialized
     (package-initialize))
 
+  (setq use-package-always-defer t
+        use-package-verbose nil  ; Set to t for debugging, nil for performance
+        use-package-minimum-reported-time 0.1)
   (eval-when-compile
-    (setq use-package-always-defer t
-          use-package-verbose nil  ; Set to t for debugging, nil for performance
-          use-package-minimum-reported-time 0.1)
     (require 'use-package))
 
   (provide 'early-init)
@@ -205,7 +205,7 @@ theming and helpful visual indicators.
   (use-package doom-modeline
     :ensure t
     :commands doom-modeline-mode
-    :hook (after-init . (lambda () (run-with-idle-timer 0 nil #'doom-modeline-mode))))
+    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'doom-modeline-mode))))
 #+end_src
 
 *** Visual Indicators
@@ -367,7 +367,9 @@ VIM motions are clearly the superior way to edit text but I'm hardcoded to Emacs
 text editting. This will be a long transition.
 
 #+begin_src emacs-lisp
-  (use-package evil :ensure t)
+  (use-package evil
+    :ensure t
+    :commands evil-mode)
 #+end_src
 
 ** Editor Behavior & Preferences
@@ -587,7 +589,8 @@ remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
   (use-package ob-rust
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package org
     :ensure t
@@ -692,17 +695,17 @@ packages only when they are missing.
     :ensure t
     :defer t
     :commands (flyspell-mode flyspell-prog-mode)
-    :custom
-    (flyspell-issue-welcome-flag nil)
-    (flyspell-issue-message-flag nil)
-    (flyspell-mark-duplications-flag nil)
-    (ispell-program-name "aspell")
-    (ispell-list-command "list")
     :bind (:map flyspell-mouse-map
                 ([down-mouse-3] . flyspell-correct-word)
                 ([mouse-3] . undefined))
     :hook (((text-mode org-mode markdown-mode) . flyspell-mode)
-           (prog-mode . flyspell-prog-mode)))
+           (prog-mode . flyspell-prog-mode))
+    :config
+    (setq flyspell-issue-welcome-flag nil
+          flyspell-issue-message-flag nil
+          flyspell-mark-duplications-flag nil
+          ispell-program-name "aspell"
+          ispell-list-command "list"))
 
 #+end_src
 
@@ -710,7 +713,8 @@ packages only when they are missing.
 
 #+begin_src emacs-lisp
   (use-package ox-gfm
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package markdown-mode
     :ensure t
@@ -850,7 +854,7 @@ for most of my programming languages.
   (use-package ivy
     :ensure t
     :commands ivy-mode
-    :hook (after-init . (lambda () (run-with-idle-timer 0 nil #'ivy-mode))))
+    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'ivy-mode))))
 
   (use-package counsel
     :ensure t
@@ -931,6 +935,7 @@ integration with rust-analyzer (via LSP) and cargo.
 
   (use-package rust-mode
     :ensure t
+    :mode "\\.rs\\'"
     :init
     (setq rust-mode-treesitter-derive t))
 
@@ -1029,25 +1034,32 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
      :load-path "~/code/combobulate")
 
   (use-package csv-mode
-    :ensure t)
+    :ensure t
+    :mode "\\.csv\\'")
 
   (use-package dockerfile-mode
-    :ensure t)
+    :ensure t
+    :mode "Dockerfile\\'")
 
   (use-package yaml-mode
-    :ensure t)
+    :ensure t
+    :mode "\\.ya?ml\\'")
 
   (use-package bnf-mode
-    :ensure t)
+    :ensure t
+    :mode "\\.bnf\\'")
 
   (use-package htmlize
-    :ensure t)
+    :ensure t
+    :defer t)
 
   (use-package ag
-    :ensure t)
+    :ensure t
+    :commands (ag ag-project ag-regexp))
 
   (use-package string-inflection
-    :ensure t)
+    :ensure t
+    :commands (string-inflection-all-cycle))
 
   (use-package yasnippet
     :ensure t
@@ -1056,15 +1068,21 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :hook ((prog-mode . yas-minor-mode)
            (org-mode . yas-minor-mode)))
 
-  (use-package dotenv-mode :ensure t)
+  (use-package dotenv-mode
+    :ensure t
+    :mode "\\.env\\'")
 
   (use-package pest-mode
     :ensure t
     :mode "\\.pest\\'"
     :hook (pest-mode . flymake-mode))
 
-  (use-package flymake-pest :ensure t)
-  (use-package flycheck-pest :ensure t)
+  (use-package flymake-pest
+    :ensure t
+    :defer t)
+  (use-package flycheck-pest
+    :ensure t
+    :defer t)
 #+end_src
 
 Reset the garbage collection threshold.
