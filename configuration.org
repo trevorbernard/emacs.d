@@ -132,12 +132,10 @@ and handle frame appearance for better startup performance.
   (setq package-pinned-packages
         '((projectile . "melpa-stable")))
 
+  (setq package-enable-at-startup nil)
+
   (unless package--initialized
     (package-initialize))
-
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
 
   (eval-when-compile
     (setq use-package-always-defer t
@@ -195,8 +193,8 @@ theming and helpful visual indicators.
   (use-package timu-spacegrey-theme
     :ensure t
     :load-path "~/code/timu-spacegrey-theme"
-    :custom
-    (timu-spacegrey-transparent-background t)
+    :init
+    (setq timu-spacegrey-transparent-background t)
     :hook
     (after-init . (lambda () (load-theme 'timu-spacegrey t))))
 
@@ -230,11 +228,6 @@ configurations for optimal Emacs integration.
 
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
-   (use-package exec-path-from-shell
-     :ensure t
-     :config
-     (exec-path-from-shell-initialize))
-
    ;; Mac file handling - move files to dedicated Emacs trash
    (setq delete-by-moving-to-trash t)
    (setq trash-directory "~/.Trash/emacs")
@@ -481,8 +474,9 @@ Bind projectile to =C-c p= and enable by default.
     :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
-    :commands (projectile-find-file projectile-switch-project projectile-command-map)
-    :hook (after-init . projectile-mode))
+    :commands (projectile-find-file projectile-switch-project projectile-command-map projectile-mode)
+    :config
+    (projectile-mode))
 #+end_src
 
 ** Company
@@ -856,8 +850,7 @@ for most of my programming languages.
 #+begin_src emacs-lisp
   (use-package ivy
     :ensure t
-    :init
-    (ivy-mode))
+    :hook (after-init . ivy-mode))
 
   (use-package counsel
     :ensure t
@@ -988,7 +981,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     (use-package lsp-nix
       :ensure lsp-mode
       :after (lsp-mode)
-      :demand t
       :custom
       (lsp-nix-nil-formatter ["nixfmt"]))
 
@@ -1067,10 +1059,8 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package envrc
     :ensure t
     :bind-keymap ("C-c e" . envrc-command-map)
-    :hook (after-init . envrc-global-mode))
-
-  (use-package direnv
-    :ensure t)
+    :config
+    (envrc-global-mode))
 
   (use-package yasnippet
     :ensure t
