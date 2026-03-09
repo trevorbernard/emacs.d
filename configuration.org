@@ -968,13 +968,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
           ("<return>" . 'ielm-return)))
 #+end_src
 
-** OCaml
-
-#+begin_src emacs-lisp
-  (use-package tuareg
-    :ensure t)
-#+end_src
-
 ** Nix
 
 #+begin_src emacs-lisp
@@ -1055,11 +1048,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
   (use-package string-inflection
     :ensure t)
-
-  (use-package envrc
-    :ensure t
-    :bind-keymap ("C-c e" . envrc-command-map)
-    :hook (after-init . envrc-global-mode))
 
   (use-package yasnippet
     :ensure t
