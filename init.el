@@ -13,13 +13,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(ag bnf-mode cider clipetty company counsel csv-mode direnv dockerfile-mode
-        doom-modeline dotenv-mode envrc evil exec-path-from-shell flycheck-pest
-        flymake-pest htmlize inf-clojure just-ts-mode lsp-ivy lsp-java lsp-ui
-        magit nix-mode nixfmt ob-rust ox-gfm paredit projectile
-        rainbow-delimiters rustic string-inflection terraform-mode
-        timu-spacegrey-theme tuareg yaml-mode yasnippet))
+ '(package-selected-packages nil)
  '(package-vc-selected-packages
    '((timu-spacegrey-theme :vc-backend Git :url
                            "https://github.com/trevorbernard/timu-spacegrey-theme.git")))

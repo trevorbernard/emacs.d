@@ -191,15 +191,12 @@ theming and helpful visual indicators.
 
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
-    :ensure t
     :load-path "~/code/timu-spacegrey-theme"
     :init
     (setq timu-spacegrey-transparent-background t)
+    (add-to-list 'custom-theme-load-path "~/code/timu-spacegrey-theme")
     :hook
     (after-init . (lambda () (load-theme 'timu-spacegrey t))))
-
-  (with-eval-after-load 'timu-spacegrey-theme
-    (set-face-attribute 'default nil :background "unspecified"))
 #+end_src
 
 *** Mode Line
