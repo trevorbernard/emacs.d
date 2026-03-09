@@ -284,6 +284,8 @@ consolidates all terminal-specific configurations and clipboard handling.
   ;; Enable mouse support in terminal immediately
   (unless (display-graphic-p)
     (xterm-mouse-mode t)
+    (global-set-key (kbd "<wheel-up>") 'scroll-down-line)
+    (global-set-key (kbd "<wheel-down>") 'scroll-up-line)
     (set-face-inverse-video 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
