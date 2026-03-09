@@ -82,8 +82,8 @@ and handle frame appearance for better startup performance.
   (setq frame-inhibit-implied-resize t
         frame-resize-pixelwise t)
 
-  ;; enable smooth scrolling
-  (pixel-scroll-precision-mode t)
+  (when (display-graphic-p)
+    (pixel-scroll-precision-mode t))
 
   ;; Native compilation configuration - consolidated here to avoid race conditions
   (when (and (fboundp 'native-comp-available-p)
@@ -204,7 +204,8 @@ theming and helpful visual indicators.
 #+begin_src emacs-lisp
   (use-package doom-modeline
     :ensure t
-    :hook (after-init . doom-modeline-mode))
+    :commands doom-modeline-mode
+    :hook (after-init . (lambda () (run-with-idle-timer 0 nil #'doom-modeline-mode))))
 #+end_src
 
 *** Visual Indicators
@@ -675,8 +676,7 @@ packages only when they are missing.
       :modes (python-mode python-ts-mode))
 
     :hook ((python-mode . tb/python-ruff-setup)
-           (prog-mode . flycheck-mode)
-           (text-mode . flycheck-mode))
+           (prog-mode . flycheck-mode))
 
     :bind (:map flycheck-mode-map
                 ("M-n" . flycheck-next-error)
@@ -847,7 +847,8 @@ for most of my programming languages.
 #+begin_src emacs-lisp
   (use-package ivy
     :ensure t
-    :hook (after-init . ivy-mode))
+    :commands ivy-mode
+    :hook (after-init . (lambda () (run-with-idle-timer 0 nil #'ivy-mode))))
 
   (use-package counsel
     :ensure t
@@ -1056,8 +1057,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package envrc
     :ensure t
     :bind-keymap ("C-c e" . envrc-command-map)
-    :config
-    (envrc-global-mode))
+    :hook (after-init . envrc-global-mode))
 
   (use-package yasnippet
     :ensure t
