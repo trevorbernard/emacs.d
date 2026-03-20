@@ -42,7 +42,8 @@ and handle frame appearance for better startup performance.
 #+begin_src emacs-lisp :tangle early-init.el
   ;;; -*- lexical-binding: t -*-
 
-  (setq process-adaptive-read-buffering nil)
+  (setq process-adaptive-read-buffering nil
+        read-process-output-max (* 10 1024 1024))
 
   (add-hook 'emacs-startup-hook
             (lambda ()
@@ -57,21 +58,10 @@ and handle frame appearance for better startup performance.
 
   (set-display-table-slot standard-display-table 'vertical-border ?|)
 
-  ;; Set frame parameters before frame creation
-  (setq default-frame-alist
-        (append default-frame-alist
-                '((menu-bar-lines . 0)
-                  (tool-bar-lines . 0)
-                  (vertical-scroll-bars)
-                  (horizontal-scroll-bars)
-                  (internal-border-width . 0))))
-
   (set-face-attribute 'mode-line nil :background 'unspecified)
   (set-face-attribute 'header-line nil :background 'unspecified)
 
-  (dolist (mode '(menu-bar-mode tool-bar-mode scroll-bar-mode))
-    (when (fboundp mode)
-      (funcall mode -1)))
+  (menu-bar-mode -1)
 
   ;; suppresses the message
   (defun display-startup-echo-area-message ())
@@ -79,11 +69,7 @@ and handle frame appearance for better startup performance.
   (setq inhibit-startup-message t
         inhibit-startup-echo-area-message "tbernard")
 
-  (setq frame-inhibit-implied-resize t
-        frame-resize-pixelwise t)
-
-  (when (display-graphic-p)
-    (pixel-scroll-precision-mode t))
+  (setq frame-inhibit-implied-resize t)
 
   ;; Native compilation configuration - consolidated here to avoid race conditions
   (when (and (fboundp 'native-comp-available-p)
@@ -150,13 +136,7 @@ and handle frame appearance for better startup performance.
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
-  (setq read-process-output-max (* 10 1024 1024))
-  (setq process-adaptive-read-buffering nil)
-
   (setq treemacs-no-load-time-warnings t)
-
-  (unless (boundp 'image-scaling-factor)
-    (setq image-scaling-factor 1.0))
 #+end_src
 
 ** General use-package settings
@@ -213,7 +193,6 @@ theming and helpful visual indicators.
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
-    :defer t
     :hook ((prog-mode . rainbow-delimiters-mode)))
 #+end_src
 
@@ -226,16 +205,9 @@ configurations for optimal Emacs integration.
 
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
-   ;; Mac file handling - move files to dedicated Emacs trash
    (setq delete-by-moving-to-trash t)
    (setq trash-directory "~/.Trash/emacs")
-
-   ;; Display preferences for macOS
-   (setq ns-use-native-fullscreen t)
-   (setq ns-use-thin-smoothing t)
    (setq ns-pop-up-frames nil)
-
-   ;; Avoid dired issues specific to macOS
    (setq dired-use-ls-dired nil))
 #+end_src
 
@@ -295,19 +267,6 @@ consolidates all terminal-specific configurations and clipboard handling.
       (defalias 'x-hide-tip #'tb/x-hide-tip)))
 #+end_src
 
-# *** Terminal Emulator
-
-# vterm provides a fully-fledged terminal emulator that handles escape
-# sequences properly, making it superior to the built-in term/ansi-term.
-
-# #+begin_src emacs-lisp
-#   (use-package vterm
-#     :defer t
-#     :ensure t
-#     :custom
-#     (vterm-always-compile-module t))
-# #+end_src
-
 *** OSC-52 Clipboard Support
 
 When working in a terminal over SSH, OSC-52 allows yanked text in Emacs
@@ -322,15 +281,6 @@ to become available on the host machine's clipboard.
 ** Key Bindings
 
 Global key bindings and keyboard shortcuts for improved ergonomics.
-
-*** Basic Key Bindings
-
-#+begin_src emacs-lisp
-  ;; Disable minimize keys in GUI immediately
-  (when window-system
-    (keymap-global-set "C-z" 'ignore)
-    (keymap-global-set "C-x C-z" 'ignore))
-#+end_src
 
 *** Invoke M-x without the Alt key
 
@@ -492,7 +442,7 @@ Bind projectile to =C-c p= and enable by default.
           ("C-p". company-select-previous)
           ("M-<". company-select-first)
           ("M->". company-select-last))
-    :hook (prog-mode . #'company))
+    :hook (prog-mode . company-mode))
 #+end_src
 
 ** Magit
@@ -547,7 +497,6 @@ compatibility problems in the past so pin it to melpa-stable.
 #+begin_src emacs-lisp
   (use-package clojure-mode
     :ensure t
-    :defer t
     :hook (clojure-mode . subword-mode)
     :custom
     (clojure-align-forms-automatically t)
@@ -555,13 +504,10 @@ compatibility problems in the past so pin it to melpa-stable.
     (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
 
   (use-package inf-clojure
-    :ensure t
-    :defer t
-    :hook (inf-clojure-mode . rainbow-delimiters-mode))
+    :ensure t)
 
   (use-package cider
     :ensure t
-    :defer t
     :commands cider-jack-in
     :custom
     (nrepl-log-messages t)
@@ -571,13 +517,6 @@ compatibility problems in the past so pin it to melpa-stable.
 
 I have long since used this key binding to jack into a repl. My
 fingers are programmed this way.
-
-** Elisp
-
-#+begin_src emacs-lisp
-  ;; eldoc-mode is enabled by default in emacs-lisp-mode since Emacs 25
-  ;; No need to explicitly add hook
-#+end_src
 
 ** Org Mode
 
@@ -589,11 +528,9 @@ remap my brain, I'll remap it to =newline=.
 
 #+begin_src emacs-lisp
   (use-package ob-rust
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package org
-    :ensure t
     :bind
     (:map
      org-mode-map
@@ -628,8 +565,6 @@ packages only when they are missing.
 
 #+begin_src emacs-lisp
   (use-package js
-    :ensure t
-    :defer t
     :custom
     (js-indent-level 2))
 #+end_src
@@ -638,8 +573,6 @@ packages only when they are missing.
 
 #+begin_src emacs-lisp
   (use-package css-mode
-    :ensure t
-    :defer t
     :custom
     (css-indent-level 2))
 #+end_src
@@ -681,7 +614,7 @@ packages only when they are missing.
       :modes (python-mode python-ts-mode))
 
     :hook ((python-mode . tb/python-ruff-setup)
-           (prog-mode . flycheck-mode))
+           ((rust-mode rustic-mode) . flycheck-mode))
 
     :bind (:map flycheck-mode-map
                 ("M-n" . flycheck-next-error)
@@ -692,14 +625,11 @@ packages only when they are missing.
 
 #+begin_src emacs-lisp
   (use-package flyspell
-    :ensure t
-    :defer t
     :commands (flyspell-mode flyspell-prog-mode)
     :bind (:map flyspell-mouse-map
                 ([down-mouse-3] . flyspell-correct-word)
                 ([mouse-3] . undefined))
-    :hook (((text-mode org-mode markdown-mode) . flyspell-mode)
-           (prog-mode . flyspell-prog-mode))
+    :hook (((org-mode markdown-mode) . flyspell-mode))
     :config
     (setq flyspell-issue-welcome-flag nil
           flyspell-issue-message-flag nil
@@ -713,8 +643,7 @@ packages only when they are missing.
 
 #+begin_src emacs-lisp
   (use-package ox-gfm
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package markdown-mode
     :ensure t
@@ -858,7 +787,7 @@ for most of my programming languages.
 
   (use-package counsel
     :ensure t
-    :after ivy
+    :commands counsel-mode
     :hook (ivy-mode . counsel-mode))
 
   (use-package lsp-ivy
@@ -879,9 +808,7 @@ for most of my programming languages.
     :commands (lsp lsp-deferred)
     :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
-    ;; Set variables early, before package is loaded
     (setq lsp-log-io nil
-          read-process-output-max (* 10 1024 1024)
           lsp-use-plists t)
     :config
     ;; Booster patch
@@ -964,9 +891,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
 #+begin_src emacs-lisp
   (use-package ielm
-    :ensure t
-    :hook ((ielm-mode . rainbow-delimiters-mode)
-           (ielm-mode . paredit-mode))
+    :hook ((ielm-mode . paredit-mode))
     :bind
     (:map ielm-map
           ("C-m" . 'ielm-return)
@@ -1007,7 +932,6 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 #+begin_src emacs-lisp
   (use-package just-ts-mode
     :ensure t
-    :defer t
     :hook (just-ts-mode . (lambda ()
                             (setq-local just-ts-indent-offset 2
                                         tab-width 2))))
@@ -1050,8 +974,7 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :mode "\\.bnf\\'")
 
   (use-package htmlize
-    :ensure t
-    :defer t)
+    :ensure t)
 
   (use-package ag
     :ensure t
@@ -1075,14 +998,10 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package pest-mode
     :ensure t
     :mode "\\.pest\\'"
-    :hook (pest-mode . flymake-mode))
+    :hook (pest-mode . flycheck-mode))
 
-  (use-package flymake-pest
-    :ensure t
-    :defer t)
   (use-package flycheck-pest
-    :ensure t
-    :defer t)
+    :ensure t)
 #+end_src
 
 Reset the garbage collection threshold.
