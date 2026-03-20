@@ -39,54 +39,21 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.9)
 
-  (set-display-table-slot standard-display-table 'vertical-border ?|)
-
   (set-face-attribute 'mode-line nil :background 'unspecified)
   (set-face-attribute 'header-line nil :background 'unspecified)
 
   (menu-bar-mode -1)
 
-  ;; suppresses the message
   (defun display-startup-echo-area-message ())
 
-  (setq inhibit-startup-message t
-        inhibit-startup-echo-area-message "tbernard")
+  (setq inhibit-startup-message t)
 
-  (setq frame-inhibit-implied-resize t)
-
-  ;; Native compilation configuration - consolidated here to avoid race conditions
-  (when (and (fboundp 'native-comp-available-p)
-             (native-comp-available-p))
-    (let ((eln-cache-dir (expand-file-name "eln-cache/" user-emacs-directory)))
-      (condition-case err
-          (progn
-            ;; Ensure eln-cache directory exists and is writable
-            (unless (file-directory-p eln-cache-dir)
-              (make-directory eln-cache-dir t))
-
-            ;; Only add to path if directory is actually writable
-            (when (and (boundp 'native-comp-eln-load-path)
-                       (file-writable-p eln-cache-dir))
-              (add-to-list 'native-comp-eln-load-path eln-cache-dir))
-
-            ;; Configure native compilation settings
-            (setq native-comp-speed 2
-                  comp-deferred-compilation t
-                  native-comp-jit-compilation t
-                  ;; Dynamic async jobs based on CPU cores (max 4, min 1)
-                  native-comp-async-jobs-number (min 4 (max 1 (/ (num-processors) 2)))
-                  ;; Enable warnings only for debugging - set to t if compilation fails
-                  native-comp-async-report-warnings-errors nil)
-
-            (message "Native compilation configured: %d async jobs, cache: %s"
-                     native-comp-async-jobs-number eln-cache-dir))
-
-        (error
-         (message "Native compilation setup failed: %s - falling back to defaults" err)
-         ;; Minimal fallback configuration
-         (setq native-comp-speed 1
-               comp-deferred-compilation nil
-               native-comp-async-report-warnings-errors t)))))
+  (when (native-comp-available-p)
+    (startup-redirect-eln-cache (expand-file-name "eln-cache/" user-emacs-directory))
+    (setq native-comp-speed 2
+          native-comp-jit-compilation t
+          native-comp-async-jobs-number (min 4 (max 1 (/ (num-processors) 2)))
+          native-comp-async-report-warnings-errors nil))
 
   (setenv "LSP_USE_PLISTS" "true")
 
@@ -103,14 +70,12 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
   (setq package-enable-at-startup nil)
 
-  (unless package--initialized
-    (package-initialize))
+  (package-initialize)
 
   (setq use-package-always-defer t
         use-package-verbose nil  ; Set to t for debugging, nil for performance
         use-package-minimum-reported-time 0.1)
-  (eval-when-compile
-    (require 'use-package))
+  (require 'use-package)
 
   (provide 'early-init)
 #+end_src
@@ -119,7 +84,6 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
-  (setq treemacs-no-load-time-warnings t)
   (setq load-prefer-newer t)
 
   (setq user-full-name "Trevor Bernard"
@@ -164,7 +128,6 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (when (eq system-type 'darwin)
    (setq delete-by-moving-to-trash t)
    (setq trash-directory "~/.Trash/emacs")
-   (setq ns-pop-up-frames nil)
    (setq dired-use-ls-dired nil))
 #+end_src
 
@@ -179,8 +142,7 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
     (set-face-background 'vertical-border (face-background 'default))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     (unless (fboundp 'x-hide-tip)
-      (defun tb/x-hide-tip ())
-      (defalias 'x-hide-tip #'tb/x-hide-tip)))
+      (defun x-hide-tip () nil)))
 #+end_src
 
 ** Clipboard
@@ -226,9 +188,7 @@ sequences let yanked text reach the host clipboard.
   (global-auto-revert-mode t)
   (column-number-mode 1)
   (delete-selection-mode 1)
-  (global-font-lock-mode 1)
   (show-paren-mode 1)
-  (transient-mark-mode 1)
 #+end_src
 
 ** File Handling
@@ -266,7 +226,7 @@ sequences let yanked text reach the host clipboard.
   (use-package ivy
     :ensure t
     :commands ivy-mode
-    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'ivy-mode))))
+    :hook (after-init . ivy-mode))
 
   (use-package counsel
     :ensure t
@@ -289,7 +249,7 @@ sequences let yanked text reach the host clipboard.
     :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
-    :commands (projectile-find-file projectile-switch-project projectile-command-map projectile-mode)
+    :commands (projectile-find-file projectile-switch-project projectile-mode)
     :config
     (projectile-mode))
 #+end_src
@@ -331,9 +291,10 @@ fingers on the home row when Caps Lock is mapped to Control.
 #+begin_src emacs-lisp
   (use-package prog-mode
     :custom
-    (show-trailing-whitespace t)
     (display-line-numbers-type 'relative)
-    :hook (prog-mode . display-line-numbers-mode))
+    :hook (prog-mode . (lambda ()
+                         (setq-local show-trailing-whitespace t)
+                         (display-line-numbers-mode))))
 #+end_src
 
 ** Magit
@@ -635,8 +596,8 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     :hook ((ielm-mode . paredit-mode))
     :bind
     (:map ielm-map
-          ("C-m" . 'ielm-return)
-          ("<return>" . 'ielm-return)))
+          ("C-m" . ielm-return)
+          ("<return>" . ielm-return)))
 #+end_src
 
 * Languages
@@ -653,9 +614,6 @@ Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
     (clojure-align-forms-automatically t)
     :config
     (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
-
-  (use-package inf-clojure
-    :ensure t)
 
   (use-package cider
     :ensure t
@@ -702,7 +660,8 @@ use =C-j= in place of the enter key everywhere.
 
 #+begin_src emacs-lisp
   (use-package ob-rust
-    :ensure t)
+    :ensure t
+    :after org)
 
   (use-package org
     :bind
@@ -713,11 +672,11 @@ use =C-j= in place of the enter key everywhere.
      ("C-c l" . org-store-link)
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
+    :hook (org-mode . auto-fill-mode)
     :config
     (set-face-attribute 'org-block nil :background 'unspecified)
     (set-face-attribute 'org-block-begin-line nil :background 'unspecified)
     (set-face-attribute 'org-block-end-line nil :background 'unspecified)
-    (turn-on-auto-fill)
     (org-babel-do-load-languages
      'org-babel-load-languages '((rust . t)
                                  (shell . t))))
@@ -757,7 +716,6 @@ Exporting to PDF requires basictex:
 
 #+begin_src emacs-lisp
   (use-package ruby-ts-mode
-    :ensure t
     :mode "\\.rb\\'"
     :mode "Rakefile\\'"
     :mode "Gemfile\\'"
@@ -801,9 +759,6 @@ Exporting to PDF requires basictex:
     :mode (("\\.md\\'" . gfm-mode)
            ("\\.markdown\\'" . gfm-mode)))
 
-  (use-package ox-gfm
-    :ensure t)
-
   (use-package csv-mode
     :ensure t
     :mode "\\.csv\\'")
@@ -836,16 +791,10 @@ Exporting to PDF requires basictex:
     :hook (pest-mode . flycheck-mode))
 
   (use-package flycheck-pest
-    :ensure t)
-
-  (use-package htmlize
-    :ensure t)
-
-  (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
+    :ensure t
+    :after pest-mode)
 #+end_src
 
 * Epilogue
 
-#+begin_src emacs-lisp
-  (setq gc-cons-threshold (* 1024 1024 2))
-#+end_src
+The GC threshold is restored by =emacs-startup-hook= in early-init.

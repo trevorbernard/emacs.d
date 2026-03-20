@@ -11,7 +11,6 @@
            (native-comp-available-p))
       (progn
         (message "Using native compilation")
-        (setq native-comp-speed 2)
         (dolist (file files)
           (native-compile file)))
     (message "Native compilation not available, using byte compilation")

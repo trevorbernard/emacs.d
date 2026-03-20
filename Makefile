@@ -8,7 +8,7 @@ ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
 CONFIGURATION_ORG = configuration.org
 INIT_EL = init.el
 
-.DEFAULT_GOAL := setup
+.DEFAULT_GOAL := all
 
 .PHONY: all setup install-packages clean compile compile-native check-native-comp tangle help check-deps validate
 
@@ -41,7 +41,7 @@ compile: init.el tangle
 
 compile-native: init.el tangle
 	@echo "Compiling Emacs configuration with native compilation..."
-	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)' --eval "(setq comp-deferred-compilation t)"
+	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
 
 tangle: configuration.org
 	@echo "Tangling configuration.org..."
