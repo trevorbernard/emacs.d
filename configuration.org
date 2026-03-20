@@ -15,6 +15,20 @@ Linux and Mac. Startup speed matters. This configuration uses
 
 Remap Caps Lock to Control. Your pinkies will thank you.
 
+** Installation
+
+#+begin_example
+git clone git@github.com:trevorbernard/emacs.d.git ~/.emacs.d
+cd ~/.emacs.d
+make setup
+#+end_example
+
+=make setup= installs all ELPA packages, downloads tree-sitter grammars,
+and compiles the configuration. Requires Emacs 29+.
+
+Start Emacs with =emacs -nw=. After editing =configuration.org=, run =make=
+to tangle and recompile.
+
 * Bootstrap
 
 Everything here runs before the main configuration loads. The GC

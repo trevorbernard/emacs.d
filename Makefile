@@ -23,7 +23,7 @@ check-native-comp:
 		$(MAKE) compile-native; \
 	else \
 		$(MAKE) compile; \
-		@echo "Native compilation not available, using regular byte compilation"; \
+\t\techo "Native compilation not available, using regular byte compilation"; \\
 	fi
 
 clean:

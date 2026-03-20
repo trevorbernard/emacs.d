@@ -4,6 +4,11 @@
 ;; Load early-init.el to set up package system for compilation
 (load-file (expand-file-name "early-init.el" user-emacs-directory))
 
+;; On a fresh install there is no elpa/archives/ cache, so package-install
+;; called by use-package :ensure t at macro-expansion time would fail.
+(unless package-archive-contents
+  (package-refresh-contents))
+
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 (let ((files '("configuration.el" "init.el")))
