@@ -574,12 +574,14 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 
 #+begin_src emacs-lisp
   (use-package combobulate
+     :if (file-directory-p "~/code/combobulate")
      :custom
      (combobulate-key-prefix "C-c o")
      :hook ((prog-mode . combobulate-mode))
      :load-path "~/code/combobulate")
 
   (use-package indent-bars
+    :if (file-directory-p "~/code/indent-bars")
     :load-path "~/code/indent-bars"
     :hook ((prog-mode . indent-bars-mode)))
 #+end_src
