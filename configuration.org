@@ -3,41 +3,24 @@
 #+LANGUAGE: en
 #+PROPERTY: header-args :tangle yes
 
-* Configuration
-
 #+BEGIN_QUOTE
 This is my emacs, there are many like it, but this one is mine...
 #+END_QUOTE
 
-** Table of Contents
-- [[#getting-started][Getting Started]]
-- [[#early-initialization][Early Initialization]]
-- [[#package-settings][Package Settings]]
-- [[#ui--appearance][UI & Appearance]]
-- [[#platform-specific-configuration][Platform-Specific Configuration]]
-- [[#terminal--clipboard-integration][Terminal & Clipboard Integration]]
-- [[#key-bindings][Key Bindings]]
-- [[#editor-behavior--preferences][Editor Behavior & Preferences]]
-- [[#development][Development]]
-- [[#language-configurations][Language Configurations]]
+* Introduction
 
-** Getting Started
+I run Emacs =30.1= exclusively in the terminal (=emacs -nw=) on both
+Linux and Mac. Startup speed matters. This configuration uses
+=use-package= with global deferred loading and native compilation.
 
-I currently use =30.1= on both Linux and Mac systems. YMMV on Windows
-or different versions of Emacs.
+Remap Caps Lock to Control. Your pinkies will thank you.
 
-You will need the following already installed for this configuration
-to run correctly.
+* Bootstrap
 
-I strongly suggest you remap your Caps Lock key to Control to help
-reduce the onset of Emacs pinky. I even go further and have a new key
-binding for =M-x=, so you are hitting =Ctrl= instead of =Alt=.
+Everything here runs before the main configuration loads. The GC
+threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
-** Early Initialization
-
-Early initialization happens before the main init file loads. This is where
-we configure the package system, set up garbage collection optimization,
-and handle frame appearance for better startup performance.
+** Early Init
 
 #+begin_src emacs-lisp :tangle early-init.el
   ;;; -*- lexical-binding: t -*-
@@ -137,37 +120,15 @@ and handle frame appearance for better startup performance.
 #+begin_src emacs-lisp
   ;;; -*- lexical-binding: t -*-
   (setq treemacs-no-load-time-warnings t)
-#+end_src
-
-** General use-package settings
-
-Package system and use-package are now bootstrapped in early-init.el for
-better startup performance. This ensures use-package is available before
-the main configuration loads.
-
-** Emacs Initialization
-
-I like to have my Emacs clean, crisp, and minimal. Disable the menu
-bar, tool bar, and scroll bar. Protip: Learn the Emacs navigation key
-strokes until they are second nature. You can thank me later.
-
-** Package Settings
-
-Package system is now handled entirely in early-init.el for optimal startup
-performance. The package bootstrap, load-path setup, and use-package
-configuration are all done before the main configuration loads.
-
-#+begin_src emacs-lisp
-  ;; Only set load-prefer-newer since package system is handled in early-init.el
   (setq load-prefer-newer t)
+
+  (setq user-full-name "Trevor Bernard"
+        user-mail-address "trevor.bernard@pm.me")
 #+end_src
 
-** UI & Appearance
+* Appearance
 
-Visual configuration for a clean, modern Emacs experience with consistent
-theming and helpful visual indicators.
-
-*** Theme Configuration
+** Theme
 
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
@@ -179,7 +140,7 @@ theming and helpful visual indicators.
     (after-init . (lambda () (load-theme 'timu-spacegrey t))))
 #+end_src
 
-*** Mode Line
+** Mode Line
 
 #+begin_src emacs-lisp
   (use-package doom-modeline
@@ -188,7 +149,7 @@ theming and helpful visual indicators.
     :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'doom-modeline-mode))))
 #+end_src
 
-*** Visual Indicators
+** Visual Indicators
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
@@ -196,12 +157,9 @@ theming and helpful visual indicators.
     :hook ((prog-mode . rainbow-delimiters-mode)))
 #+end_src
 
-** Platform-Specific Configuration
+* Terminal
 
-Different operating systems and display environments require specific
-configurations for optimal Emacs integration.
-
-*** macOS Configuration
+** macOS
 
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
@@ -211,29 +169,29 @@ configurations for optimal Emacs integration.
    (setq dired-use-ls-dired nil))
 #+end_src
 
-** Personal
-
-That's me.
+** Mouse & Display
 
 #+begin_src emacs-lisp
-  (setq user-full-name "Trevor Bernard"
-        user-mail-address "trevor.bernard@pm.me")
+  (unless (display-graphic-p)
+    (xterm-mouse-mode t)
+    (global-set-key (kbd "<wheel-up>") 'scroll-down-line)
+    (global-set-key (kbd "<wheel-down>") 'scroll-up-line)
+    (set-face-inverse-video 'vertical-border nil)
+    (set-face-background 'vertical-border (face-background 'default))
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
+    (unless (fboundp 'x-hide-tip)
+      (defun tb/x-hide-tip ())
+      (defalias 'x-hide-tip #'tb/x-hide-tip)))
 #+end_src
 
-** Terminal & Clipboard Integration
+** Clipboard
 
-Modern Emacs needs seamless integration between terminal and GUI environments,
-especially when working over SSH or in mixed Wayland/X11 setups. This section
-consolidates all terminal-specific configurations and clipboard handling.
-
-*** Wayland Clipboard Integration
+Wayland needs explicit clipboard plumbing for copy/paste between Emacs
+and other applications. For terminal sessions over SSH, OSC-52 escape
+sequences let yanked text reach the host clipboard.
 
 #+begin_src emacs-lisp
-  ;; Configure Wayland clipboard integration immediately if needed
   (when (getenv "WAYLAND_DISPLAY")
-    ;; Without this, copy and pasting from other wayland apps into
-    ;; emacs-pgtk doesn't work.
-    ;; https://www.emacswiki.org/emacs/CopyAndPaste#h5o-4
     (setq tb/wl-copy-process nil)
     (defun tb/wl-copy (text)
       (setq tb/wl-copy-process (make-process :name "wl-copy"
@@ -250,168 +208,74 @@ consolidates all terminal-specific configurations and clipboard handling.
     (setq interprogram-paste-function 'tb/wl-paste))
 #+end_src
 
-*** Terminal Mouse & Display Support
-
-#+begin_src emacs-lisp
-  ;; Enable mouse support in terminal immediately
-  (unless (display-graphic-p)
-    (xterm-mouse-mode t)
-    (global-set-key (kbd "<wheel-up>") 'scroll-down-line)
-    (global-set-key (kbd "<wheel-down>") 'scroll-up-line)
-    (set-face-inverse-video 'vertical-border nil)
-    (set-face-background 'vertical-border (face-background 'default))
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
-    ;; Define x-hide-tip as no-op for terminal mode
-    (unless (fboundp 'x-hide-tip)
-      (defun tb/x-hide-tip ())
-      (defalias 'x-hide-tip #'tb/x-hide-tip)))
-#+end_src
-
-*** OSC-52 Clipboard Support
-
-When working in a terminal over SSH, OSC-52 allows yanked text in Emacs
-to become available on the host machine's clipboard.
-
 #+begin_src emacs-lisp
   (use-package clipetty
     :ensure t
     :bind ("M-w" . clipetty-kill-ring-save))
 #+end_src
 
-** Key Bindings
+* Editing
 
-Global key bindings and keyboard shortcuts for improved ergonomics.
-
-*** Invoke M-x without the Alt key
-
-=M-x= is one of the most widely used key combinations in Emacs but
-it's also the most annoying. You have to scrunch your left thumb and
-forefinger in the most uncomfortable RSI-inducing way.
-
-I choose to rebind =M-x= to =C-x C-m= because of an article Steve
-Yegge wrote called: [[https://sites.google.com/site/steveyegge2/effective-emacs][Effective Emacs]]. This allows you to keep your
-fingers on the home row if you have Caps Lock mapped to Control. With
-some practice, it will become second-nature.
-
-#+begin_src emacs-lisp
-  ;; Set up M-x alternatives immediately
-  (keymap-global-set "C-x C-m" 'execute-extended-command)
-  (keymap-global-set "C-c C-m" 'execute-extended-command)
-#+end_src
-
-*** Development Bindings
-
-#+begin_src emacs-lisp
-  ;; Cider REPL jack-in - long-time habit
-  (keymap-global-set "C-c C-j" 'cider-jack-in)
-
-  ;; Magit bindings for git operations
-  (keymap-global-set "C-x g" 'magit-status)
-  (keymap-global-set "C-c g" 'magit-file-dispatch)
-#+end_src
-
-
-** Evil Mode
-
-VIM motions are clearly the superior way to edit text but I'm hardcoded to Emacs
-text editting. This will be a long transition.
-
-#+begin_src emacs-lisp
-  (use-package evil
-    :ensure t
-    :commands evil-mode)
-#+end_src
-
-** Editor Behavior & Preferences
-
-Core Emacs settings that affect how the editor behaves and feels during
-everyday use.
-
-*** Basic Editor Behavior
+** Behavior
 
 #+begin_src emacs-lisp
   (setq
-   ;; Allow short answers 'y' or 'n'
    use-short-answers t
-   ;; Make pgup/dn remember current line
    scroll-preserve-screen-position t
-   ;; Disable the annoying bell
    ring-bell-function 'ignore)
 
-  ;; Auto revert buffers when files change on disk
   (global-auto-revert-mode t)
-  ;; Show column number in mode line
   (column-number-mode 1)
-  ;; Allow delete of selection when typing
   (delete-selection-mode 1)
-  ;; Syntax highlighting everywhere
   (global-font-lock-mode 1)
-  ;; Highlight matching parentheses
   (show-paren-mode 1)
-  ;; Highlight selected regions
   (transient-mark-mode 1)
 #+end_src
 
-*** File Handling & Backup Preferences
-
-By default, Emacs generates backup files, auto-save files, and lockfiles.
-With modern system stability and version control, these are often redundant.
+** File Handling
 
 #+begin_src emacs-lisp
   (setq
-   make-backup-files nil    ; No backup~ files
-   auto-save-default nil    ; No #autosave# files
-   create-lockfiles nil)    ; No .#lock files
+   make-backup-files nil
+   auto-save-default nil
+   create-lockfiles nil)
 #+end_src
 
-*** Indentation & Formatting
+** Indentation
 
 #+begin_src emacs-lisp
-  ;; Use spaces instead of tabs
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
   (setq-default tab-width 8)
-
-  ;; Text width and line handling
   (setq-default fill-column 80)
   (setq-default truncate-lines nil)
 #+end_src
 
-*** Enable Useful Functions
+** Enabled Commands
 
 #+begin_src emacs-lisp
-  ;; Allow these functions without confirmation warnings
   (put 'downcase-region 'disabled nil)
   (put 'narrow-to-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
 #+end_src
 
+* Navigation & Completion
 
-* Development
-
-When in programming mode, I bind =C-c C-c= to run ='compile=. This is a
-huge time-saver when working on projects - just hit the key combo and
-watch your code build.
+** Ivy & Counsel
 
 #+begin_src emacs-lisp
-  (use-package prog-mode
-    :custom
-    (show-trailing-whitespace t)
-    (display-line-numbers-type 'relative)
-    :hook (prog-mode . display-line-numbers-mode))
+  (use-package ivy
+    :ensure t
+    :commands ivy-mode
+    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'ivy-mode))))
+
+  (use-package counsel
+    :ensure t
+    :commands counsel-mode
+    :hook (ivy-mode . counsel-mode))
 #+end_src
 
-Experiment with indent-bars
-
-#+begin_src emacs-lisp
-  (use-package indent-bars
-    :load-path "~/code/indent-bars"
-    :hook ((prog-mode . indent-bars-mode)))
-#+end_src
-
-** Projectile Mode
-
-Bind projectile to =C-c p= and enable by default.
+** Projectile
 
 #+begin_src emacs-lisp
   (use-package projectile
@@ -445,10 +309,35 @@ Bind projectile to =C-c p= and enable by default.
     :hook (prog-mode . company-mode))
 #+end_src
 
-** Magit
+* Key Bindings
 
-=C-c= is reserved for the user. Add a more friendly binding for
-=magit-file-dispatch=
+=M-x= via =C-x C-m= per [[https://sites.google.com/site/steveyegge2/effective-emacs][Steve Yegge's Effective Emacs]]. Keeps your
+fingers on the home row when Caps Lock is mapped to Control.
+
+#+begin_src emacs-lisp
+  (keymap-global-set "C-x C-m" 'execute-extended-command)
+  (keymap-global-set "C-c C-m" 'execute-extended-command)
+#+end_src
+
+#+begin_src emacs-lisp
+  (keymap-global-set "C-c C-j" 'cider-jack-in)
+  (keymap-global-set "C-x g" 'magit-status)
+  (keymap-global-set "C-c g" 'magit-file-dispatch)
+#+end_src
+
+* Development Tools
+
+** prog-mode Defaults
+
+#+begin_src emacs-lisp
+  (use-package prog-mode
+    :custom
+    (show-trailing-whitespace t)
+    (display-line-numbers-type 'relative)
+    :hook (prog-mode . display-line-numbers-mode))
+#+end_src
+
+** Magit
 
 #+begin_src emacs-lisp
   (use-package magit
@@ -458,12 +347,8 @@ Bind projectile to =C-c p= and enable by default.
 
 ** Paredit
 
-Some handy dandy paredit shortcuts
-
-On Mac, =^-left= and =^-right= are bound to Mission Control. Go to
-`System Preferences > Keyboard > Shortcuts > Mission Control` and
-change the settings for "Move left a space" and "Move right a space"
-or disable them completely.
+On Mac, =^-left= and =^-right= conflict with Mission Control. Disable
+them in System Preferences > Keyboard > Shortcuts > Mission Control.
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -485,96 +370,12 @@ or disable them completely.
             scheme-mode) . paredit-mode))
 #+end_src
 
-* Language Configurations
-
-Programming language-specific configurations and integrations.
-
-** Clojure
-
-I don't like my cider to be bleeding edge since it's caused
-compatibility problems in the past so pin it to melpa-stable.
+** Evil
 
 #+begin_src emacs-lisp
-  (use-package clojure-mode
+  (use-package evil
     :ensure t
-    :hook (clojure-mode . subword-mode)
-    :custom
-    (clojure-align-forms-automatically t)
-    :config
-    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
-
-  (use-package inf-clojure
-    :ensure t)
-
-  (use-package cider
-    :ensure t
-    :commands cider-jack-in
-    :custom
-    (nrepl-log-messages t)
-    (cider-repl-use-clojure-font-lock t)
-    (cider-repl-display-help-banner nil))
-#+end_src
-
-I have long since used this key binding to jack into a repl. My
-fingers are programmed this way.
-
-** Org Mode
-
-I almost exclusively use =C-j= in place of hitting the enter key. The
-problem is that it's bound to the =org-return-indent= function. This is
-very annoying when you are in =org-mode=. So instead of trying to
-remap my brain, I'll remap it to =newline=.
-
-
-#+begin_src emacs-lisp
-  (use-package ob-rust
-    :ensure t)
-
-  (use-package org
-    :bind
-    (:map
-     org-mode-map
-     ("C-j" . org-return)
-     ("C-c ]" . org-ref-insert-link)
-     ("C-c l" . org-store-link)
-     ("C-c a" . org-agenda)
-     ("C-c c" . org-capture))
-    :config
-    (set-face-attribute 'org-block nil :background 'unspecified)
-    (set-face-attribute 'org-block-begin-line nil :background 'unspecified)
-    (set-face-attribute 'org-block-end-line nil :background 'unspecified)
-    (turn-on-auto-fill)
-    (org-babel-do-load-languages
-     'org-babel-load-languages '((rust . t)
-                                 (shell . t))))
-#+end_src
-
-*** Exporting to PDF
-
-In order to export to PDF, I choose to use basictex and install
-packages only when they are missing.
-
-#+begin_src bash :tangle no
-  brew reinstall --cask basictex
-  sudo tlmgr update --self
-  sudo tlmgr install wrapfig
-  sudo tlmgr install capt-of
-#+end_src
-
-** JavaScript
-
-#+begin_src emacs-lisp
-  (use-package js
-    :custom
-    (js-indent-level 2))
-#+end_src
-
-** CSS
-
-#+begin_src emacs-lisp
-  (use-package css-mode
-    :custom
-    (css-indent-level 2))
+    :commands evil-mode)
 #+end_src
 
 ** Flycheck
@@ -636,36 +437,13 @@ packages only when they are missing.
           flyspell-mark-duplications-flag nil
           ispell-program-name "aspell"
           ispell-list-command "list"))
-
 #+end_src
 
-** Markdown
+** Tree-sitter
 
-#+begin_src emacs-lisp
-  (use-package ox-gfm
-    :ensure t)
-
-  (use-package markdown-mode
-    :ensure t
-    :mode (("\\.md\\'" . gfm-mode)
-           ("\\.markdown\\'" . gfm-mode)))
-#+end_src
-
-** Git
-
-Use diff-mode when editing a git commit message
-
-#+begin_src emacs-lisp
-  (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
-#+end_src
-
-** Web Development
-
-Tree-sitter is a game-changer for syntax highlighting and code
-navigation. It's a parser generator tool that builds concrete syntax
-trees for source files, which enables much more accurate syntax
-highlighting and structural editing than regex-based modes. Emacs 29+
-has built-in support for it.
+Emacs 29+ has built-in tree-sitter support. This configures grammars
+for all languages and remaps traditional major modes to their
+tree-sitter equivalents.
 
 #+begin_src emacs-lisp
   (use-package treesit
@@ -697,7 +475,6 @@ has built-in support for it.
                  (or (called-interactively-p 'any)
                      (not os/treesit-grammars-installed)
                      (not (file-exists-p os/treesit-grammar-cache-file))))
-        ;; Ensure treesit-language-source-alist is bound
         (unless (boundp 'treesit-language-source-alist)
           (setq treesit-language-source-alist nil))
 
@@ -725,13 +502,11 @@ has built-in support for it.
                                  (just "https://github.com/IndianBoy42/tree-sitter-just")
                                  (ruby "https://github.com/tree-sitter/tree-sitter-ruby"))))
 
-          ;; First pass: add all grammars to source list and collect missing ones
           (dolist (grammar grammar-sources)
             (add-to-list 'treesit-language-source-alist grammar)
             (unless (treesit-language-available-p (car grammar))
               (push grammar grammars-to-install)))
 
-          ;; Install missing grammars if any
           (when grammars-to-install
             (message "Installing %d missing tree-sitter grammars..." (length grammars-to-install))
             (dolist (grammar grammars-to-install)
@@ -739,15 +514,12 @@ has built-in support for it.
                   (treesit-install-language-grammar (car grammar))
                 (error (message "Failed to install grammar %s: %s" (car grammar) err)))))
 
-          ;; Mark as completed and persist to file
           (setq os/treesit-grammars-installed t)
           (with-temp-file os/treesit-grammar-cache-file
             (insert (format "Last checked: %s\n" (current-time-string))))
           (when (called-interactively-p 'any)
             (message "Tree-sitter grammar check completed.")))))
 
-    ;; Remap traditional modes to tree-sitter modes
-    ;; This is a huge improvement for syntax highlighting
     (dolist (mapping
              '((bash-mode . bash-ts-mode)
                (c++-mode . c++-ts-mode)
@@ -768,28 +540,15 @@ has built-in support for it.
                (typescript-mode . typescript-ts-mode)))
       (add-to-list 'major-mode-remap-alist mapping))
     :config
-    ;; Check grammars once after init, not on every prog-mode buffer
     (add-hook 'after-init-hook
               (lambda () (run-with-idle-timer 2.0 nil #'os/setup-install-grammars))))
 #+end_src
 
-** Language Server Protocol (LSP)
+** LSP
 
-LSP is a game-changer for IDE-like features in Emacs. It provides code
-completion, go-to-definition, find references, and much more. I use it
-for most of my programming languages.
+Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when available to speed up JSON parsing.
 
 #+begin_src emacs-lisp
-  (use-package ivy
-    :ensure t
-    :commands ivy-mode
-    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'ivy-mode))))
-
-  (use-package counsel
-    :ensure t
-    :commands counsel-mode
-    :hook (ivy-mode . counsel-mode))
-
   (use-package lsp-ivy
     :ensure t
     :after (lsp-mode ivy)
@@ -811,7 +570,6 @@ for most of my programming languages.
     (setq lsp-log-io nil
           lsp-use-plists t)
     :config
-    ;; Booster patch
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       (or
        (when (equal (following-char) ?#)
@@ -839,24 +597,78 @@ for most of my programming languages.
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 #+end_src
 
-** Ruby
+** Structural Editing
 
 #+begin_src emacs-lisp
-  (use-package ruby-ts-mode
+  (use-package combobulate
+     :custom
+     (combobulate-key-prefix "C-c o")
+     :hook ((prog-mode . combobulate-mode))
+     :load-path "~/code/combobulate")
+
+  (use-package indent-bars
+    :load-path "~/code/indent-bars"
+    :hook ((prog-mode . indent-bars-mode)))
+#+end_src
+
+** Snippets & Search
+
+#+begin_src emacs-lisp
+  (use-package yasnippet
     :ensure t
-    :mode "\\.rb\\'"
-    :mode "Rakefile\\'"
-    :mode "Gemfile\\'"
+    :diminish yas-minor-mode
+    :commands (yas-minor-mode yas-global-mode)
+    :hook ((prog-mode . yas-minor-mode)
+           (org-mode . yas-minor-mode)))
+
+  (use-package ag
+    :ensure t
+    :commands (ag ag-project ag-regexp))
+
+  (use-package string-inflection
+    :ensure t
+    :commands (string-inflection-all-cycle))
+#+end_src
+
+** IELM
+
+#+begin_src emacs-lisp
+  (use-package ielm
+    :hook ((ielm-mode . paredit-mode))
+    :bind
+    (:map ielm-map
+          ("C-m" . 'ielm-return)
+          ("<return>" . 'ielm-return)))
+#+end_src
+
+* Languages
+
+** Clojure
+
+Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
+
+#+begin_src emacs-lisp
+  (use-package clojure-mode
+    :ensure t
+    :hook (clojure-mode . subword-mode)
     :custom
-    (ruby-indent-level 2)
-    (ruby-indent-tabs-mode nil))
+    (clojure-align-forms-automatically t)
+    :config
+    (eldoc-add-command 'paredit-backward-delete 'paredit-close-round))
+
+  (use-package inf-clojure
+    :ensure t)
+
+  (use-package cider
+    :ensure t
+    :commands cider-jack-in
+    :custom
+    (nrepl-log-messages t)
+    (cider-repl-use-clojure-font-lock t)
+    (cider-repl-display-help-banner nil))
 #+end_src
 
 ** Rust
-
-Rust is my language du jour. It's slowly becoming my favourite
-programming language. The rustic package provides excellent
-integration with rust-analyzer (via LSP) and cargo.
 
 #+begin_src emacs-lisp
 
@@ -885,17 +697,41 @@ integration with rust-analyzer (via LSP) and cargo.
     (rustic-ansi-faces ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"]))
 #+end_src
 
-** ELISP
+** Org
 
-An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
+=C-j= is rebound from =org-return-indent= to =org-return= because I
+use =C-j= in place of the enter key everywhere.
 
 #+begin_src emacs-lisp
-  (use-package ielm
-    :hook ((ielm-mode . paredit-mode))
+  (use-package ob-rust
+    :ensure t)
+
+  (use-package org
     :bind
-    (:map ielm-map
-          ("C-m" . 'ielm-return)
-          ("<return>" . 'ielm-return)))
+    (:map
+     org-mode-map
+     ("C-j" . org-return)
+     ("C-c ]" . org-ref-insert-link)
+     ("C-c l" . org-store-link)
+     ("C-c a" . org-agenda)
+     ("C-c c" . org-capture))
+    :config
+    (set-face-attribute 'org-block nil :background 'unspecified)
+    (set-face-attribute 'org-block-begin-line nil :background 'unspecified)
+    (set-face-attribute 'org-block-end-line nil :background 'unspecified)
+    (turn-on-auto-fill)
+    (org-babel-do-load-languages
+     'org-babel-load-languages '((rust . t)
+                                 (shell . t))))
+#+end_src
+
+Exporting to PDF requires basictex:
+
+#+begin_src bash :tangle no
+  brew reinstall --cask basictex
+  sudo tlmgr update --self
+  sudo tlmgr install wrapfig
+  sudo tlmgr install capt-of
 #+end_src
 
 ** Nix
@@ -919,22 +755,17 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
        ("C-c C-f" . nixpkgs-fmt-buffer)))
 #+end_src
 
-** Terraform
+** Ruby
 
 #+begin_src emacs-lisp
-  (use-package terraform-mode
+  (use-package ruby-ts-mode
     :ensure t
-    :hook (terraform-mode . lsp-deferred))
-#+end_src
-
-** Justfile
-
-#+begin_src emacs-lisp
-  (use-package just-ts-mode
-    :ensure t
-    :hook (just-ts-mode . (lambda ()
-                            (setq-local just-ts-indent-offset 2
-                                        tab-width 2))))
+    :mode "\\.rb\\'"
+    :mode "Rakefile\\'"
+    :mode "Gemfile\\'"
+    :custom
+    (ruby-indent-level 2)
+    (ruby-indent-tabs-mode nil))
 #+end_src
 
 ** Java
@@ -948,14 +779,32 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
   (use-package dap-java :after (lsp-java))
 #+end_src
 
-** Misc
+** Terraform
 
 #+begin_src emacs-lisp
-  (use-package combobulate
-     :custom
-     (combobulate-key-prefix "C-c o")
-     :hook ((prog-mode . combobulate-mode))
-     :load-path "~/code/combobulate")
+  (use-package terraform-mode
+    :ensure t
+    :hook (terraform-mode . lsp-deferred))
+#+end_src
+
+* File Modes
+
+#+begin_src emacs-lisp
+  (use-package js
+    :custom
+    (js-indent-level 2))
+
+  (use-package css-mode
+    :custom
+    (css-indent-level 2))
+
+  (use-package markdown-mode
+    :ensure t
+    :mode (("\\.md\\'" . gfm-mode)
+           ("\\.markdown\\'" . gfm-mode)))
+
+  (use-package ox-gfm
+    :ensure t)
 
   (use-package csv-mode
     :ensure t
@@ -973,27 +822,15 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
     :ensure t
     :mode "\\.bnf\\'")
 
-  (use-package htmlize
-    :ensure t)
-
-  (use-package ag
-    :ensure t
-    :commands (ag ag-project ag-regexp))
-
-  (use-package string-inflection
-    :ensure t
-    :commands (string-inflection-all-cycle))
-
-  (use-package yasnippet
-    :ensure t
-    :diminish yas-minor-mode
-    :commands (yas-minor-mode yas-global-mode)
-    :hook ((prog-mode . yas-minor-mode)
-           (org-mode . yas-minor-mode)))
-
   (use-package dotenv-mode
     :ensure t
     :mode "\\.env\\'")
+
+  (use-package just-ts-mode
+    :ensure t
+    :hook (just-ts-mode . (lambda ()
+                            (setq-local just-ts-indent-offset 2
+                                        tab-width 2))))
 
   (use-package pest-mode
     :ensure t
@@ -1002,9 +839,14 @@ An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
 
   (use-package flycheck-pest
     :ensure t)
+
+  (use-package htmlize
+    :ensure t)
+
+  (add-to-list 'auto-mode-alist '("COMMIT_EDITMSG$" . diff-mode))
 #+end_src
 
-Reset the garbage collection threshold.
+* Epilogue
 
 #+begin_src emacs-lisp
   (setq gc-cons-threshold (* 1024 1024 2))
