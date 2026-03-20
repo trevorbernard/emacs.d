@@ -145,8 +145,7 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 #+begin_src emacs-lisp
   (use-package doom-modeline
     :ensure t
-    :commands doom-modeline-mode
-    :hook (after-init . (lambda () (run-with-idle-timer 0.5 nil #'doom-modeline-mode))))
+    :hook (after-init . doom-modeline-mode))
 #+end_src
 
 ** Visual Indicators
