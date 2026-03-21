@@ -577,13 +577,36 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
      :if (file-directory-p "~/code/combobulate")
      :custom
      (combobulate-key-prefix "C-c o")
-     :hook ((prog-mode . combobulate-mode))
+     :hook ((python-ts-mode
+             tsx-ts-mode
+             typescript-ts-mode
+             js-ts-mode
+             css-ts-mode
+             yaml-ts-mode
+             json-ts-mode
+             go-ts-mode
+             html-ts-mode
+             toml-ts-mode) . combobulate-mode)
      :load-path "~/code/combobulate")
 
   (use-package indent-bars
     :if (file-directory-p "~/code/indent-bars")
     :load-path "~/code/indent-bars"
-    :hook ((prog-mode . indent-bars-mode)))
+    :hook ((python-ts-mode
+            tsx-ts-mode
+            typescript-ts-mode
+            js-ts-mode
+            css-ts-mode
+            yaml-ts-mode
+            json-ts-mode
+            go-ts-mode
+            html-ts-mode
+            toml-ts-mode
+            rust-ts-mode
+            java-ts-mode
+            c-ts-mode
+            c++-ts-mode
+            bash-ts-mode) . indent-bars-mode))
 #+end_src
 
 ** Snippets & Search
