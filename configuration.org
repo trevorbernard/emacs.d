@@ -293,7 +293,6 @@ fingers on the home row when Caps Lock is mapped to Control.
 #+end_src
 
 #+begin_src emacs-lisp
-  (keymap-global-set "C-c C-j" 'cider-jack-in)
   (keymap-global-set "C-x g" 'magit-status)
   (keymap-global-set "C-c g" 'magit-file-dispatch)
 #+end_src
@@ -359,8 +358,8 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
     "Configure ruff as the Python checker unless in org-src-mode."
     (unless (bound-and-true-p org-src-mode)
       (when (buffer-file-name)
-        (setq-local flycheck-checkers '(python-ruff))
-        (flycheck-mode))))
+        (flycheck-mode)
+        (setq-local flycheck-checkers '(python-ruff)))))
 
   (use-package flycheck
     :ensure t
@@ -657,6 +656,7 @@ Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
   (use-package cider
     :ensure t
     :commands cider-jack-in
+    :bind ("C-c C-j" . cider-jack-in)
     :custom
     (nrepl-log-messages t)
     (cider-repl-use-clojure-font-lock t)
@@ -804,11 +804,11 @@ Exporting to PDF requires basictex:
 
   (use-package dockerfile-mode
     :ensure t
-    :mode "Dockerfile\\'")
+    :commands dockerfile-mode)
 
   (use-package yaml-mode
     :ensure t
-    :mode "\\.ya?ml\\'")
+    :commands yaml-mode)
 
   (use-package bnf-mode
     :ensure t
