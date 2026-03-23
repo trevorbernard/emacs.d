@@ -1,5 +1,6 @@
 EMACS = emacs
 EMACS_FLAGS = -Q --batch
+export LSP_USE_PLISTS = true
 COMPILE_SCRIPT = lisp/compile.el
 GENERATED_FILES = init.elc configuration.el configuration.elc
 ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
