@@ -388,7 +388,7 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
       :modes (python-mode python-ts-mode))
 
     :hook ((python-mode . tb/python-ruff-setup)
-           ((rust-mode rustic-mode) . flycheck-mode))
+           (rust-mode . flycheck-mode))
 
     :bind (:map flycheck-mode-map
                 ("M-n" . flycheck-next-error)
@@ -669,7 +669,6 @@ Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
 
   (use-package rust-mode
     :ensure t
-    :mode "\\.rs\\'"
     :init
     (setq rust-mode-treesitter-derive t))
 
