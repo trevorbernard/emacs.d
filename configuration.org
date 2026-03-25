@@ -795,7 +795,11 @@ Exporting to PDF requires basictex:
   (use-package markdown-mode
     :ensure t
     :mode (("\\.md\\'" . gfm-mode)
-           ("\\.markdown\\'" . gfm-mode)))
+           ("\\.markdown\\'" . gfm-mode))
+    :config
+    (set-face-attribute 'markdown-code-face nil :background 'unspecified)
+    (set-face-attribute 'markdown-pre-face nil :background 'unspecified)
+    (set-face-attribute 'markdown-inline-code-face nil :background 'unspecified))
 
   (use-package csv-mode
     :ensure t
