@@ -156,7 +156,9 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
     (set-face-background 'vertical-border (face-background 'default))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     (unless (fboundp 'x-hide-tip)
-      (defun x-hide-tip () nil)))
+      (defun x-hide-tip () nil))
+    (send-string-to-terminal "\e[1 q")
+    (add-hook 'kill-emacs-hook (lambda () (send-string-to-terminal "\e[5 q"))))
 #+end_src
 
 ** Clipboard
