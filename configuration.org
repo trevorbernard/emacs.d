@@ -110,10 +110,12 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
-    :load-path "~/code/timu-spacegrey-theme"
+    :vc (:url "https://github.com/trevorbernard/timu-spacegrey-theme" :rev :newest)
+    :demand t
     :init
     (setq timu-spacegrey-transparent-background t)
-    (add-to-list 'custom-theme-load-path "~/code/timu-spacegrey-theme")
+    (add-to-list 'custom-theme-load-path
+                 (expand-file-name "elpa/timu-spacegrey-theme" user-emacs-directory))
     :hook
     (after-init . (lambda () (load-theme 'timu-spacegrey t))))
 #+end_src
@@ -575,7 +577,7 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 
 #+begin_src emacs-lisp
   (use-package combobulate
-     :if (file-directory-p "~/code/combobulate")
+     :vc (:url "https://github.com/mickeynp/combobulate" :rev :newest)
      :custom
      (combobulate-key-prefix "C-c o")
      :hook ((python-ts-mode
@@ -587,12 +589,10 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
              json-ts-mode
              go-ts-mode
              html-ts-mode
-             toml-ts-mode) . combobulate-mode)
-     :load-path "~/code/combobulate")
+             toml-ts-mode) . combobulate-mode))
 
   (use-package indent-bars
-    :if (file-directory-p "~/code/indent-bars")
-    :load-path "~/code/indent-bars"
+    :vc (:url "https://github.com/jdtsmith/indent-bars" :rev :newest)
     :hook ((python-ts-mode
             tsx-ts-mode
             typescript-ts-mode

@@ -15,8 +15,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages nil)
  '(package-vc-selected-packages
-   '((timu-spacegrey-theme :vc-backend Git :url
-                           "https://github.com/trevorbernard/timu-spacegrey-theme.git")))
+   '((indent-bars :url "https://github.com/jdtsmith/indent-bars")
+     (combobulate :url "https://github.com/mickeynp/combobulate")))
  '(safe-local-variable-values
    '((eval setq lsp-yaml-max-items-computed 10000)
      (eval progn
