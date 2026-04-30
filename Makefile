@@ -1,6 +1,8 @@
 EMACS = emacs
 EMACS_FLAGS = -Q --batch
 export LSP_USE_PLISTS = true
+# macOS 26+ removed /usr/lib stubs; the native compiler's GCC driver needs the SDK path
+export SDKROOT ?= $(shell xcrun --show-sdk-path 2>/dev/null)
 COMPILE_SCRIPT = lisp/compile.el
 GENERATED_FILES = init.elc configuration.el configuration.elc
 ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
