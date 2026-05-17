@@ -56,6 +56,12 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (set-face-attribute 'mode-line nil :background 'unspecified)
   (set-face-attribute 'header-line nil :background 'unspecified)
 
+  (setq-default mode-line-format nil)
+
+  (add-to-list 'custom-theme-load-path
+               (expand-file-name "elpa/timu-spacegrey-theme" user-emacs-directory))
+  (setq timu-spacegrey-transparent-background t)
+
   (menu-bar-mode -1)
 
   (defun display-startup-echo-area-message ())
@@ -82,9 +88,11 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (setq package-pinned-packages
         '((projectile . "melpa-stable")))
 
-  (setq package-enable-at-startup nil)
+  (setq package-enable-at-startup nil
+        package-quickstart t
+        package-quickstart-file (expand-file-name "package-quickstart.el" user-emacs-directory))
 
-  (package-initialize)
+  (package-activate-all)
 
   (setq use-package-always-defer t
         use-package-verbose nil  ; Set to t for debugging, nil for performance
@@ -112,12 +120,8 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (use-package timu-spacegrey-theme
     :vc (:url "https://github.com/trevorbernard/timu-spacegrey-theme" :rev :newest)
     :demand t
-    :init
-    (setq timu-spacegrey-transparent-background t)
-    (add-to-list 'custom-theme-load-path
-                 (expand-file-name "elpa/timu-spacegrey-theme" user-emacs-directory))
-    :hook
-    (after-init . (lambda () (load-theme 'timu-spacegrey t))))
+    :config
+    (load-theme 'timu-spacegrey t))
 #+end_src
 
 ** Mode Line

@@ -4,7 +4,7 @@ export LSP_USE_PLISTS = true
 # macOS 26+ removed /usr/lib stubs; the native compiler's GCC driver needs the SDK path
 export SDKROOT ?= $(shell xcrun --show-sdk-path 2>/dev/null)
 COMPILE_SCRIPT = lisp/compile.el
-GENERATED_FILES = init.elc configuration.el configuration.elc
+GENERATED_FILES = init.elc configuration.el configuration.elc package-quickstart.el package-quickstart.elc
 ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
 
 # Validate required files exist
@@ -13,7 +13,7 @@ INIT_EL = init.el
 
 .DEFAULT_GOAL := all
 
-.PHONY: all setup install-packages clean compile compile-native check-native-comp tangle help check-deps validate
+.PHONY: all setup install-packages clean compile compile-native check-native-comp tangle help check-deps validate quickstart
 
 all: check-native-comp
 
@@ -74,7 +74,16 @@ install-packages: tangle
 		--eval "(unless (package-installed-p 'use-package) (package-install 'use-package))" \
 		--eval "(load-file \"configuration.el\")" \
 		--eval "(when (fboundp 'os/setup-install-grammars) (os/setup-install-grammars))" || { echo "Warning: Package installation had errors"; exit 0; }
+	@$(MAKE) quickstart
 	@echo "Package installation complete"
+
+quickstart:
+	@echo "Refreshing package-quickstart.el..."
+	@$(EMACS) $(EMACS_FLAGS) \
+		--eval "(require 'package)" \
+		--eval "(setq package-quickstart-file \"$(CURDIR)/package-quickstart.el\")" \
+		--eval "(package-initialize)" \
+		--eval "(package-quickstart-refresh)"
 
 help:
 	@echo "Emacs Configuration Setup"
@@ -84,6 +93,7 @@ help:
 	@echo "  validate        - Validate required files exist"
 	@echo "  check-deps      - Check if Emacs is available and validate files"
 	@echo "  install-packages- Install Emacs packages and Tree-sitter grammars"
+	@echo "  quickstart      - Regenerate package-quickstart.el (after install/remove/vc-update)"
 	@echo "  all             - Tangle and compile configuration"
 	@echo "  compile         - Compile Emacs configuration files (byte compilation)"
 	@echo "  compile-native  - Compile Emacs configuration files (native compilation)"

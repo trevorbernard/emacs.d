@@ -8,6 +8,7 @@ ido.last
 .\#*
 configuration.el
 early-init.el
+package-quickstart.el
 eshell/*
 project
 projectile-bookmarks.eld
