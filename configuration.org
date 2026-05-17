@@ -84,9 +84,10 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
                            ("gnu" . "https://elpa.gnu.org/packages/")))
 
-  ;; pin projectile to melpa-stable
+  ;; pin to melpa-stable to avoid bleeding-edge breakage
   (setq package-pinned-packages
-        '((projectile . "melpa-stable")))
+        '((projectile . "melpa-stable")
+          (cider      . "melpa-stable")))
 
   (setq package-enable-at-startup nil
         package-quickstart t
@@ -345,7 +346,7 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
             emacs-lisp-mode
             eval-expression-minibuffer-setup
             ielm-mode
-            inf-clojure-mode-hook
+            inf-clojure-mode
             lisp-interaction-mode
             lisp-mode
             scheme-mode) . paredit-mode))
@@ -395,7 +396,7 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
                 line-end))
       :modes (python-mode python-ts-mode))
 
-    :hook ((python-mode . tb/python-ruff-setup)
+    :hook ((python-ts-mode . tb/python-ruff-setup)
            (rust-mode . flycheck-mode))
 
     :bind (:map flycheck-mode-map
