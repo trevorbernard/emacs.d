@@ -96,8 +96,7 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (package-activate-all)
 
   (setq use-package-always-defer t
-        use-package-verbose nil  ; Set to t for debugging, nil for performance
-        use-package-minimum-reported-time 0.1)
+        use-package-verbose nil)
   (require 'use-package)
 
   (provide 'early-init)
@@ -162,8 +161,6 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
     (set-face-inverse-video 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
-    (unless (fboundp 'x-hide-tip)
-      (defun x-hide-tip () nil))
     (send-string-to-terminal "\e[1 q")
     (add-hook 'kill-emacs-hook (lambda () (send-string-to-terminal "\e[5 q"))))
 #+end_src
@@ -228,9 +225,7 @@ sequences let yanked text reach the host clipboard.
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
-  (setq-default tab-width 8)
   (setq-default fill-column 80)
-  (setq-default truncate-lines nil)
 #+end_src
 
 ** Enabled Commands
@@ -248,12 +243,10 @@ sequences let yanked text reach the host clipboard.
 #+begin_src emacs-lisp
   (use-package ivy
     :ensure t
-    :commands ivy-mode
     :hook (after-init . ivy-mode))
 
   (use-package counsel
     :ensure t
-    :commands counsel-mode
     :hook (ivy-mode . counsel-mode))
 #+end_src
 
@@ -272,7 +265,6 @@ sequences let yanked text reach the host clipboard.
     :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
-    :commands (projectile-find-file projectile-switch-project projectile-mode)
     :config
     (projectile-mode))
 #+end_src
@@ -408,7 +400,6 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
 
 #+begin_src emacs-lisp
   (use-package flyspell
-    :commands (flyspell-mode flyspell-prog-mode)
     :bind (:map flyspell-mouse-map
                 ([down-mouse-3] . flyspell-correct-word)
                 ([mouse-3] . undefined))
@@ -548,8 +539,7 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     :commands (lsp lsp-deferred)
     :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
-    (setq lsp-log-io nil
-          lsp-use-plists t)
+    (setq lsp-use-plists t)
     :config
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       (or
@@ -776,8 +766,6 @@ Exporting to PDF requires basictex:
     :ensure t
     :after lsp-mode
     :hook (java-ts-mode . lsp))
-
-  (use-package dap-java :after (lsp-java))
 #+end_src
 
 ** Terraform
