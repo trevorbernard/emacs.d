@@ -24,5 +24,4 @@ tramp
 workspace
 .dap-breakpoints
 eclipse.jdt.ls
-treesit-grammars-installed
 .claude/settings.local.json
