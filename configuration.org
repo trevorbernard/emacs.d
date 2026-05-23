@@ -160,6 +160,8 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
     (global-set-key (kbd "<wheel-down>") 'scroll-up-line)
     (set-face-inverse-video 'vertical-border nil)
     (set-face-background 'vertical-border (face-background 'default))
+    (unless standard-display-table
+      (setq standard-display-table (make-display-table)))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     (send-string-to-terminal "\e[1 q")
     (add-hook 'kill-emacs-hook (lambda () (send-string-to-terminal "\e[5 q"))))
