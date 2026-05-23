@@ -437,6 +437,7 @@ tree-sitter equivalents.
         (cmake      "https://github.com/uyha/tree-sitter-cmake")
         (cpp        "https://github.com/tree-sitter/tree-sitter-cpp")
         (css        "https://github.com/tree-sitter/tree-sitter-css"        "v0.20.0")
+        (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
         (elisp      "https://github.com/Wilfred/tree-sitter-elisp")
         (go         "https://github.com/tree-sitter/tree-sitter-go"         "v0.20.0")
         (html       "https://github.com/tree-sitter/tree-sitter-html"       "v0.20.1")
@@ -458,14 +459,13 @@ tree-sitter equivalents.
     (defun os/setup-install-grammars ()
       "Install any missing tree-sitter grammars."
       (interactive)
-      (when (treesit-available-p)
-        (setq treesit-language-source-alist tb/treesit-grammar-sources)
+      (when (and (fboundp 'treesit-available-p) (treesit-available-p))
+        (require 'treesit)
         (dolist (entry tb/treesit-grammar-sources)
           (let ((lang (car entry)))
+            (add-to-list 'treesit-language-source-alist entry)
             (unless (treesit-language-available-p lang)
-              (condition-case err
-                  (treesit-install-language-grammar lang)
-                (error (message "Failed to install grammar %s: %s" lang err))))))))
+              (treesit-install-language-grammar lang))))))
 
     (dolist (mapping
              '((bash-mode . bash-ts-mode)
@@ -484,10 +484,7 @@ tree-sitter equivalents.
                (sh-mode . bash-ts-mode)
                (ruby-mode . ruby-ts-mode)
                (typescript-mode . typescript-ts-mode)))
-      (add-to-list 'major-mode-remap-alist mapping))
-    :config
-    (add-hook 'after-init-hook
-              (lambda () (run-with-idle-timer 2.0 nil #'os/setup-install-grammars))))
+      (add-to-list 'major-mode-remap-alist mapping)))
 #+end_src
 
 ** LSP
