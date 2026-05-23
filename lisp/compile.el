@@ -11,16 +11,13 @@
 
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
-(let ((files '("configuration.el" "init.el")))
-  (if (and (fboundp 'native-comp-available-p)
-           (native-comp-available-p))
-      (progn
-        (message "Using native compilation")
-        (dolist (file files)
-          (native-compile file)))
-    (message "Native compilation not available, using byte compilation")
-    (dolist (file files)
-      (byte-compile-file file))))
+;; Byte-compile configuration.el so a basename `load' in init.el finds a .elc
+;; (≈2x faster than loading source). We deliberately do NOT native-compile:
+;; config code runs once at startup, byte vs native load time is identical, and
+;; the .eln is not loaded at interactive startup. Installed packages keep their
+;; own .eln. init.el is left as source: it is tiny and compiling it risks a
+;; stale init.elc shadowing edits (the bootstrap loads before load-prefer-newer).
+(byte-compile-file "configuration.el")
 
 (provide 'compile)
 

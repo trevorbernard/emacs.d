@@ -1,12 +1,20 @@
 ;;; -*- lexical-binding: t -*-
 
-;; Native compilation is now configured in early-init.el
+;; Native compilation is configured in early-init.el.
 
-(let ((file-name-handler-alist nil))
-  (if (file-exists-p (expand-file-name "configuration.el" user-emacs-directory))
-      (load-file (expand-file-name "configuration.el" user-emacs-directory))
+;; Prefer a newer configuration.el over a stale configuration.elc, so a bare
+;; `make tangle' (without recompiling) still loads the current configuration.
+(setq load-prefer-newer t)
+
+(let ((file-name-handler-alist nil)
+      (config (expand-file-name "configuration" user-emacs-directory)))
+  ;; Load the byte-compiled configuration.elc when present (≈2x faster than
+  ;; loading source); fall back to source, or tangle from org on a fresh clone.
+  (if (or (file-exists-p (concat config ".elc"))
+          (file-exists-p (concat config ".el")))
+      (load config nil t)
     (require 'org)
-    (org-babel-load-file (expand-file-name "configuration.org" user-emacs-directory))))
+    (org-babel-load-file (concat config ".org"))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

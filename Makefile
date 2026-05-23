@@ -13,21 +13,13 @@ INIT_EL = init.el
 
 .DEFAULT_GOAL := all
 
-.PHONY: all setup install-packages clean compile compile-native check-native-comp tangle help check-deps validate quickstart
+.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart
 
-all: check-native-comp
+all: compile
 
 setup: check-deps install-packages all
 	@echo "\nEmacs setup complete! You can now start Emacs."
 	@echo "Tip: Run 'make help' to see all available targets"
-
-check-native-comp:
-	@if $(EMACS) $(EMACS_FLAGS) --eval "(if (fboundp 'native-comp-available-p) (kill-emacs 0) (kill-emacs 1))"; then \
-		$(MAKE) compile-native; \
-	else \
-		$(MAKE) compile; \
-		echo "Native compilation not available, using regular byte compilation"; \
-	fi
 
 clean:
 	@echo "Cleaning generated files..."
@@ -39,12 +31,11 @@ clean:
 	fi
 
 compile: init.el tangle
-	@echo "Compiling Emacs configuration (byte compilation)..."
+	@echo "Byte-compiling Emacs configuration..."
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
 
-compile-native: init.el tangle
-	@echo "Compiling Emacs configuration with native compilation..."
-	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
+# Backwards-compatible alias: the config is byte-compiled (see lisp/compile.el).
+compile-native: compile
 
 tangle: configuration.org
 	@echo "Tangling configuration.org..."
@@ -94,9 +85,9 @@ help:
 	@echo "  check-deps      - Check if Emacs is available and validate files"
 	@echo "  install-packages- Install Emacs packages and Tree-sitter grammars"
 	@echo "  quickstart      - Regenerate package-quickstart.el (after install/remove/vc-update)"
-	@echo "  all             - Tangle and compile configuration"
-	@echo "  compile         - Compile Emacs configuration files (byte compilation)"
-	@echo "  compile-native  - Compile Emacs configuration files (native compilation)"
+	@echo "  all             - Tangle and byte-compile configuration"
+	@echo "  compile         - Tangle and byte-compile configuration files"
+	@echo "  compile-native  - Alias for compile (config is byte-compiled)"
 	@echo "  clean           - Remove generated files and native compilation cache"
 	@echo "  tangle          - Tangle Emacs configuration org file"
 	@echo "  help            - Display this help message"

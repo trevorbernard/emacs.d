@@ -240,10 +240,15 @@ sequences let yanked text reach the host clipboard.
 
 ** Ivy & Counsel
 
+Completion is deferred off the startup path: =ivy-mode= loads on the
+first idle moment after startup (counsel follows via =ivy-mode-hook=).
+Short-lived instances that never go idle never pay for it.
+
 #+begin_src emacs-lisp
   (use-package ivy
     :ensure t
-    :hook (after-init . ivy-mode))
+    :init
+    (run-with-idle-timer 0.5 nil #'ivy-mode))
 
   (use-package counsel
     :ensure t
