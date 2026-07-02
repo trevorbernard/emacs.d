@@ -4,8 +4,13 @@
 ;; Load early-init.el to set up package system for compilation
 (load-file (expand-file-name "early-init.el" user-emacs-directory))
 
-;; On a fresh install there is no elpa/archives/ cache, so package-install
-;; called by use-package :ensure t at macro-expansion time would fail.
+;; use-package :ensure t installs missing packages at macro-expansion time (during
+;; byte-compilation), which needs package-archive-contents populated. early-init's
+;; package-quickstart path activates installed packages but never reads the archive
+;; index into memory, so read the on-disk elpa/archives/ cache here (no network).
+;; Only fall back to a network refresh when that cache is genuinely absent, e.g. on
+;; a fresh install.
+(package-read-all-archive-contents)
 (unless package-archive-contents
   (package-refresh-contents))
 

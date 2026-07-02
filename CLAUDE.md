@@ -36,6 +36,6 @@ With Nix: `nix develop` provides Emacs with native compilation and cmake.
 ## Editing Guidelines
 
 - **Edit `configuration.org`, not `configuration.el`** - The .el file is generated
-- Run `make tangle` after org changes, or just restart Emacs (it tangles automatically if .el is missing)
+- Run `make` after org changes so the config is tangled **and** recompiled. Bare `make tangle` only regenerates `configuration.el`; because `init.el` sets `load-prefer-newer`, the now-newer source shadows the stale `.elc` and Emacs loads interpreted (slower) config until you `make compile`.
 - Package declarations use `use-package` with deferred loading by default
 - Tree-sitter modes are configured to auto-remap from traditional major modes
