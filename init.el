@@ -23,8 +23,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages nil)
  '(package-vc-selected-packages
-   '((indent-bars :url "https://github.com/jdtsmith/indent-bars")
-     (combobulate :url "https://github.com/mickeynp/combobulate")))
+   '((indent-bars :url "https://github.com/jdtsmith/indent-bars")))
  '(safe-local-variable-values
    '((eval setq lsp-yaml-max-items-computed 10000)
      (eval progn

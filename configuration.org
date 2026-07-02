@@ -547,21 +547,6 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 ** Structural Editing
 
 #+begin_src emacs-lisp
-  (use-package combobulate
-     :vc (:url "https://github.com/mickeynp/combobulate" :rev :newest)
-     :custom
-     (combobulate-key-prefix "C-c o")
-     :hook ((python-ts-mode
-             tsx-ts-mode
-             typescript-ts-mode
-             js-ts-mode
-             css-ts-mode
-             yaml-ts-mode
-             json-ts-mode
-             go-ts-mode
-             html-ts-mode
-             toml-ts-mode) . combobulate-mode))
-
   (use-package indent-bars
     :vc (:url "https://github.com/jdtsmith/indent-bars" :rev :newest)
     :hook ((python-ts-mode
