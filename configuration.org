@@ -529,6 +529,7 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
     (setq lsp-use-plists t)
+    (setq lsp-enable-dap-auto-configure nil)
     :config
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       (or
@@ -740,6 +741,34 @@ Exporting to PDF requires basictex:
     :ensure t
     :after lsp-mode
     :hook (java-ts-mode . lsp))
+#+end_src
+
+DAP debugging is only wanted for Java, but lsp-mode auto-enables
+=dap-auto-configure-mode= in every LSP buffer whenever dap-mode is
+merely installed (lsp-java depends on it). It is disabled globally in
+the lsp-mode block above and re-enabled buffer-locally here, before
+=lsp= configures the buffer.
+
+#+begin_src emacs-lisp
+  (defun my/lsp-java-enable-dap ()
+    (setq-local lsp-enable-dap-auto-configure t))
+
+  (add-hook 'java-ts-mode-hook #'my/lsp-java-enable-dap)
+#+end_src
+
+DAP's =tooltip= feature binds =[mouse-movement]= in =lsp-mode-map= to
+a handler that calls =x-hide-tip=, a C function that doesn't exist in
+no-GUI Emacs builds, so every mouse motion under =xterm-mouse-mode=
+logs "Symbol's function definition is void: x-hide-tip". Drop the
+feature on such builds.
+
+#+begin_src emacs-lisp
+  (use-package dap-mode
+    :defer t
+    :config
+    (unless (fboundp 'x-hide-tip)
+      (setq dap-auto-configure-features
+            (delq 'tooltip dap-auto-configure-features))))
 #+end_src
 
 ** Terraform
