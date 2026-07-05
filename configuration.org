@@ -736,7 +736,16 @@ Exporting to PDF requires basictex:
 
 ** Java
 
+lsp-java hard-depends on treemacs (via lsp-treemacs), and loading
+treemacs logs "Python3 not found" when no python3 is installed. The
+treemacs UI is never used here — only its library is pulled in — so
+silence the load-time warning. =eval-and-compile= because use-package
+also loads lsp-java (and thus treemacs) inside the byte-compiler.
+
 #+begin_src emacs-lisp
+  (eval-and-compile
+    (defvar treemacs-no-load-time-warnings t))
+
   (use-package lsp-java
     :ensure t
     :after lsp-mode
