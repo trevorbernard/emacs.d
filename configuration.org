@@ -403,6 +403,15 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
     :bind (:map flycheck-mode-map
                 ("M-n" . flycheck-next-error)
                 ("M-p" . flycheck-previous-error)))
+
+  ;; Configure the rust-cargo checker from cargo metadata so binary-only
+  ;; crates (no lib target) don't fail with "no library targets found".
+  ;; rust-mode-hook covers rustic (derived) and matches the flycheck-mode
+  ;; hook above; rust-ts-mode would run it twice via mode derivation.
+  (use-package flycheck-rust
+    :ensure t
+    :after flycheck
+    :hook (rust-mode . flycheck-rust-setup))
 #+end_src
 
 ** Flyspell
