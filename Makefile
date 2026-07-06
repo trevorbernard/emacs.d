@@ -5,21 +5,44 @@ export LSP_USE_PLISTS = true
 export SDKROOT ?= $(shell xcrun --show-sdk-path 2>/dev/null)
 COMPILE_SCRIPT = lisp/compile.el
 GENERATED_FILES = init.elc configuration.el configuration.elc package-quickstart.el package-quickstart.elc
-ELN_CACHE_DIR = $(HOME)/.emacs.d/eln-cache
+ELN_CACHE_DIR = $(CURDIR)/eln-cache
 
 # Validate required files exist
 CONFIGURATION_ORG = configuration.org
 INIT_EL = init.el
 
 .DEFAULT_GOAL := all
+.DELETE_ON_ERROR:
 
 .PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart
 
 all: compile
 
 setup: check-deps install-packages all
-	@echo "\nEmacs setup complete! You can now start Emacs."
+	@echo ""
+	@echo "Emacs setup complete! You can now start Emacs."
 	@echo "Tip: Run 'make help' to see all available targets"
+
+# Tangling emits both files from one invocation (grouped target, needs GNU make 4.3+).
+configuration.el early-init.el &: $(CONFIGURATION_ORG)
+	@echo "Tangling configuration.org..."
+	@$(EMACS) $(EMACS_FLAGS) --eval "(require 'org)" \
+		--eval "(org-babel-tangle-file \"$(CONFIGURATION_ORG)\")"
+	@# org-babel skips rewriting outputs whose content is unchanged, which would
+	@# leave them older than configuration.org and make this rule fire forever.
+	@touch configuration.el early-init.el
+
+# early-init.el is a prerequisite because $(COMPILE_SCRIPT) loads it.
+configuration.elc: configuration.el early-init.el $(COMPILE_SCRIPT)
+	@echo "Byte-compiling Emacs configuration..."
+	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
+
+tangle: configuration.el
+
+compile: configuration.elc
+
+# Backwards-compatible alias: the config is byte-compiled (see lisp/compile.el).
+compile-native: compile
 
 clean:
 	@echo "Cleaning generated files..."
@@ -29,18 +52,6 @@ clean:
 		echo "Cleaning native compilation cache..."; \
 		rm -rf "$(ELN_CACHE_DIR)"; \
 	fi
-
-compile: init.el tangle
-	@echo "Byte-compiling Emacs configuration..."
-	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
-
-# Backwards-compatible alias: the config is byte-compiled (see lisp/compile.el).
-compile-native: compile
-
-tangle: configuration.org
-	@echo "Tangling configuration.org..."
-	@$(EMACS) $(EMACS_FLAGS) --eval "(require 'org)" \
-		--eval "(org-babel-tangle-file \"configuration.org\")"
 
 validate:
 	@echo "Validating required files..."
@@ -55,7 +66,7 @@ check-deps: validate
 	@$(EMACS) --version | head -1
 	@echo "Emacs found"
 
-install-packages: tangle
+install-packages: configuration.el
 	@echo "Installing Emacs packages and Tree-sitter grammars..."
 	@$(EMACS) $(EMACS_FLAGS) \
 		--eval "(require 'package)" \
@@ -64,7 +75,7 @@ install-packages: tangle
 		--eval "(package-refresh-contents)" \
 		--eval "(unless (package-installed-p 'use-package) (package-install 'use-package))" \
 		--eval "(load-file \"configuration.el\")" \
-		--eval "(when (fboundp 'os/setup-install-grammars) (os/setup-install-grammars))" || { echo "Warning: Package installation had errors"; exit 0; }
+		--eval "(when (fboundp 'os/setup-install-grammars) (os/setup-install-grammars))" || { echo "Error: package installation failed"; exit 1; }
 	@$(MAKE) quickstart
 	@echo "Package installation complete"
 
@@ -85,7 +96,7 @@ help:
 	@echo "  check-deps      - Check if Emacs is available and validate files"
 	@echo "  install-packages- Install Emacs packages and Tree-sitter grammars"
 	@echo "  quickstart      - Regenerate package-quickstart.el (after install/remove/vc-update)"
-	@echo "  all             - Tangle and byte-compile configuration"
+	@echo "  all             - Tangle and byte-compile configuration (incremental)"
 	@echo "  compile         - Tangle and byte-compile configuration files"
 	@echo "  compile-native  - Alias for compile (config is byte-compiled)"
 	@echo "  clean           - Remove generated files and native compilation cache"
