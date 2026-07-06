@@ -10,13 +10,17 @@ This is a literate Emacs configuration using Org-mode. The main configuration li
 
 ```bash
 make setup              # First-time setup: install packages + compile
-make                    # Tangle and compile (auto-selects native if available)
-make tangle             # Extract configuration.el from configuration.org
+make                    # Tangle and byte-compile (incremental)
+make tangle             # Extract configuration.el + early-init.el from configuration.org
 make compile            # Byte compile
-make compile-native     # Native compile
+make compile-native     # Alias for compile (config is byte-compiled only)
 make install-packages   # Install packages and Tree-sitter grammars
 make clean              # Remove generated files and eln-cache
 ```
+
+The build is incremental: `tangle` and `compile` are aliases for real file
+targets, so `make` does nothing when `configuration.org` is older than its
+outputs. Use `make -B` to force a rebuild.
 
 With Nix: `nix develop` provides Emacs with native compilation and cmake.
 
@@ -36,6 +40,6 @@ With Nix: `nix develop` provides Emacs with native compilation and cmake.
 ## Editing Guidelines
 
 - **Edit `configuration.org`, not `configuration.el`** - The .el file is generated
-- Run `make` after org changes so the config is tangled **and** recompiled. Bare `make tangle` only regenerates `configuration.el`; because `init.el` sets `load-prefer-newer`, the now-newer source shadows the stale `.elc` and Emacs loads interpreted (slower) config until you `make compile`.
+- Run `make` after org changes so the config is tangled **and** recompiled. Bare `make tangle` only regenerates `configuration.el`; because `init.el` sets `load-prefer-newer`, the now-newer source shadows the stale `.elc` and Emacs loads interpreted (slower) config until you `make compile`. With the incremental build, plain `make` always leaves the `.elc` up to date, so this only bites if you stop at `make tangle`.
 - Package declarations use `use-package` with deferred loading by default
 - Tree-sitter modes are configured to auto-remap from traditional major modes
