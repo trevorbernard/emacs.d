@@ -199,6 +199,22 @@ sequences let yanked text reach the host clipboard.
     :bind ("M-w" . clipetty-kill-ring-save))
 #+end_src
 
+** Ghostel
+
+Terminal emulator powered by libghostty-vt, the VT engine behind
+Ghostty. The engine is bundled inside ghostel's native module, which
+auto-downloads as a prebuilt binary on first use (=M-x ghostel=), so no
+system libghostty-vt is required. =:defer t= is explicit (despite the
+global =use-package-always-defer=) so the package only loads when the
+terminal is actually invoked, even if a byte-compile ever runs without
+early-init's settings.
+
+#+begin_src emacs-lisp
+  (use-package ghostel
+    :ensure t
+    :defer t)
+#+end_src
+
 * Editing
 
 ** Behavior
