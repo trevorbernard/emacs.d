@@ -626,6 +626,20 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
           ("<return>" . ielm-return)))
 #+end_src
 
+** Claude Code
+
+MCP-based Claude Code integration (=M-x claude-code-ide=). Not on
+MELPA; installed from GitHub via =package-vc=. Uses ghostel as the
+terminal backend since vterm isn't installed here.
+
+#+begin_src emacs-lisp
+  (use-package claude-code-ide
+    :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+    :defer t
+    :custom
+    (claude-code-ide-terminal-backend 'ghostel))
+#+end_src
+
 * Languages
 
 ** Clojure
