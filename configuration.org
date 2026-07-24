@@ -9,7 +9,7 @@ This is my emacs, there are many like it, but this one is mine...
 
 * Introduction
 
-I run Emacs =30.1= exclusively in the terminal (=emacs -nw=) on both
+I run Emacs =30.2= exclusively in the terminal (=emacs -nw=) on both
 Linux and Mac. Startup speed matters. This configuration uses
 =use-package= with global deferred loading and native compilation.
 
@@ -24,7 +24,8 @@ make setup
 #+end_example
 
 =make setup= installs all ELPA packages, downloads tree-sitter grammars,
-and compiles the configuration. Requires Emacs 29+.
+and compiles the configuration. Requires Emacs 30+ (=use-package= with
+=:vc= support).
 
 Start Emacs with =emacs -nw=. After editing =configuration.org=, run =make=
 to tangle and recompile.
@@ -280,7 +281,6 @@ Short-lived instances that never go idle never pay for it.
 #+begin_src emacs-lisp
   (use-package projectile
     :ensure t
-    :diminish projectile-mode
     :custom
     (projectile-project-search-path '("~/p/" "~/code/" "~/.emacs.d/"))
     (projectile-completion-system 'ivy)
@@ -557,7 +557,9 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 
 #+begin_src emacs-lisp
   (use-package indent-bars
-    :vc (:url "https://github.com/jdtsmith/indent-bars" :rev :newest)
+    ;; Pinned: third-party code fetched from GitHub; bump deliberately.
+    :vc (:url "https://github.com/jdtsmith/indent-bars"
+              :rev "f95fee11d9932cba71d686807025239be0319e91")
     :hook ((python-ts-mode
             tsx-ts-mode
             typescript-ts-mode
@@ -580,7 +582,6 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
-    :diminish yas-minor-mode
     :commands (yas-minor-mode yas-global-mode)
     :hook ((prog-mode . yas-minor-mode)
            (org-mode . yas-minor-mode)))

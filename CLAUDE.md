@@ -32,7 +32,7 @@ With Nix: `nix develop` provides Emacs with native compilation and cmake.
 3. `configuration.el` - Generated from `configuration.org`, contains all packages and settings
 
 **Key directories:**
-- `lisp/` - Custom elisp (`compile.el` for build, `org-journal.el` for journaling)
+- `lisp/` - Custom elisp (`compile.el` for build)
 - `elpa/` - Installed packages (auto-generated)
 - `eln-cache/` - Native compilation cache (auto-generated)
 - `snippets/` - YASnippet templates
