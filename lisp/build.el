@@ -1,4 +1,4 @@
-;;; compile.el --- Compile configuration files -*- lexical-binding: t -*-
+;;; build.el --- Compile configuration files -*- lexical-binding: t -*-
 (require 'org)
 
 ;; Load early-init.el to set up package system for compilation
@@ -22,8 +22,11 @@
 ;; the .eln is not loaded at interactive startup. Installed packages keep their
 ;; own .eln. init.el is left as source: it is tiny and compiling it risks a
 ;; stale init.elc shadowing edits (the bootstrap loads before load-prefer-newer).
-(byte-compile-file "configuration.el")
+;; byte-compile-file returns nil on failure without signalling, and batch Emacs
+;; would still exit 0 — exit non-zero so make actually stops.
+(unless (byte-compile-file "configuration.el")
+  (kill-emacs 1))
 
-(provide 'compile)
+(provide 'build)
 
-;;; compile.el ends here
+;;; build.el ends here

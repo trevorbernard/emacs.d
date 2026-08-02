@@ -1,9 +1,20 @@
 EMACS = emacs
-EMACS_FLAGS = -Q --batch
+# --init-directory pins user-emacs-directory (and with it package-user-dir and
+# eln-cache) to this checkout; -Q alone leaves it at ~/.emacs.d, so builds from a
+# worktree or alternate clone would read and write the wrong tree.
+EMACS_FLAGS = -Q --batch --init-directory=$(CURDIR)/
 export LSP_USE_PLISTS = true
-# macOS 26+ removed /usr/lib stubs; the native compiler's GCC driver needs the SDK path
-export SDKROOT ?= $(shell xcrun --show-sdk-path 2>/dev/null)
-COMPILE_SCRIPT = lisp/compile.el
+# macOS 26+ removed /usr/lib stubs; the native compiler's GCC driver needs the SDK
+# path. Guarded and simply-expanded: an exported recursive variable would re-run
+# xcrun for every recipe's environment, on every platform.
+ifeq ($(shell uname -s),Darwin)
+ifeq ($(origin SDKROOT),undefined)
+export SDKROOT := $(shell xcrun --show-sdk-path 2>/dev/null)
+endif
+endif
+COMPILE_SCRIPT = lisp/build.el
+# init.elc is not produced by any rule (see lisp/build.el: init.el stays source);
+# it is listed so `clean' sweeps one left by an older build.
 GENERATED_FILES = init.elc early-init.el configuration.el configuration.elc package-quickstart.el package-quickstart.elc
 ELN_CACHE_DIR = $(CURDIR)/eln-cache
 
@@ -11,8 +22,17 @@ ELN_CACHE_DIR = $(CURDIR)/eln-cache
 CONFIGURATION_ORG = configuration.org
 INIT_EL = init.el
 
+# The tangle rule below uses a grouped target, which silently degrades to
+# independent targets (tangling twice) on the make 3.81 that macOS ships.
+ifeq ($(filter grouped-target,$(.FEATURES)),)
+$(error GNU make 4.3+ required; on macOS: brew install make, then use gmake)
+endif
+
 .DEFAULT_GOAL := all
 .DELETE_ON_ERROR:
+# setup's prerequisites are order-dependent, and two targets can tangle the same
+# files; -j would run them concurrently.
+.NOTPARALLEL:
 
 .PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart
 
@@ -28,6 +48,11 @@ configuration.el early-init.el &: $(CONFIGURATION_ORG)
 	@echo "Tangling configuration.org..."
 	@$(EMACS) $(EMACS_FLAGS) --eval "(require 'org)" \
 		--eval "(org-babel-tangle-file \"$(CONFIGURATION_ORG)\")"
+	@# Guard before touching: touch would otherwise create an empty stand-in for
+	@# an output the tangle failed to emit, turning that into a green build.
+	@for f in configuration.el early-init.el; do \
+		test -s "$$f" || { echo "Error: tangling produced no $$f"; exit 1; }; \
+	done
 	@# org-babel skips rewriting outputs whose content is unchanged, which would
 	@# leave them older than configuration.org and make this rule fire forever.
 	@touch configuration.el early-init.el
@@ -41,13 +66,12 @@ tangle: configuration.el
 
 compile: configuration.elc
 
-# Backwards-compatible alias: the config is byte-compiled (see lisp/compile.el).
+# Backwards-compatible alias: the config is byte-compiled (see lisp/build.el).
 compile-native: compile
 
 clean:
 	@echo "Cleaning generated files..."
 	@rm -f $(GENERATED_FILES)
-	@find . -type f -name '*.eln' -delete 2>/dev/null || true
 	@if [ -d "$(ELN_CACHE_DIR)" ]; then \
 		echo "Cleaning native compilation cache..."; \
 		rm -rf "$(ELN_CACHE_DIR)"; \
@@ -62,18 +86,21 @@ validate:
 
 check-deps: validate
 	@echo "Checking system dependencies..."
-	@command -v $(EMACS) >/dev/null 2>&1 || { echo "Error: Emacs not found. Please install Emacs 29+ first."; exit 1; }
+	@command -v $(EMACS) >/dev/null 2>&1 || { echo "Error: Emacs not found. Please install Emacs 30+ first."; exit 1; }
 	@$(EMACS) --version | head -1
+	@# 30+ for use-package :vc, which configuration.org relies on.
+	@$(EMACS) $(EMACS_FLAGS) --eval "(when (< emacs-major-version 30) \
+		(message \"Error: Emacs 30+ required, found %s\" emacs-version) (kill-emacs 1))"
 	@echo "Emacs found"
 
-install-packages: configuration.el
+# Load early-init.el rather than restating its package setup: it owns
+# package-archives *and* package-pinned-packages, and a copy here silently
+# dropped the pins, installing pinned packages from the wrong archive.
+install-packages: configuration.el early-init.el
 	@echo "Installing Emacs packages and Tree-sitter grammars..."
 	@$(EMACS) $(EMACS_FLAGS) \
-		--eval "(require 'package)" \
-		--eval "(setq package-archives '((\"melpa\" . \"https://melpa.org/packages/\") (\"melpa-stable\" . \"https://stable.melpa.org/packages/\") (\"gnu\" . \"https://elpa.gnu.org/packages/\")))" \
-		--eval "(package-initialize)" \
+		--eval "(load-file \"early-init.el\")" \
 		--eval "(package-refresh-contents)" \
-		--eval "(unless (package-installed-p 'use-package) (package-install 'use-package))" \
 		--eval "(load-file \"configuration.el\")" \
 		--eval "(when (fboundp 'os/setup-install-grammars) (os/setup-install-grammars))" || { echo "Error: package installation failed"; exit 1; }
 	@$(MAKE) quickstart
