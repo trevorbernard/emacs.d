@@ -12,6 +12,7 @@ package-quickstart.el
 eshell/*
 project
 projectile-bookmarks.eld
+projectile-frecency.eld
 transient/*
 .lsp-session-*
 eln-cache/*
