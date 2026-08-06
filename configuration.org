@@ -401,12 +401,14 @@ the buffer restricted to ruff — no custom checker definition.
 
   ;; Configure the rust-cargo checker from cargo metadata so binary-only
   ;; crates (no lib target) don't fail with "no library targets found".
-  ;; rust-mode-hook covers rustic (derived) and matches the flycheck-mode
-  ;; hook above; rust-ts-mode would run it twice via mode derivation.
+  ;; Hook on flycheck-mode, not rust-mode: flycheck is deferred, so on the
+  ;; first Rust buffer flycheck-rust loads *during* rust-mode-hook and its
+  ;; add-hook lands too late to run. flycheck-mode-hook fires after flycheck
+  ;; is loaded, and fires once per buffer regardless of mode derivation.
   (use-package flycheck-rust
     :ensure t
     :after flycheck
-    :hook (rust-mode . flycheck-rust-setup))
+    :hook (flycheck-mode . flycheck-rust-setup))
 #+end_src
 
 ** Flyspell
