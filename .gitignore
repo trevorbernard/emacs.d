@@ -26,3 +26,4 @@ workspace
 .dap-breakpoints
 eclipse.jdt.ls
 .claude/settings.local.json
+custom.el

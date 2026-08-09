@@ -16,30 +16,12 @@
     (require 'org)
     (org-babel-load-file (concat config ".org"))))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- ;; No `package-vc-selected-packages' entry here: the :vc declarations in
- ;; configuration.org own the vc packages, and a copy in this file recorded
- ;; indent-bars without its pinned :rev, so anything driving installation
- ;; from Custom would have quietly resolved the pin to whatever is newest.
- '(safe-local-variable-values
-   '((eval setq lsp-yaml-max-items-computed 10000)
-     (eval progn
-           (when
-               (and (fboundp 'lsp-workspace-folders-remove) (lsp-workspace-root))
-             (lsp-workspace-folders-remove (lsp-workspace-root)))
-           (when (fboundp 'lsp-workspace-folders-add)
-             (lsp-workspace-folders-add default-directory)))
-     (eval with-eval-after-load 'lsp-mode
-           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\.cargo\\'")
-           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\ops\\'")
-           (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\docs\\'")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;; Keep Custom's writes (safe-local-variable-values, M-x customize) out of
+;; this git-tracked file. custom.el is gitignored, machine-local state.
+;; No `package-vc-selected-packages' should reappear in it: the :vc
+;; declarations in configuration.org own the vc packages, and a copy here
+;; recorded indent-bars without its pinned :rev, so anything driving
+;; installation from Custom would have quietly resolved the pin to newest.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (file-exists-p custom-file)
+  (load custom-file nil t))
