@@ -278,6 +278,12 @@ Short-lived instances that never go idle never pay for it.
 
 ** Projectile
 
+=projectile-mode= is enabled on the first idle moment, the same way
+=ivy-mode= is. Left in =:config= it would only run once =C-c p= had
+loaded the package, so until the first keypress nothing that asks
+projectile for the current project — the mode line, =projectile-project-root=
+callers — would get an answer.
+
 #+begin_src emacs-lisp
   (use-package projectile
     :ensure t
@@ -290,8 +296,8 @@ Short-lived instances that never go idle never pay for it.
     :bind-keymap ("C-c p" . projectile-command-map)
     :bind (:map projectile-command-map
                 ("C" . projectile-invalidate-cache))
-    :config
-    (projectile-mode))
+    :init
+    (run-with-idle-timer 0.5 nil #'projectile-mode))
 #+end_src
 
 ** Company
@@ -405,10 +411,22 @@ the buffer restricted to ruff — no custom checker definition.
   ;; first Rust buffer flycheck-rust loads *during* rust-mode-hook and its
   ;; add-hook lands too late to run. flycheck-mode-hook fires after flycheck
   ;; is loaded, and fires once per buffer regardless of mode derivation.
+  ;;
+  ;; That breadth is also why the mode guard is needed: flycheck-mode-hook
+  ;; runs in *every* checked buffer, and flycheck-rust-setup shells out to
+  ;; `cargo metadata' whenever it finds a Cargo.toml above the file. Without
+  ;; the guard, opening a Python or pest buffer anywhere inside a Rust
+  ;; project pays for a synchronous cargo subprocess. rustic-mode derives
+  ;; from rust-mode, which derives from rust-ts-mode, so both names cover it.
+  (defun tb/flycheck-rust-setup-maybe ()
+    "Run `flycheck-rust-setup' only in Rust buffers."
+    (when (derived-mode-p '(rust-mode rust-ts-mode))
+      (flycheck-rust-setup)))
+
   (use-package flycheck-rust
     :ensure t
     :after flycheck
-    :hook (flycheck-mode . flycheck-rust-setup))
+    :hook (flycheck-mode . tb/flycheck-rust-setup-maybe))
 #+end_src
 
 ** Flyspell
@@ -433,17 +451,44 @@ Emacs 29+ has built-in tree-sitter support. This configures grammars
 for all languages and remaps traditional major modes to their
 tree-sitter equivalents.
 
+Every grammar listed below must have a corresponding =*-ts-mode= that
+something actually reaches, or it is downloaded and compiled for
+nothing. Emacs 30 ships no =elisp-ts-mode=, =make-ts-mode=,
+=markdown-ts-mode= or =scss-ts-mode=, so those grammars are omitted;
+=go=, =html=, =toml= and =cmake= need explicit wiring below because
+Emacs does not route their file extensions to the tree-sitter mode on
+its own.
+
+JavaScript files use =js-ts-mode= (the JavaScript grammar), not
+=typescript-ts-mode=: parsing JavaScript with the TypeScript grammar
+is wrong, and it is what left =js-ts-mode= — referenced by the LSP and
+=indent-bars= hooks — unreachable.
+
+=.jsx= maps to =js-ts-mode= too, deliberately. The JavaScript grammar
+parses JSX natively, and =js-ts-mode='s *body* re-prepends
+=("\\.jsx?\\'" . js-ts-mode)= to =auto-mode-alist= every time it runs
+— so once any =.js= file has been opened, an entry here pointing =.jsx=
+at =tsx-ts-mode= is silently overridden and =.jsx= behaves differently
+depending on what you opened first. Agreeing with it makes the mapping
+order-independent. TypeScript keeps its own grammars: =.ts=/=.mts= on
+=typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
+
 #+begin_src emacs-lisp
   (use-package treesit
     :mode (("\\.tsx\\'" . tsx-ts-mode)
-           ("\\.js\\'"  . typescript-ts-mode)
-           ("\\.mjs\\'" . typescript-ts-mode)
+           ("\\.js\\'"  . js-ts-mode)
+           ("\\.mjs\\'" . js-ts-mode)
+           ("\\.cjs\\'" . js-ts-mode)
+           ("\\.jsx\\'" . js-ts-mode)
            ("\\.mts\\'" . typescript-ts-mode)
-           ("\\.cjs\\'" . typescript-ts-mode)
            ("\\.ts\\'"  . typescript-ts-mode)
-           ("\\.jsx\\'" . tsx-ts-mode)
            ("\\.json\\'" .  json-ts-mode)
            ("\\.yaml\\'" .  yaml-ts-mode)
+           ("\\.yml\\'" .  yaml-ts-mode)
+           ("\\.go\\'" . go-ts-mode)
+           ("/go\\.mod\\'" . go-mod-ts-mode)
+           ("\\.cmake\\'" . cmake-ts-mode)
+           ("/CMakeLists\\.txt\\'" . cmake-ts-mode)
            ("\\.Dockerfile\\'" . dockerfile-ts-mode))
     :preface
     (defconst tb/treesit-grammar-sources
@@ -453,19 +498,16 @@ tree-sitter equivalents.
         (cpp        "https://github.com/tree-sitter/tree-sitter-cpp")
         (css        "https://github.com/tree-sitter/tree-sitter-css"        "v0.20.0")
         (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
-        (elisp      "https://github.com/Wilfred/tree-sitter-elisp")
         (go         "https://github.com/tree-sitter/tree-sitter-go"         "v0.20.0")
+        (gomod      "https://github.com/camdencheek/tree-sitter-go-mod")
         (html       "https://github.com/tree-sitter/tree-sitter-html"       "v0.20.1")
         (java       "https://github.com/tree-sitter/tree-sitter-java")
         (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.21.2" "src")
         (json       "https://github.com/tree-sitter/tree-sitter-json"       "v0.20.2")
         (just       "https://github.com/IndianBoy42/tree-sitter-just")
-        (make       "https://github.com/alemuller/tree-sitter-make")
-        (markdown   "https://github.com/ikatyang/tree-sitter-markdown")
         (python     "https://github.com/tree-sitter/tree-sitter-python"     "v0.20.4")
         (ruby       "https://github.com/tree-sitter/tree-sitter-ruby")
         (rust       "https://github.com/tree-sitter/tree-sitter-rust"       "v0.24.1" "src")
-        (scss       "https://github.com/serenadeai/tree-sitter-scss")
         (toml       "https://github.com/tree-sitter/tree-sitter-toml")
         (tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src")
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src")
@@ -487,14 +529,18 @@ tree-sitter equivalents.
                (c++-mode . c++-ts-mode)
                (c-mode . c-ts-mode)
                (c-or-c++-mode . c-or-c++-ts-mode)
+               (conf-toml-mode . toml-ts-mode)
                (css-mode . css-ts-mode)
+               (dockerfile-mode . dockerfile-ts-mode)
+               (html-mode . html-ts-mode)
                (java-mode . java-ts-mode)
                (js-json-mode . json-ts-mode)
-               (js-mode . typescript-ts-mode)
-               (js2-mode . typescript-ts-mode)
+               (javascript-mode . js-ts-mode)
+               (js-mode . js-ts-mode)
+               (js2-mode . js-ts-mode)
                (json-mode . json-ts-mode)
+               (mhtml-mode . html-ts-mode)
                (python-mode . python-ts-mode)
-               (scss-mode . scss-ts-mode)
                (sh-base-mode . bash-ts-mode)
                (sh-mode . bash-ts-mode)
                (ruby-mode . ruby-ts-mode)
@@ -690,7 +736,6 @@ use =C-j= in place of the enter key everywhere.
     (:map
      org-mode-map
      ("C-j" . org-return)
-     ("C-c ]" . org-ref-insert-link)
      ("C-c l" . org-store-link)
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
@@ -715,23 +760,29 @@ Exporting to PDF requires basictex:
 
 ** Nix
 
+=C-c C-f= is bound in the =nix-mode= block, not the =nixfmt= one. A
+=:bind (:map nix-mode-map ...)= under =use-package nixfmt= defers the
+binding until nixfmt loads, and nixfmt only loads when the binding is
+pressed — so it never gets installed at all. Hanging it off nix-mode
+defers it to nix-mode's load instead, and nixfmt's own autoload pulls
+the package in on first use.
+
 #+begin_src emacs-lisp
-    (use-package lsp-nix
-      :ensure lsp-mode
-      :after (lsp-mode)
-      :custom
-      (lsp-nix-nil-formatter ["nixfmt"]))
+  (use-package lsp-nix
+    :ensure lsp-mode
+    :after (lsp-mode)
+    :custom
+    (lsp-nix-nil-formatter ["nixfmt"]))
 
-    (use-package nix-mode
-      :ensure t
-      :hook (nix-mode . lsp-deferred))
+  (use-package nixfmt
+    :ensure t
+    :commands (nixfmt-buffer nixfmt-region))
 
-    (use-package nixfmt
-      :ensure t
-      :bind
-      (:map
-       nix-mode-map
-       ("C-c C-f" . nixpkgs-fmt-buffer)))
+  (use-package nix-mode
+    :ensure t
+    :bind (:map nix-mode-map
+                ("C-c C-f" . nixfmt-buffer))
+    :hook (nix-mode . lsp-deferred))
 #+end_src
 
 ** Ruby
@@ -827,10 +878,6 @@ feature on such builds.
   (use-package dockerfile-mode
     :ensure t
     :commands dockerfile-mode)
-
-  (use-package yaml-mode
-    :ensure t
-    :commands yaml-mode)
 
   (use-package bnf-mode
     :ensure t
