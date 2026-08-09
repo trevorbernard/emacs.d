@@ -21,8 +21,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((indent-bars :url "https://github.com/jdtsmith/indent-bars")))
+ ;; No `package-vc-selected-packages' entry here: the :vc declarations in
+ ;; configuration.org own the vc packages, and a copy in this file recorded
+ ;; indent-bars without its pinned :rev, so anything driving installation
+ ;; from Custom would have quietly resolved the pin to whatever is newest.
  '(safe-local-variable-values
    '((eval setq lsp-yaml-max-items-computed 10000)
      (eval progn
