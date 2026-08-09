@@ -204,9 +204,19 @@ the kill ring instead of yanking an empty string.
     (setq interprogram-paste-function 'tb/wl-paste))
 #+end_src
 
+Clipetty (OSC-52) is the clipboard path where wl-copy isn't: SSH
+sessions and local macOS. In a local Wayland session the wl-copy
+plumbing above already owns the clipboard, so clipetty stays off and
+=M-w= keeps its default =kill-ring-save= — kills still land in the
+system clipboard via =interprogram-cut-function=. A plain =SSH_TTY=
+gate would be wrong here: it would also disable clipetty in local Mac
+terminals, where OSC-52 is the only bridge to the pasteboard.
+
 #+begin_src emacs-lisp
   (use-package clipetty
     :ensure t
+    :if (or (getenv "SSH_TTY")
+            (not (and (getenv "WAYLAND_DISPLAY") (executable-find "wl-copy"))))
     :bind ("M-w" . clipetty-kill-ring-save))
 #+end_src
 
