@@ -176,8 +176,15 @@ Wayland needs explicit clipboard plumbing for copy/paste between Emacs
 and other applications. For terminal sessions over SSH, OSC-52 escape
 sequences let yanked text reach the host clipboard.
 
+=tb/wl-paste= calls =wl-paste= directly rather than through
+=shell-command-to-string=: the shell version also captured stderr, so
+an empty clipboard pasted wl-paste's "No selection" message as text,
+and it spawned a shell plus a =tr= per yank. CRs are stripped in
+lisp, and an empty result returns nil so =current-kill= falls back to
+the kill ring instead of yanking an empty string.
+
 #+begin_src emacs-lisp
-  (when (getenv "WAYLAND_DISPLAY")
+  (when (and (getenv "WAYLAND_DISPLAY") (executable-find "wl-copy"))
     (setq tb/wl-copy-process nil)
     (defun tb/wl-copy (text)
       (setq tb/wl-copy-process (make-process :name "wl-copy"
@@ -189,7 +196,10 @@ sequences let yanked text reach the host clipboard.
       (process-send-eof tb/wl-copy-process))
     (defun tb/wl-paste ()
       (unless (and tb/wl-copy-process (process-live-p tb/wl-copy-process))
-        (shell-command-to-string "wl-paste -n | tr -d \r")))
+        (with-temp-buffer
+          (call-process "wl-paste" nil '(t nil) nil "-n")
+          (unless (zerop (buffer-size))
+            (string-replace "\r" "" (buffer-string))))))
     (setq interprogram-cut-function 'tb/wl-copy)
     (setq interprogram-paste-function 'tb/wl-paste))
 #+end_src
