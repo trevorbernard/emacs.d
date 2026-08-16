@@ -70,7 +70,7 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
   (setq inhibit-startup-message t)
 
   ;; A lisp-interaction-mode scratch buffer fires every prog-mode hook at
-  ;; startup, dragging in company, yasnippet, and paredit (~70ms).
+  ;; startup, dragging in corfu, yasnippet, and paredit (~70ms).
   ;; (setq initial-major-mode 'fundamental-mode)
 
   (when (native-comp-available-p)
@@ -87,7 +87,8 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
-                           ("gnu" . "https://elpa.gnu.org/packages/")))
+                           ("gnu" . "https://elpa.gnu.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
 
   ;; pin to melpa-stable to avoid bleeding-edge breakage
   (setq package-pinned-packages
@@ -279,21 +280,38 @@ early-init's settings.
 
 * Navigation & Completion
 
-** Ivy & Counsel
+** Vertico, Orderless & Marginalia
 
-Completion is deferred off the startup path: =ivy-mode= loads on the
-first idle moment after startup (counsel follows via =ivy-mode-hook=).
-Short-lived instances that never go idle never pay for it.
+Minibuffer completion enhances the built-in =completing-read= UI
+instead of replacing it, so every command picks it up without
+per-package adapters. Completion is deferred off the startup path:
+=vertico-mode= loads on the first idle moment after startup (savehist
+and marginalia follow via =vertico-mode-hook=). Short-lived instances
+that never go idle never pay for it.
+
+Orderless rides the same idle delay because its completion style must
+be loaded before =completion-styles= may name it; until then the
+default styles apply.
 
 #+begin_src emacs-lisp
-  (use-package ivy
+  (use-package vertico
     :ensure t
     :init
-    (run-with-idle-timer 0.5 nil #'ivy-mode))
+    (run-with-idle-timer 0.5 nil #'vertico-mode))
 
-  (use-package counsel
+  (use-package savehist
+    :hook (vertico-mode . savehist-mode))
+
+  (use-package marginalia
     :ensure t
-    :hook (ivy-mode . counsel-mode))
+    :hook (vertico-mode . marginalia-mode))
+
+  (use-package orderless
+    :ensure t
+    :defer 0.5
+    :config
+    (setq completion-styles '(orderless basic)
+          completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
 ** Projectile
@@ -309,7 +327,7 @@ callers — would get an answer.
     :ensure t
     :custom
     (projectile-project-search-path '("~/p/" "~/code/" "~/.emacs.d/"))
-    (projectile-completion-system 'ivy)
+    (projectile-completion-system 'default)
     (projectile-enable-caching t)
     (projectile-indexing-method 'alien)
     (projectile-sort-order 'recently-active)
@@ -320,18 +338,30 @@ callers — would get an answer.
     (run-with-idle-timer 0.5 nil #'projectile-mode))
 #+end_src
 
-** Company
+** Corfu
+
+In-buffer completion consumes standard =completion-at-point-functions=
+directly. C-n/C-p and M-</M-> work in the popup out of the box.
+Child frames don't exist on TTY frames until Emacs 31, so
+corfu-terminal (NonGNU ELPA) renders the popup with overlays there; it
+stands down by itself on graphical displays.
 
 #+begin_src emacs-lisp
-  (use-package company
+  (use-package corfu
     :ensure t
-    :bind
-    (:map company-active-map
-          ("C-n". company-select-next)
-          ("C-p". company-select-previous)
-          ("M-<". company-select-first)
-          ("M->". company-select-last))
-    :hook (prog-mode . company-mode))
+    :custom
+    (corfu-auto t)
+    (corfu-cycle t)
+    :hook (prog-mode . corfu-mode))
+
+  (use-package corfu-terminal
+    :ensure t
+    :after corfu
+    ;; :after alone never loads a deferred package; :demand makes the
+    ;; corfu after-load actually require it.
+    :demand t
+    :config
+    (corfu-terminal-mode 1))
 #+end_src
 
 * Key Bindings
@@ -573,11 +603,6 @@ order-independent. TypeScript keeps its own grammars: =.ts=/=.mts= on
 Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when available to speed up JSON parsing.
 
 #+begin_src emacs-lisp
-  (use-package lsp-ivy
-    :ensure t
-    :after (lsp-mode ivy)
-    :commands lsp-ivy-workspace-symbol)
-
   (use-package lsp-ui
     :ensure t
     :after lsp-mode
@@ -589,10 +614,18 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
   (use-package lsp-mode
     :ensure t
     :commands (lsp lsp-deferred)
-    :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
+    :hook (((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
+           (lsp-completion-mode . os/lsp-completion-orderless))
     :init
     (setq lsp-use-plists t)
     (setq lsp-enable-dap-auto-configure nil)
+    ;; Corfu consumes lsp-mode's capf itself; :none stops lsp-mode from
+    ;; configuring company. lsp-capf otherwise pins the lsp-passthrough
+    ;; style, which bypasses orderless.
+    (setq lsp-completion-provider :none)
+    (defun os/lsp-completion-orderless ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(orderless)))
     :config
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       (or
