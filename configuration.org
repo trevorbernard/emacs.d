@@ -120,6 +120,9 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 ** Theme
 
+My fork of timu-spacegrey with a transparent background, pulled from
+GitHub via =:vc=.
+
 #+begin_src emacs-lisp
   (use-package timu-spacegrey-theme
     :vc (:url "https://github.com/trevorbernard/timu-spacegrey-theme" :rev :newest)
@@ -148,6 +151,9 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 ** macOS
 
+Delete to the Trash instead of unlinking, and don't ask =ls= for
+=--dired= since BSD ls doesn't have it.
+
 #+begin_src emacs-lisp
   (when (eq system-type 'darwin)
    (setq delete-by-moving-to-trash t)
@@ -156,6 +162,9 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 #+end_src
 
 ** Mouse & Display
+
+Mouse support in the terminal, a plain vertical border, and a block
+cursor on start with the bar put back on exit.
 
 #+begin_src emacs-lisp
   (unless (display-graphic-p)
@@ -173,16 +182,15 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 ** Clipboard
 
-Wayland needs explicit clipboard plumbing for copy/paste between Emacs
-and other applications. For terminal sessions over SSH, OSC-52 escape
-sequences let yanked text reach the host clipboard.
+Wayland needs explicit plumbing to share the clipboard with other
+applications. Over SSH, OSC-52 escape sequences get yanked text to the
+host clipboard instead.
 
-=tb/wl-paste= calls =wl-paste= directly rather than through
-=shell-command-to-string=: the shell version also captured stderr, so
-an empty clipboard pasted wl-paste's "No selection" message as text,
-and it spawned a shell plus a =tr= per yank. CRs are stripped in
-lisp, and an empty result returns nil so =current-kill= falls back to
-the kill ring instead of yanking an empty string.
+=tb/wl-paste= calls =wl-paste= directly instead of through a shell.
+The shell version captured stderr too, so an empty clipboard pasted
+wl-paste's "No selection" message as text, and it spawned a shell and
+a =tr= on every yank. An empty result returns nil so =current-kill=
+falls back to the kill ring.
 
 #+begin_src emacs-lisp
   (when (and (getenv "WAYLAND_DISPLAY") (executable-find "wl-copy"))
@@ -205,13 +213,12 @@ the kill ring instead of yanking an empty string.
     (setq interprogram-paste-function 'tb/wl-paste))
 #+end_src
 
-Clipetty (OSC-52) is the clipboard path where wl-copy isn't: SSH
-sessions and local macOS. In a local Wayland session the wl-copy
+Clipetty (OSC-52) covers the cases where wl-copy isn't around: SSH
+sessions and local Mac. In a local Wayland session the wl-copy
 plumbing above already owns the clipboard, so clipetty stays off and
-=M-w= keeps its default =kill-ring-save= — kills still land in the
-system clipboard via =interprogram-cut-function=. A plain =SSH_TTY=
-gate would be wrong here: it would also disable clipetty in local Mac
-terminals, where OSC-52 is the only bridge to the pasteboard.
+=M-w= keeps its default =kill-ring-save=. Don't gate this on =SSH_TTY=
+alone. That would also turn clipetty off in a local Mac terminal,
+where OSC-52 is the only way to the pasteboard.
 
 #+begin_src emacs-lisp
   (use-package clipetty
@@ -223,13 +230,11 @@ terminals, where OSC-52 is the only bridge to the pasteboard.
 
 ** Ghostel
 
-Terminal emulator powered by libghostty-vt, the VT engine behind
-Ghostty. The engine is bundled inside ghostel's native module, which
-auto-downloads as a prebuilt binary on first use (=M-x ghostel=), so no
-system libghostty-vt is required. =:defer t= is explicit (despite the
-global =use-package-always-defer=) so the package only loads when the
-terminal is actually invoked, even if a byte-compile ever runs without
-early-init's settings.
+A terminal emulator built on libghostty-vt, the engine behind Ghostty.
+It ships as a prebuilt native module that downloads on the first
+=M-x ghostel=, so nothing needs to be installed system-wide. =:defer t=
+is spelled out even though deferral is the global default, so a
+byte-compile without early-init still doesn't load it.
 
 #+begin_src emacs-lisp
   (use-package ghostel
@@ -239,7 +244,10 @@ early-init's settings.
 
 * Editing
 
-** Behavior
+** Behaviour
+
+Ignore the stupid ring bell feature, answer with y/n, and revert
+buffers when the file changes on disk.
 
 #+begin_src emacs-lisp
   (setq
@@ -255,6 +263,9 @@ early-init's settings.
 
 ** File Handling
 
+Backup files, auto-save files, and lockfiles just clutter the
+workspace. Git has me covered.
+
 #+begin_src emacs-lisp
   (setq
    make-backup-files nil
@@ -264,6 +275,8 @@ early-init's settings.
 
 ** Indentation
 
+Use spaces in favour of tabs because they are evil. Wrap at 80.
+
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq-default c-basic-offset 4)
@@ -271,6 +284,8 @@ early-init's settings.
 #+end_src
 
 ** Enabled Commands
+
+Emacs disables these by default to protect newcomers from themselves.
 
 #+begin_src emacs-lisp
   (put 'downcase-region 'disabled nil)
@@ -282,17 +297,15 @@ early-init's settings.
 
 ** Vertico, Orderless & Marginalia
 
-Minibuffer completion enhances the built-in =completing-read= UI
-instead of replacing it, so every command picks it up without
-per-package adapters. Vertico and orderless load eagerly: each is one
-small file, and deferring them only buys a window where M-x has
-neither the UI nor the matching style. Marginalia is enabled the same
-way; a =vertico-mode-hook= would miss, since vertico-mode has already
-run by the time marginalia's form installs the hook.
+Vertico enhances the built-in =completing-read= UI instead of
+replacing it, so every command picks it up with no adapters. Vertico,
+orderless, and marginalia load eagerly. Each is one small file, and
+deferring them only bought a window where =M-x= had neither the UI nor
+the matching style. Marginalia can't ride =vertico-mode-hook= either:
+vertico-mode has already run by the time the hook gets installed.
 
-Savehist is independent of the UI: minibuffer history is worth
-keeping whichever frontend is active, and corfu-history sorts recent
-in-buffer candidates first from the same store.
+Savehist is on regardless of the frontend. Minibuffer history is worth
+keeping, and corfu-history reads the same store.
 
 #+begin_src emacs-lisp
   (use-package vertico
@@ -322,11 +335,10 @@ in-buffer candidates first from the same store.
 
 ** Projectile
 
-=projectile-mode= is enabled on the first idle moment rather than in
-=:config=, where it would only run once =C-c p= had
-loaded the package, so until the first keypress nothing that asks
-projectile for the current project — the mode line, =projectile-project-root=
-callers — would get an answer.
+Enable =projectile-mode= on the first idle moment rather than in
+=:config=. There it would only run once =C-c p= had loaded the
+package, and until then the mode line and anything else asking for
+the current project would get nothing.
 
 #+begin_src emacs-lisp
   (use-package projectile
@@ -346,17 +358,15 @@ callers — would get an answer.
 
 ** Corfu
 
-In-buffer completion consumes standard =completion-at-point-functions=
-directly. C-n/C-p and M-</M-> work in the popup out of the box.
-Child frames don't exist on TTY frames until Emacs 31, so
-corfu-terminal (NonGNU ELPA) renders the popup with overlays there; it
-stands down by itself on graphical displays.
+Corfu reads =completion-at-point-functions= directly. C-n/C-p and
+M-</M-> work in the popup out of the box. TTY frames don't get child
+frames until Emacs 31, so corfu-terminal (NonGNU ELPA) draws the popup
+with overlays. It stands down by itself on graphical displays.
 
-Company bundled dabbrev and file-path backends alongside capf; corfu
-reads capf only, so cape supplies those as capfs. They are appended
-at low priority so a mode-specific capf (elisp, LSP, CIDER) still
-wins, while buffers without one (YAML, Markdown, Clojure with no
-REPL) still get something.
+Company bundled dabbrev and file-path backends. Corfu only reads capf,
+so cape supplies those. They sit at low priority so a mode-specific
+capf (elisp, LSP, CIDER) still wins, and buffers without one (YAML,
+Markdown, Clojure without a REPL) still get something.
 
 #+begin_src emacs-lisp
   (use-package corfu
@@ -387,13 +397,17 @@ REPL) still get something.
 
 * Key Bindings
 
-=M-x= via =C-x C-m= per [[https://sites.google.com/site/steveyegge2/effective-emacs][Steve Yegge's Effective Emacs]]. Keeps your
-fingers on the home row when Caps Lock is mapped to Control.
+=M-x= is the most used key chord in Emacs and the most annoying one.
+I rebind it to =C-x C-m= per [[https://sites.google.com/site/steveyegge2/effective-emacs][Steve Yegge's Effective Emacs]]. With Caps
+Lock as Control your fingers never leave the home row.
 
 #+begin_src emacs-lisp
   (keymap-global-set "C-x C-m" 'execute-extended-command)
   (keymap-global-set "C-c C-m" 'execute-extended-command)
 #+end_src
+
+=C-c= is reserved for the user. Add a friendlier binding for
+=magit-file-dispatch=.
 
 #+begin_src emacs-lisp
   (keymap-global-set "C-x g" 'magit-status)
@@ -423,8 +437,10 @@ fingers on the home row when Caps Lock is mapped to Control.
 
 ** Paredit
 
-On Mac, =^-left= and =^-right= conflict with Mission Control. Disable
-them in System Preferences > Keyboard > Shortcuts > Mission Control.
+Some handy dandy paredit shortcuts. On Mac, =^-left= and =^-right=
+are taken by Mission Control. Go to System Preferences > Keyboard >
+Shortcuts > Mission Control and change or disable "Move left a space"
+and "Move right a space".
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -448,6 +464,8 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
 
 ** Evil
 
+Off by default. =M-x evil-mode= when I want it.
+
 #+begin_src emacs-lisp
   (use-package evil
     :ensure t
@@ -456,8 +474,21 @@ them in System Preferences > Keyboard > Shortcuts > Mission Control.
 
 ** Flycheck
 
-Flycheck ships a built-in =python-ruff= checker, so Python only needs
-the buffer restricted to ruff — no custom checker definition.
+Flycheck ships a =python-ruff= checker, so Python only needs the
+buffer restricted to ruff. No custom checker needed.
+
+flycheck-rust configures the =rust-cargo= checker from cargo metadata
+so binary-only crates don't fail with "no library targets found". It
+hooks =flycheck-mode=, not =rust-mode=: flycheck is deferred, so in
+the first Rust buffer flycheck-rust loads during =rust-mode-hook= and
+its own add-hook lands too late to run.
+
+The mode guard matters because =flycheck-mode-hook= fires in every
+checked buffer, and =flycheck-rust-setup= shells out to =cargo
+metadata= whenever it finds a Cargo.toml above the file. Without it, a
+Python or pest buffer inside a Rust project pays for a synchronous
+cargo call. rustic-mode derives from rust-mode, which derives from
+rust-ts-mode, so both names cover it.
 
 #+begin_src emacs-lisp
   (defun tb/python-ruff-setup ()
@@ -476,19 +507,6 @@ the buffer restricted to ruff — no custom checker definition.
                 ("M-n" . flycheck-next-error)
                 ("M-p" . flycheck-previous-error)))
 
-  ;; Configure the rust-cargo checker from cargo metadata so binary-only
-  ;; crates (no lib target) don't fail with "no library targets found".
-  ;; Hook on flycheck-mode, not rust-mode: flycheck is deferred, so on the
-  ;; first Rust buffer flycheck-rust loads *during* rust-mode-hook and its
-  ;; add-hook lands too late to run. flycheck-mode-hook fires after flycheck
-  ;; is loaded, and fires once per buffer regardless of mode derivation.
-  ;;
-  ;; That breadth is also why the mode guard is needed: flycheck-mode-hook
-  ;; runs in *every* checked buffer, and flycheck-rust-setup shells out to
-  ;; `cargo metadata' whenever it finds a Cargo.toml above the file. Without
-  ;; the guard, opening a Python or pest buffer anywhere inside a Rust
-  ;; project pays for a synchronous cargo subprocess. rustic-mode derives
-  ;; from rust-mode, which derives from rust-ts-mode, so both names cover it.
   (defun tb/flycheck-rust-setup-maybe ()
     "Run `flycheck-rust-setup' only in Rust buffers."
     (when (derived-mode-p '(rust-mode rust-ts-mode))
@@ -501,6 +519,8 @@ the buffer restricted to ruff — no custom checker definition.
 #+end_src
 
 ** Flyspell
+
+Needs aspell installed. Right-click corrects the word under the mouse.
 
 #+begin_src emacs-lisp
   (use-package flyspell
@@ -518,31 +538,28 @@ the buffer restricted to ruff — no custom checker definition.
 
 ** Tree-sitter
 
-Emacs 29+ has built-in tree-sitter support. This configures grammars
-for all languages and remaps traditional major modes to their
-tree-sitter equivalents.
+Emacs 29+ has tree-sitter built in. This installs the grammars and
+remaps the traditional major modes to their =-ts-mode= equivalents.
 
-Every grammar listed below must have a corresponding =*-ts-mode= that
-something actually reaches, or it is downloaded and compiled for
-nothing. Emacs 30 ships no =elisp-ts-mode=, =make-ts-mode=,
-=markdown-ts-mode= or =scss-ts-mode=, so those grammars are omitted;
-=go=, =html=, =toml= and =cmake= need explicit wiring below because
-Emacs does not route their file extensions to the tree-sitter mode on
-its own.
+Every grammar here must have a =*-ts-mode= that something actually
+reaches, or it gets downloaded and compiled for nothing. Emacs 30 has
+no =elisp-ts-mode=, =make-ts-mode=, =markdown-ts-mode=, or
+=scss-ts-mode=, so those grammars are out. =go=, =html=, =toml=, and
+=cmake= need explicit =:mode= entries because Emacs doesn't route
+their extensions to the tree-sitter mode on its own.
 
-JavaScript files use =js-ts-mode= (the JavaScript grammar), not
-=typescript-ts-mode=: parsing JavaScript with the TypeScript grammar
-is wrong, and it is what left =js-ts-mode= — referenced by the LSP and
-=indent-bars= hooks — unreachable.
+JavaScript uses =js-ts-mode= and the JavaScript grammar, not
+=typescript-ts-mode=. Parsing JavaScript with the TypeScript grammar
+is wrong, and it left =js-ts-mode= unreachable even though the LSP and
+=indent-bars= hooks reference it.
 
-=.jsx= maps to =js-ts-mode= too, deliberately. The JavaScript grammar
-parses JSX natively, and =js-ts-mode='s *body* re-prepends
-=("\\.jsx?\\'" . js-ts-mode)= to =auto-mode-alist= every time it runs
-— so once any =.js= file has been opened, an entry here pointing =.jsx=
-at =tsx-ts-mode= is silently overridden and =.jsx= behaves differently
-depending on what you opened first. Agreeing with it makes the mapping
-order-independent. TypeScript keeps its own grammars: =.ts=/=.mts= on
-=typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
+=.jsx= goes to =js-ts-mode= too, on purpose. The JavaScript grammar
+parses JSX natively, and the body of =js-ts-mode= re-prepends
+=("\\.jsx?\\'" . js-ts-mode)= to =auto-mode-alist= every time it runs.
+Point =.jsx= at =tsx-ts-mode= and it silently flips back after the
+first =.js= file is opened. Agreeing with it keeps the mapping
+order-independent. TypeScript keeps its own grammars: =.ts= and =.mts=
+on =typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
 
 #+begin_src emacs-lisp
   (use-package treesit
@@ -621,7 +638,8 @@ order-independent. TypeScript keeps its own grammars: =.ts=/=.mts= on
 
 ** LSP
 
-Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when available to speed up JSON parsing.
+I use LSP for most languages. [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] wraps the server when
+it's on =PATH= to speed up JSON parsing.
 
 #+begin_src emacs-lisp
   (use-package lsp-ui
@@ -675,11 +693,13 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
 #+end_src
 
-** Structural Editing
+** Indent Guides
+
+indent-bars draws indentation guides in tree-sitter buffers. It comes
+straight from GitHub, so it's pinned to a commit. Bump it deliberately.
 
 #+begin_src emacs-lisp
   (use-package indent-bars
-    ;; Pinned: third-party code fetched from GitHub; bump deliberately.
     :vc (:url "https://github.com/jdtsmith/indent-bars"
               :rev "f95fee11d9932cba71d686807025239be0319e91")
     :hook ((python-ts-mode
@@ -719,6 +739,8 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 
 ** IELM
 
+An Interactive Emacs Lisp Mode (IELM) gives you an Emacs Lisp shell.
+
 #+begin_src emacs-lisp
   (use-package ielm
     :hook ((ielm-mode . paredit-mode))
@@ -730,9 +752,9 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
 
 ** Claude Code
 
-MCP-based Claude Code integration (=M-x claude-code-ide=). Not on
-MELPA; installed from GitHub via =package-vc=. Uses ghostel as the
-terminal backend since vterm isn't installed here.
+Claude Code integration over MCP (=M-x claude-code-ide=). It's not on
+MELPA, so it comes from GitHub via =:vc=. Ghostel is the terminal
+backend because I don't have vterm.
 
 #+begin_src emacs-lisp
   (use-package claude-code-ide
@@ -746,7 +768,10 @@ terminal backend since vterm isn't installed here.
 
 ** Clojure
 
-Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
+I don't like my cider to be bleeding edge since it's caused
+compatibility problems in the past, so it's pinned to melpa-stable in
+early-init. I have long since used =C-c C-j= to jack into a repl. My
+fingers are programmed this way.
 
 #+begin_src emacs-lisp
   (use-package clojure-mode
@@ -769,8 +794,11 @@ Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
 
 ** Rust
 
-#+begin_src emacs-lisp
+Rust is my language du jour and slowly becoming my favourite. rustic
+layers cargo integration and rust-analyzer (via LSP) on top of
+rust-mode.
 
+#+begin_src emacs-lisp
   (use-package rust-mode
     :ensure t
     :init
@@ -797,8 +825,9 @@ Cider is pinned to melpa-stable to avoid bleeding-edge breakage.
 
 ** Org
 
-=C-j= is rebound from =org-return-indent= to =org-return= because I
-use =C-j= in place of the enter key everywhere.
+I almost exclusively use =C-j= in place of the enter key, and org
+binds it to =org-return-indent=. Rather than remap my brain, remap
+the key to =org-return=.
 
 #+begin_src emacs-lisp
   (use-package ob-rust
@@ -823,7 +852,7 @@ use =C-j= in place of the enter key everywhere.
                                  (shell . t))))
 #+end_src
 
-Exporting to PDF requires basictex:
+To export to PDF, install basictex and the two packages org needs:
 
 #+begin_src bash :tangle no
   brew reinstall --cask basictex
@@ -834,12 +863,11 @@ Exporting to PDF requires basictex:
 
 ** Nix
 
-=C-c C-f= is bound in the =nix-mode= block, not the =nixfmt= one. A
-=:bind (:map nix-mode-map ...)= under =use-package nixfmt= defers the
-binding until nixfmt loads, and nixfmt only loads when the binding is
-pressed — so it never gets installed at all. Hanging it off nix-mode
-defers it to nix-mode's load instead, and nixfmt's own autoload pulls
-the package in on first use.
+=C-c C-f= lives in the =nix-mode= block, not the =nixfmt= one. Bound
+under =use-package nixfmt=, it would wait for nixfmt to load, and
+nixfmt only loads when the binding is pressed. It would never get
+installed. Hanging it off nix-mode installs it when nix-mode loads,
+and nixfmt's autoload pulls the package in on first use.
 
 #+begin_src emacs-lisp
   (use-package lsp-nix
@@ -873,11 +901,11 @@ the package in on first use.
 
 ** Java
 
-lsp-java hard-depends on treemacs (via lsp-treemacs), and loading
-treemacs logs "Python3 not found" when no python3 is installed. The
-treemacs UI is never used here — only its library is pulled in — so
-silence the load-time warning. =eval-and-compile= because use-package
-also loads lsp-java (and thus treemacs) inside the byte-compiler.
+lsp-java drags in treemacs through lsp-treemacs, and loading treemacs
+logs "Python3 not found" when there's no python3. I never use the
+treemacs UI, only its library, so silence the warning. It's in
+=eval-and-compile= because use-package also loads lsp-java, and so
+treemacs, inside the byte-compiler.
 
 #+begin_src emacs-lisp
   (eval-and-compile
@@ -889,11 +917,11 @@ also loads lsp-java (and thus treemacs) inside the byte-compiler.
     :hook (java-ts-mode . lsp))
 #+end_src
 
-DAP debugging is only wanted for Java, but lsp-mode auto-enables
-=dap-auto-configure-mode= in every LSP buffer whenever dap-mode is
-merely installed (lsp-java depends on it). It is disabled globally in
-the lsp-mode block above and re-enabled buffer-locally here, before
-=lsp= configures the buffer.
+I only want DAP for Java, but lsp-mode turns on
+=dap-auto-configure-mode= in every LSP buffer as soon as dap-mode is
+installed, and lsp-java depends on it. So it's off globally in the
+lsp-mode block and back on buffer-locally here, before =lsp=
+configures the buffer.
 
 #+begin_src emacs-lisp
   (defun my/lsp-java-enable-dap ()
@@ -903,10 +931,10 @@ the lsp-mode block above and re-enabled buffer-locally here, before
 #+end_src
 
 DAP's =tooltip= feature binds =[mouse-movement]= in =lsp-mode-map= to
-a handler that calls =x-hide-tip=, a C function that doesn't exist in
-no-GUI Emacs builds, so every mouse motion under =xterm-mouse-mode=
-logs "Symbol's function definition is void: x-hide-tip". Drop the
-feature on such builds.
+a handler that calls =x-hide-tip=. That C function doesn't exist in
+no-GUI builds, so every mouse move under =xterm-mouse-mode= logs
+"Symbol's function definition is void: x-hide-tip". Drop the feature
+on those builds.
 
 #+begin_src emacs-lisp
   (use-package dap-mode
