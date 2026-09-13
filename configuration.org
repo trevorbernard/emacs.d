@@ -284,31 +284,37 @@ early-init's settings.
 
 Minibuffer completion enhances the built-in =completing-read= UI
 instead of replacing it, so every command picks it up without
-per-package adapters. Completion is deferred off the startup path:
-=vertico-mode= loads on the first idle moment after startup (savehist
-and marginalia follow via =vertico-mode-hook=). Short-lived instances
-that never go idle never pay for it.
+per-package adapters. Vertico and orderless load eagerly: each is one
+small file, and deferring them only buys a window where M-x has
+neither the UI nor the matching style. Marginalia is enabled the same
+way; a =vertico-mode-hook= would miss, since vertico-mode has already
+run by the time marginalia's form installs the hook.
 
-Orderless rides the same idle delay because its completion style must
-be loaded before =completion-styles= may name it; until then the
-default styles apply.
+Savehist is independent of the UI: minibuffer history is worth
+keeping whichever frontend is active, and corfu-history sorts recent
+in-buffer candidates first from the same store.
 
 #+begin_src emacs-lisp
   (use-package vertico
     :ensure t
-    :init
-    (run-with-idle-timer 0.5 nil #'vertico-mode))
+    :demand t
+    :config
+    (vertico-mode 1))
 
   (use-package savehist
-    :hook (vertico-mode . savehist-mode))
+    :demand t
+    :config
+    (savehist-mode 1))
 
   (use-package marginalia
     :ensure t
-    :hook (vertico-mode . marginalia-mode))
+    :demand t
+    :config
+    (marginalia-mode 1))
 
   (use-package orderless
     :ensure t
-    :defer 0.5
+    :demand t
     :config
     (setq completion-styles '(orderless basic)
           completion-category-overrides '((file (styles basic partial-completion)))))
@@ -316,8 +322,8 @@ default styles apply.
 
 ** Projectile
 
-=projectile-mode= is enabled on the first idle moment, the same way
-=ivy-mode= is. Left in =:config= it would only run once =C-c p= had
+=projectile-mode= is enabled on the first idle moment rather than in
+=:config=, where it would only run once =C-c p= had
 loaded the package, so until the first keypress nothing that asks
 projectile for the current project — the mode line, =projectile-project-root=
 callers — would get an answer.
@@ -346,13 +352,21 @@ Child frames don't exist on TTY frames until Emacs 31, so
 corfu-terminal (NonGNU ELPA) renders the popup with overlays there; it
 stands down by itself on graphical displays.
 
+Company bundled dabbrev and file-path backends alongside capf; corfu
+reads capf only, so cape supplies those as capfs. They are appended
+at low priority so a mode-specific capf (elisp, LSP, CIDER) still
+wins, while buffers without one (YAML, Markdown, Clojure with no
+REPL) still get something.
+
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure t
     :custom
     (corfu-auto t)
     (corfu-cycle t)
-    :hook (prog-mode . corfu-mode))
+    :hook ((prog-mode . corfu-mode)
+           (corfu-mode . corfu-history-mode)
+           (corfu-mode . corfu-popupinfo-mode)))
 
   (use-package corfu-terminal
     :ensure t
@@ -362,6 +376,13 @@ stands down by itself on graphical displays.
     :demand t
     :config
     (corfu-terminal-mode 1))
+
+  (use-package cape
+    :ensure t
+    :demand t
+    :config
+    (add-hook 'completion-at-point-functions #'cape-dabbrev 90)
+    (add-hook 'completion-at-point-functions #'cape-file 90))
 #+end_src
 
 * Key Bindings
@@ -563,7 +584,7 @@ order-independent. TypeScript keeps its own grammars: =.ts=/=.mts= on
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src")
         (yaml       "https://github.com/ikatyang/tree-sitter-yaml"          "v0.5.0")))
 
-    (defun os/setup-install-grammars ()
+    (defun tb/setup-install-grammars ()
       "Install any missing tree-sitter grammars."
       (interactive)
       (when (and (fboundp 'treesit-available-p) (treesit-available-p))
@@ -615,7 +636,7 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     :ensure t
     :commands (lsp lsp-deferred)
     :hook (((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
-           (lsp-completion-mode . os/lsp-completion-orderless))
+           (lsp-completion-mode . tb/lsp-completion-orderless))
     :init
     (setq lsp-use-plists t)
     (setq lsp-enable-dap-auto-configure nil)
@@ -623,7 +644,7 @@ Uses [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] when a
     ;; configuring company. lsp-capf otherwise pins the lsp-passthrough
     ;; style, which bypasses orderless.
     (setq lsp-completion-provider :none)
-    (defun os/lsp-completion-orderless ()
+    (defun tb/lsp-completion-orderless ()
       (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
             '(orderless)))
     :config

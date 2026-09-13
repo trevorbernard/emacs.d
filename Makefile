@@ -102,7 +102,7 @@ install-packages: configuration.el early-init.el
 		--eval "(load-file \"early-init.el\")" \
 		--eval "(package-refresh-contents)" \
 		--eval "(load-file \"configuration.el\")" \
-		--eval "(when (fboundp 'os/setup-install-grammars) (os/setup-install-grammars))" || { echo "Error: package installation failed"; exit 1; }
+		--eval "(when (fboundp 'tb/setup-install-grammars) (tb/setup-install-grammars))" || { echo "Error: package installation failed"; exit 1; }
 	@$(MAKE) quickstart
 	@echo "Package installation complete"
 
