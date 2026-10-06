@@ -330,7 +330,8 @@ keeping, and corfu-history reads the same store.
     :demand t
     :config
     (setq completion-styles '(orderless basic)
-          completion-category-overrides '((file (styles basic partial-completion)))))
+          completion-category-overrides '((file (styles basic partial-completion))
+                                          (lsp-capf (styles orderless)))))
 #+end_src
 
 ** Projectile
@@ -366,7 +367,9 @@ with overlays. It stands down by itself on graphical displays.
 Company bundled dabbrev and file-path backends. Corfu only reads capf,
 so cape supplies those. They sit at low priority so a mode-specific
 capf (elisp, LSP, CIDER) still wins, and buffers without one (YAML,
-Markdown, Clojure without a REPL) still get something.
+Markdown, Clojure without a REPL) still get something. Both capfs are
+autoloaded, so hooking them in =:init= leaves cape unloaded until the
+first completion.
 
 #+begin_src emacs-lisp
   (use-package corfu
@@ -389,8 +392,7 @@ Markdown, Clojure without a REPL) still get something.
 
   (use-package cape
     :ensure t
-    :demand t
-    :config
+    :init
     (add-hook 'completion-at-point-functions #'cape-dabbrev 90)
     (add-hook 'completion-at-point-functions #'cape-file 90))
 #+end_src
@@ -653,18 +655,15 @@ it's on =PATH= to speed up JSON parsing.
   (use-package lsp-mode
     :ensure t
     :commands (lsp lsp-deferred)
-    :hook (((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
-           (lsp-completion-mode . tb/lsp-completion-orderless))
+    :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
     (setq lsp-use-plists t)
     (setq lsp-enable-dap-auto-configure nil)
     ;; Corfu consumes lsp-mode's capf itself; :none stops lsp-mode from
-    ;; configuring company. lsp-capf otherwise pins the lsp-passthrough
-    ;; style, which bypasses orderless.
+    ;; configuring company. lsp-mode pins lsp-capf to the lsp-passthrough
+    ;; style in completion-category-defaults; the lsp-capf entry in
+    ;; completion-category-overrides (Orderless block) takes precedence.
     (setq lsp-completion-provider :none)
-    (defun tb/lsp-completion-orderless ()
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-            '(orderless)))
     :config
     (defun lsp-booster--advice-json-parse (old-fn &rest args)
       (or
