@@ -791,7 +791,7 @@ straight from GitHub, so it's pinned to a commit. Bump it deliberately.
             bash-ts-mode) . indent-bars-mode))
 #+end_src
 
-** Snippets & Search
+** Snippets & Editing
 
 #+begin_src emacs-lisp
   (use-package yasnippet
@@ -799,10 +799,6 @@ straight from GitHub, so it's pinned to a commit. Bump it deliberately.
     :commands (yas-minor-mode yas-global-mode)
     :hook ((prog-mode . yas-minor-mode)
            (org-mode . yas-minor-mode)))
-
-  (use-package ag
-    :ensure t
-    :commands (ag ag-project ag-regexp))
 
   (use-package string-inflection
     :ensure t
