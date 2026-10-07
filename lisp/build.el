@@ -14,6 +14,34 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
+;; The cached index can still list a package at a version the archive no longer
+;; serves; `use-package-ensure-elpa' only refreshes when the package is missing
+;; from the index outright, so the download 404s. And the use-package macro
+;; downgrades every :ensure error to a warning, so the build exited 0 with the
+;; package uninstalled. Retry once against a fresh index, record what still
+;; fails, and fail the build after compiling.
+(defvar build--install-failures nil)
+
+(defun build--ensure-package (name args _state &optional _no-refresh)
+  (dolist (ensure args)
+    (let ((package (or (and (eq ensure t) (use-package-as-symbol name))
+                       ensure)))
+      (when (consp package)
+        (use-package-pin-package (car package) (cdr package))
+        (setq package (car package)))
+      (when (and package (not (package-installed-p package)))
+        (condition-case err
+            (condition-case nil
+                (package-install package)
+              (error
+               (package-refresh-contents)
+               (package-install package)))
+          (error
+           (push (format "%s: %s" package (error-message-string err))
+                 build--install-failures)))))))
+
+(setq use-package-ensure-function #'build--ensure-package)
+
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 ;; Byte-compile configuration.el so a basename `load' in init.el finds a .elc
@@ -25,6 +53,11 @@
 ;; byte-compile-file returns nil on failure without signalling, and batch Emacs
 ;; would still exit 0 — exit non-zero so make actually stops.
 (unless (byte-compile-file "configuration.el")
+  (kill-emacs 1))
+
+(when build--install-failures
+  (message "Failed to install:\n  %s"
+           (string-join (nreverse build--install-failures) "\n  "))
   (kill-emacs 1))
 
 (provide 'build)
