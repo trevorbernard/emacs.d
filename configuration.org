@@ -304,6 +304,13 @@ deferring them only bought a window where =M-x= had neither the UI nor
 the matching style. Marginalia can't ride =vertico-mode-hook= either:
 vertico-mode has already run by the time the hook gets installed.
 
+=completion-category-defaults= is cleared. Emacs 30 ships per-category
+styles there (=substring= for =project-file=, =basic substring= for
+buffers), and they beat =completion-styles=. So projectile's file
+search skipped orderless entirely and highlighted matches with the
+unthemed =completions-common-part= face, a hard navy in the terminal.
+Anything that needs its own style goes in the overrides instead.
+
 Savehist is on regardless of the frontend. Minibuffer history is worth
 keeping, and corfu-history reads the same store.
 
@@ -337,6 +344,7 @@ keeping, and corfu-history reads the same store.
       (orderless-style-dispatchers '(tb/orderless-first-prefix)))
 
     (setq completion-styles '(orderless basic)
+          completion-category-defaults nil
           completion-category-overrides '((file (styles basic partial-completion))
                                           (lsp-capf (styles tb/orderless-in-buffer)))))
 #+end_src
