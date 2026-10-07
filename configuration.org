@@ -329,9 +329,16 @@ keeping, and corfu-history reads the same store.
     :ensure t
     :demand t
     :config
+    (defun tb/orderless-first-prefix (_component index _total)
+      (when (= index 0) #'orderless-literal-prefix))
+
+    (orderless-define-completion-style tb/orderless-in-buffer
+      (orderless-matching-styles '(orderless-literal))
+      (orderless-style-dispatchers '(tb/orderless-first-prefix)))
+
     (setq completion-styles '(orderless basic)
           completion-category-overrides '((file (styles basic partial-completion))
-                                          (lsp-capf (styles orderless)))))
+                                          (lsp-capf (styles tb/orderless-in-buffer)))))
 #+end_src
 
 ** Consult
@@ -405,6 +412,17 @@ where the cape fallbacks below matter most. Emacs 30 adds an ispell
 capf to =text-mode=, which would flood every popup with dictionary
 words, so it's turned off.
 
+The popup gets a stricter matching style than the minibuffer.
+Full orderless matches fragments anywhere in a word, and with
+=corfu-auto= that means every keystroke pulls in mid-word dabbrev
+noise. =tb/orderless-in-buffer= (defined with orderless above) anchors
+the first component at the start of the candidate and keeps further
+components as plain substrings. Typing stays prefix completion, and
+=M-SPC= adds a second filter when I want one. It's set buffer-locally
+in corfu buffers so the minibuffer keeps full orderless. LSP's
+=lsp-capf= category override points at the same style, because a
+category override beats =completion-styles=.
+
 Company bundled dabbrev and file-path backends. Corfu only reads capf,
 so cape supplies those. They sit at low priority so a mode-specific
 capf (elisp, LSP, CIDER) still wins, and buffers without one (YAML,
@@ -420,7 +438,13 @@ first completion.
     (corfu-cycle t)
     (text-mode-ispell-word-completion nil)
     :hook (((prog-mode text-mode conf-mode) . corfu-mode)
-           (corfu-mode . corfu-history-mode)))
+           (corfu-mode . corfu-history-mode)
+           (corfu-mode . tb/corfu-completion-styles))
+    :preface
+    (defun tb/corfu-completion-styles ()
+      (if corfu-mode
+          (setq-local completion-styles '(tb/orderless-in-buffer basic))
+        (kill-local-variable 'completion-styles))))
 
   (use-package corfu-terminal
     :ensure t
