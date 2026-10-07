@@ -334,6 +334,39 @@ keeping, and corfu-history reads the same store.
                                           (lsp-capf (styles orderless)))))
 #+end_src
 
+** Consult
+
+Consult fills the holes counsel left: line search, buffer switching,
+imenu, yank history, and grep. Keys follow the consult README.
+=C-x b= and =M-y= are replaced outright, because consult's versions do
+everything the built-ins do, plus preview. Search goes under =M-s=,
+jumps under =M-g=.
+
+xref goes through consult too, so =M-.= and =M-?= (lsp, CIDER, elisp)
+show their matches in vertico with a preview. That's what lsp-ivy used
+to do.
+
+Projectile registers itself with =project.el=, so =consult-buffer='s
+project sources and =consult-ripgrep= find the project root on their
+own.
+
+#+begin_src emacs-lisp
+  (use-package consult
+    :ensure t
+    :bind (("C-x b"   . consult-buffer)
+           ("C-x 4 b" . consult-buffer-other-window)
+           ("M-y"     . consult-yank-pop)
+           ("M-g g"   . consult-goto-line)
+           ("M-g M-g" . consult-goto-line)
+           ("M-g i"   . consult-imenu)
+           ("M-s l"   . consult-line)
+           ("M-s r"   . consult-ripgrep)
+           ("M-s g"   . consult-git-grep))
+    :init
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref))
+#+end_src
+
 ** Projectile
 
 Enable =projectile-mode= on the first idle moment rather than in
