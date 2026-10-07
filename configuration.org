@@ -304,6 +304,13 @@ deferring them only bought a window where =M-x= had neither the UI nor
 the matching style. Marginalia can't ride =vertico-mode-hook= either:
 vertico-mode has already run by the time the hook gets installed.
 
+vertico-directory ships inside the vertico package and makes file
+paths edit by component. =DEL= right after a slash deletes the whole
+directory, and =RET= on a directory descends into it instead of
+opening dired. Typing =~/= or =/= mid-path makes the earlier part
+irrelevant, and the tidy hook clears it from the prompt. =C-j= gets the
+same binding as =RET=, because that's the key my fingers use.
+
 =completion-category-defaults= is cleared. Emacs 30 ships per-category
 styles there (=substring= for =project-file=, =basic substring= for
 buffers), and they beat =completion-styles=. So projectile's file
@@ -320,6 +327,15 @@ keeping, and corfu-history reads the same store.
     :demand t
     :config
     (vertico-mode 1))
+
+  (use-package vertico-directory
+    :after vertico
+    :bind (:map vertico-map
+                ("RET"   . vertico-directory-enter)
+                ("C-j"   . vertico-directory-enter)
+                ("DEL"   . vertico-directory-delete-char)
+                ("M-DEL" . vertico-directory-delete-word))
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
   (use-package savehist
     :demand t
