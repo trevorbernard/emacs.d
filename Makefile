@@ -34,7 +34,7 @@ endif
 # files; -j would run them concurrently.
 .NOTPARALLEL:
 
-.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart smoke hooks
+.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart smoke lint hooks
 
 all: compile
 
@@ -71,8 +71,16 @@ compile-native: compile
 
 # Byte-compiling only proves the config parses; this loads it and asserts the
 # modes came up (see lisp/smoke.el).
-smoke: configuration.elc
+smoke: lint configuration.elc
 	@$(EMACS) $(EMACS_FLAGS) -l lisp/smoke.el
+
+# Helpers are prefixed tb/ (os/ was the old prefix), and the org file uses
+# no em-dashes.
+lint:
+	@! grep -nE '\bos/[a-z-]+' $(CONFIGURATION_ORG) Makefile lisp/*.el || \
+		{ echo "Error: os/ helper prefix; use tb/"; exit 1; }
+	@! grep -n '—' $(CONFIGURATION_ORG) || \
+		{ echo "Error: em-dash in $(CONFIGURATION_ORG)"; exit 1; }
 
 hooks:
 	@git config core.hooksPath .githooks
@@ -133,6 +141,7 @@ help:
 	@echo "  install-packages- Install Emacs packages and Tree-sitter grammars"
 	@echo "  quickstart      - Regenerate package-quickstart.el (after install/remove/vc-update)"
 	@echo "  smoke           - Load the compiled config and assert key modes are on"
+	@echo "  lint            - Reject the os/ helper prefix and em-dashes (run by smoke)"
 	@echo "  hooks           - Enable the pre-commit hook that runs smoke"
 	@echo "  all             - Tangle and byte-compile configuration (incremental)"
 	@echo "  compile         - Tangle and byte-compile configuration files"
