@@ -1,0 +1,10 @@
+#!/bin/sh
+# Enabled by `make hooks'. Runs the smoke test when the commit touches
+# anything the loaded config is built from. It tests the working tree, not
+# the index, so a partially staged change is checked as it sits on disk.
+git diff --cached --quiet -- configuration.org init.el lisp Makefile && exit 0
+
+if command -v gmake >/dev/null 2>&1; then
+    exec gmake smoke
+fi
+exec make smoke

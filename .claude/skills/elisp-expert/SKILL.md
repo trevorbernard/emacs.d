@@ -1,3 +1,8 @@
+---
+name: elisp-expert
+description: Conventions for this terminal-first, startup-sensitive Emacs config. Use when writing or reviewing elisp in configuration.org, adding or removing a package, fixing terminal faces or backgrounds, or debugging startup time.
+---
+
 # Emacs Elisp Expert
 
 You are an expert Emacs Lisp advisor. The user runs Emacs primarily in the
@@ -39,41 +44,32 @@ native background to show through — no hardcoded hex colors creating gray boxe
 | `"unspecified-bg"` (string) | Canonical TTY pseudo-color for "use terminal's background" | The most explicit way to tell a TTY frame not to emit any background color escape code. Use this when `'unspecified` alone doesn't work because a parent face still provides a color. |
 | `"unspecified-fg"` (string) | Same as above but for foreground | Rarely needed but exists for symmetry. |
 
-**Best practice for terminal transparency:**
+**How this config does it:** there is no central face-fixing function.
+Each face is cleared next to the thing that owns it:
+
+- `mode-line` and `header-line` in the `** Early Init` block, before the
+  first frame draws. That block is hand-tuned; don't remove it as redundant.
+- Package faces in that package's `:config`, so they are set after the
+  package defines them:
 
 ```elisp
-(defun tb/fix-terminal-backgrounds ()
-  "Remove explicit backgrounds so the terminal background shows through."
-  (unless (display-graphic-p)
-    (dolist (face '(default
-                    org-block
-                    org-block-begin-line
-                    org-block-end-line
-                    fringe
-                    line-number
-                    line-number-current-line
-                    mode-line
-                    header-line))
-      (when (facep face)
-        (set-face-attribute face nil :background 'unspecified)))))
-
-;; Run AFTER the theme loads (priority 90 ensures this)
-(add-hook 'after-init-hook #'tb/fix-terminal-backgrounds 90)
+(use-package org
+  :config
+  (set-face-attribute 'org-block nil :background 'unspecified))
 ```
 
-**Common faces that need background clearing in TUI:**
+Follow the same pattern for a new package. `org` and `markdown-mode` are the
+existing examples.
+
+**Faces that commonly need clearing in TUI:**
 - `default`, `fringe`, `line-number`, `line-number-current-line`
-- `org-block`, `org-block-begin-line`, `org-block-end-line`
-- `mode-line`, `header-line`
-- `markdown-code-face`, `markdown-pre-face`
-- Completion framework faces (e.g., `ivy-minibuffer-match-face-2`)
+- A package's block or code faces (`org-block`, `markdown-code-face`)
+- Completion faces. `completions-common-part` is unthemed and shows as hard
+  navy; the config avoids it by clearing `completion-category-defaults`.
 
 **Never hardcode RGB hex colors for backgrounds** — they get approximated to
 the nearest terminal palette entry, which almost never matches the terminal's
 own background.
-
-The hook priority matters: themes typically load on `after-init-hook` at
-default priority (0). Use priority 90 to run the fix after the theme.
 
 ### Startup Performance
 
@@ -88,10 +84,11 @@ The user's boot sequence is: `early-init.el` → `init.el` → `configuration.el
 - `file-name-handler-alist` set to nil during init load (already done in `init.el`)
 
 **What kills startup:**
-- `:init` blocks that call autoloaded functions (e.g., `(ivy-mode)` in `:init`
-  forces an immediate require)
-- `exec-path-from-shell-initialize` — spawns a shell (~200ms+). **The user runs
-  `-nw` from a terminal, so PATH is already correct. This package is unnecessary.**
+- `:init` blocks that call autoloaded functions (e.g., `(projectile-mode)` in
+  `:init` forces an immediate require; the config uses an idle timer instead)
+- `exec-path-from-shell-initialize` — spawns a shell (~200ms+). The user runs
+  `-nw` from a terminal, so PATH is already correct. The config doesn't use
+  it; don't add it.
 - `(require 'some-package)` at top level outside of use-package
 - Synchronous network calls (package refresh, LSP server startup)
 - Heavy `:config` blocks on packages with no defer trigger — the config
@@ -126,7 +123,9 @@ The user's config lives in `configuration.org` and gets tangled to
 
 - **Always edit `configuration.org`, never `configuration.el`** — the .el is generated
 - Show org-mode source block format: `#+begin_src emacs-lisp` / `#+end_src`
-- The user runs `make tangle` or restarts Emacs (which auto-tangles if .el is missing)
+- Run `make` after an edit (tangle plus byte-compile), then `make smoke`,
+  which loads the compiled config and asserts the completion modes came up.
+  A green `make` alone only proves the config parses.
 - `early-init.el` is also tangled from `configuration.org` (`:tangle early-init.el`)
 
 ### Elisp Style
@@ -145,19 +144,26 @@ Match the user's existing style:
 
 Quick reference for the packages and patterns already in the config:
 
-- **Completion**: ivy + counsel (not vertico/consult)
+- **Minibuffer completion**: vertico + orderless + marginalia + consult
+  (ivy, counsel and swiper were removed)
+- **In-buffer completion**: corfu + corfu-terminal + cape (company was
+  removed). Anything new must speak `completion-at-point-functions`.
 - **LSP**: lsp-mode + lsp-ui + lsp-booster (not eglot)
 - **Project management**: projectile (pinned to melpa-stable)
 - **Git**: magit
 - **Theme**: timu-spacegrey with transparent background (`unspecified`)
 - **Mode line**: doom-modeline
 - **Parens**: paredit (for lisps), rainbow-delimiters
-- **Editing**: evil (installed, transitioning from Emacs bindings)
+- **Editing**: evil (installed, off by default)
+- **Checking**: flycheck (not flymake)
 - **Clipboard**: clipetty (OSC-52), wl-copy/wl-paste (Wayland)
-- **Languages**: Rust (rustic), Clojure (cider), Python, TypeScript, Nix, Java, OCaml, Ruby
+- **Terminal**: ghostel (not vterm)
+- **Languages**: Rust (rustic), Clojure (cider), Python (ruff), TypeScript, Nix, Java, Ruby, Terraform
 - **Tree-sitter**: Extensive setup with grammar auto-install and major-mode-remap-alist
-- **Env**: envrc + direnv, exec-path-from-shell (macOS)
-- **Emacs version**: 30.1, macOS + Linux
+- **Emacs version**: 30+, macOS + Linux
+
+This list goes stale. `grep -n '(use-package ' configuration.org` is the
+source of truth.
 
 ## Common Tasks and How to Handle Them
 
@@ -178,8 +184,8 @@ Quick reference for the packages and patterns already in the config:
 6. Profile with `(benchmark-run 1 ...)` on suspects
 
 ### Terminal rendering issues
-1. Check if the issue is face-related — centralize background fixes in a
-   single `after-init-hook` function with priority 90
+1. Check if the issue is face-related — clear the background in the owning
+   package's `:config` (see Terminal Face & Background Transparency)
 2. Use `'unspecified` for `set-face-attribute` backgrounds; fall back to
    `"unspecified-bg"` if inheritance still produces a color
 3. Check if a package is calling GUI-only functions without `display-graphic-p`
@@ -189,5 +195,5 @@ Quick reference for the packages and patterns already in the config:
 ### Tree-sitter problems
 1. Check if the grammar is installed: `(treesit-language-available-p 'rust)`
 2. Check `major-mode-remap-alist` for the mode mapping
-3. Run `M-x os/setup-install-grammars` to reinstall missing grammars
+3. Run `M-x tb/setup-install-grammars` to reinstall missing grammars
 4. Verify `treesit-available-p` returns t (needs Emacs compiled with tree-sitter)

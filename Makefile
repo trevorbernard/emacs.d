@@ -34,7 +34,7 @@ endif
 # files; -j would run them concurrently.
 .NOTPARALLEL:
 
-.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart
+.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart smoke hooks
 
 all: compile
 
@@ -68,6 +68,15 @@ compile: configuration.elc
 
 # Backwards-compatible alias: the config is byte-compiled (see lisp/build.el).
 compile-native: compile
+
+# Byte-compiling only proves the config parses; this loads it and asserts the
+# modes came up (see lisp/smoke.el).
+smoke: configuration.elc
+	@$(EMACS) $(EMACS_FLAGS) -l lisp/smoke.el
+
+hooks:
+	@git config core.hooksPath .githooks
+	@echo "pre-commit hook enabled (.githooks/pre-commit runs make smoke)"
 
 clean:
 	@echo "Cleaning generated files..."
@@ -123,6 +132,8 @@ help:
 	@echo "  check-deps      - Check if Emacs is available and validate files"
 	@echo "  install-packages- Install Emacs packages and Tree-sitter grammars"
 	@echo "  quickstart      - Regenerate package-quickstart.el (after install/remove/vc-update)"
+	@echo "  smoke           - Load the compiled config and assert key modes are on"
+	@echo "  hooks           - Enable the pre-commit hook that runs smoke"
 	@echo "  all             - Tangle and byte-compile configuration (incremental)"
 	@echo "  compile         - Tangle and byte-compile configuration files"
 	@echo "  compile-native  - Alias for compile (config is byte-compiled)"
