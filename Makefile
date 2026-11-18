@@ -13,6 +13,7 @@ export SDKROOT := $(shell xcrun --show-sdk-path 2>/dev/null)
 endif
 endif
 COMPILE_SCRIPT = lisp/build.el
+NATIVE_SCRIPT = lisp/native.el
 # init.elc is not produced by any rule (see lisp/build.el: init.el stays source);
 # it is listed so `clean' sweeps one left by an older build.
 GENERATED_FILES = init.elc early-init.el configuration.el configuration.elc package-quickstart.el package-quickstart.elc
@@ -34,7 +35,7 @@ endif
 # files; -j would run them concurrently.
 .NOTPARALLEL:
 
-.PHONY: all setup install-packages clean compile compile-native tangle help check-deps validate quickstart smoke lint hooks
+.PHONY: all setup install-packages clean compile compile-native native tangle help check-deps validate quickstart smoke lint hooks
 
 all: compile
 
@@ -64,6 +65,9 @@ configuration.elc: configuration.el early-init.el $(COMPILE_SCRIPT)
 	@# loaded in place of the new .elc (see the Preamble in configuration.org).
 	@rm -f "$(ELN_CACHE_DIR)"/*/configuration-*.eln
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
+	@# The build above may have installed a package; compile it now so the
+	@# first session doesn't have to.
+	@$(EMACS) $(EMACS_FLAGS) -l '$(NATIVE_SCRIPT)'
 
 tangle: configuration.el
 
@@ -71,6 +75,12 @@ compile: configuration.elc
 
 # Backwards-compatible alias: the config is byte-compiled (see lisp/build.el).
 compile-native: compile
+
+# Native-compile every package file that has no .eln yet (see lisp/native.el).
+# The configuration.elc rule runs this too, so it only needs running by hand
+# after an Emacs upgrade or a package upgrade made from inside Emacs.
+native: early-init.el
+	@$(EMACS) $(EMACS_FLAGS) -l '$(NATIVE_SCRIPT)'
 
 # Byte-compiling only proves the config parses; this loads it and asserts the
 # modes came up (see lisp/smoke.el).
@@ -149,6 +159,7 @@ help:
 	@echo "  all             - Tangle and byte-compile configuration (incremental)"
 	@echo "  compile         - Tangle and byte-compile configuration files"
 	@echo "  compile-native  - Alias for compile (config is byte-compiled)"
+	@echo "  native          - Native-compile package files that have no .eln yet"
 	@echo "  clean           - Remove generated files and native compilation cache"
 	@echo "  tangle          - Tangle Emacs configuration org file"
 	@echo "  help            - Display this help message"
