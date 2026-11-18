@@ -10,7 +10,7 @@
 
 ;; early-init.el redirects the eln cache into this checkout and activates the
 ;; packages, which the compile jobs need on `load-path' to expand macros.
-(load-file (expand-file-name "early-init.el" user-emacs-directory))
+(load (expand-file-name "early-init.el" user-emacs-directory) nil t)
 
 (unless (native-comp-available-p)
   (message "Native compilation is not available; skipping")

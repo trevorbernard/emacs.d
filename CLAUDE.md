@@ -9,11 +9,12 @@ This is a literate Emacs configuration using Org-mode. The main configuration li
 ## Build Commands
 
 ```bash
-make setup              # First-time setup: install packages + compile
+make setup              # First-time setup: check deps, install packages, compile, install grammars
 make                    # Tangle and byte-compile (incremental)
 make smoke              # Load the compiled config and assert key modes are on
 make tangle             # Extract configuration.el + early-init.el from configuration.org
-make install-packages   # Install packages and Tree-sitter grammars
+make grammars           # Install missing Tree-sitter grammars
+make help               # List every target
 make quickstart         # Regenerate package-quickstart.el
 make native             # Native-compile package files that have no .eln yet
 make hooks              # Enable the pre-commit hook (once per clone)
@@ -22,7 +23,8 @@ make clean              # Remove generated files and eln-cache
 
 The build is incremental: `tangle` and `compile` are aliases for real file
 targets, so `make` does nothing when `configuration.org` is older than its
-outputs. Use `make -B` to force a rebuild.
+outputs. Use `make -B` to force a rebuild. Package and grammar installs
+print one line each; `make VERBOSE=1` shows everything.
 
 A green `make` only proves the config byte-compiles. Run `make smoke` after
 any change to see that it loads; add an assertion to `lisp/smoke.el` when a
@@ -45,7 +47,7 @@ building Emacs (libgccjit check) as of 2026-10.
 3. `configuration.el` - Generated from `configuration.org`, contains all packages and settings
 
 **Key directories:**
-- `lisp/` - Build scripts (`build.el` compiles, `native.el` native-compiles `elpa/`, `smoke.el` is the smoke test)
+- `lisp/` - Build scripts (`build.el` compiles, `native.el` native-compiles `elpa/`, `grammars.el` installs grammars, `smoke.el` is the smoke test)
 - `.githooks/` - Tracked git hooks, enabled by `make hooks`
 - `.claude/skills/elisp-expert/` - Elisp conventions for this config
 - `elpa/` - Installed packages (auto-generated)

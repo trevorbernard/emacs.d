@@ -5,7 +5,27 @@
 (require 'use-package)
 
 ;; Load early-init.el to set up package system for compilation
-(load-file (expand-file-name "early-init.el" user-emacs-directory))
+(load (expand-file-name "early-init.el" user-emacs-directory) nil t)
+
+;; Installing a package prints dozens of lines: the download, every file it
+;; byte-compiles, and warnings about other people's code. A fresh clone
+;; printed 2,600 of them and buried the one line that mattered. Print one
+;; line per package instead; `make VERBOSE=1' brings the rest back. A failed
+;; install still signals, and is reported at the end.
+(defvar build--verbose (not (member (getenv "VERBOSE") '(nil "" "0"))))
+
+(defun build--quietly (fn &rest args)
+  (let ((inhibit-message (not build--verbose)))
+    (apply fn args)))
+
+(defun build--vc-install (fn package &rest args)
+  (message "Installing %s from source..."
+           (if (consp package) (car package) package))
+  (apply #'build--quietly fn package args))
+
+(advice-add 'package-refresh-contents :around #'build--quietly)
+(advice-add 'package-install :around #'build--quietly)
+(advice-add 'package-vc-install :around #'build--vc-install)
 
 ;; use-package :ensure t installs missing packages at macro-expansion time (during
 ;; byte-compilation), which needs package-archive-contents populated. early-init's
@@ -15,6 +35,7 @@
 ;; a fresh install.
 (package-read-all-archive-contents)
 (unless package-archive-contents
+  (message "Fetching package archives...")
   (package-refresh-contents))
 
 ;; The cached index can still list a package at a version the archive no longer
@@ -33,6 +54,7 @@
         (use-package-pin-package (car package) (cdr package))
         (setq package (car package)))
       (when (and package (not (package-installed-p package)))
+        (message "Installing %s..." package)
         (condition-case err
             (condition-case nil
                 (package-install package)

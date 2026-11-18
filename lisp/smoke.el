@@ -6,7 +6,7 @@
 
 (setq debug-on-error t)
 
-(load-file (expand-file-name "early-init.el" user-emacs-directory))
+(load (expand-file-name "early-init.el" user-emacs-directory) nil t)
 (load (expand-file-name "configuration" user-emacs-directory) nil t)
 (run-hooks 'after-init-hook 'emacs-startup-hook)
 
@@ -37,6 +37,15 @@
       (push (format "corfu-mode in %s" mode) smoke--failures))
     (unless (eq (car completion-styles) 'tb/orderless-in-buffer)
       (push (format "tb/orderless-in-buffer in %s" mode) smoke--failures))))
+
+;; Without its grammar a -ts-mode remap fails when the file is opened. Plain
+;; `make' installs packages but not grammars.
+(let ((missing (seq-remove #'treesit-language-available-p
+                            (mapcar #'car tb/treesit-grammar-sources))))
+  (when missing
+    (push (format "tree-sitter grammars missing (run make grammars): %s"
+                  (mapconcat #'symbol-name missing " "))
+          smoke--failures)))
 
 ;; flycheck-mode came up in pest buffers with no pest checker registered.
 (with-temp-buffer

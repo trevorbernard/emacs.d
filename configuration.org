@@ -25,7 +25,8 @@ make setup
 
 =make setup= installs all ELPA packages, downloads tree-sitter grammars,
 and compiles the configuration. Requires Emacs 30+ (=use-package= with
-=:vc= support).
+=:vc= support) built with tree-sitter, plus git and a C compiler for
+the grammars. =make setup= checks for all of them first.
 
 Start Emacs with =emacs -nw=. After editing =configuration.org=, run =make=
 to tangle and recompile.
@@ -211,7 +212,8 @@ Delete to the Trash instead of unlinking, and don't ask =ls= for
 ** Mouse & Display
 
 Mouse support in the terminal, a plain vertical border, and a block
-cursor on start with the bar put back on exit.
+cursor on start with the bar put back on exit. Batch runs skip the
+cursor escape, which otherwise lands in the build's output.
 
 #+begin_src emacs-lisp
   (unless (display-graphic-p)
@@ -223,8 +225,9 @@ cursor on start with the bar put back on exit.
     (unless standard-display-table
       (setq standard-display-table (make-display-table)))
     (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
-    (send-string-to-terminal "\e[1 q")
-    (add-hook 'kill-emacs-hook (lambda () (send-string-to-terminal "\e[5 q"))))
+    (unless noninteractive
+      (send-string-to-terminal "\e[1 q")
+      (add-hook 'kill-emacs-hook (lambda () (send-string-to-terminal "\e[5 q")))))
 #+end_src
 
 ** Clipboard
