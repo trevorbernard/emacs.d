@@ -662,12 +662,27 @@ rust-ts-mode, so both names cover it.
 
 Needs aspell installed. Right-click corrects the word under the mouse.
 
+Flyspell starts half a second after the buffer opens, not in the mode
+hook. Turning it on loads flyspell and ispell and starts aspell, about
+50ms of every org or markdown open, and nothing needs spell-checking
+before the first keystroke. Buffers that are gone by then, like the
+throwaway org buffer lsp-mode creates, never pay for it.
+
 #+begin_src emacs-lisp
   (use-package flyspell
     :bind (:map flyspell-mouse-map
                 ([down-mouse-3] . flyspell-correct-word)
                 ([mouse-3] . undefined))
-    :hook (((org-mode markdown-mode) . flyspell-mode))
+    :hook ((org-mode markdown-mode) . tb/flyspell-when-idle)
+    :preface
+    (defun tb/flyspell-when-idle ()
+      (run-with-idle-timer
+       0.5 nil
+       (lambda (buffer)
+         (when (buffer-live-p buffer)
+           (with-current-buffer buffer
+             (flyspell-mode 1))))
+       (current-buffer)))
     :config
     (setq flyspell-issue-welcome-flag nil
           flyspell-issue-message-flag nil
@@ -689,6 +704,16 @@ no =elisp-ts-mode=, =make-ts-mode=, =markdown-ts-mode=, or
 explicit =:mode= entries because Emacs has no classic mode for them
 and doesn't route their extensions to the tree-sitter mode on its own.
 =html= and =toml= are reached through the remap list instead.
+
+Every grammar is pinned to a tag. Emacs 30 fetches with =git clone -b=,
+so a pin has to be a tag or a branch; a commit hash won't clone. An
+unpinned grammar is built from whatever its HEAD is that day, and the
+modes' queries are written against the grammar as it was when Emacs 30
+shipped. cmake shows the drift: from v0.5.0 on, =cmake-ts-mode= fails
+with a query error at font-lock level 4, so it stays on v0.4.1.
+=make grammars= rebuilds a grammar when its pin changes, and
+=make smoke= fontifies a sample in every mode at level 4, so run both
+after bumping a tag.
 
 JavaScript uses =js-ts-mode= and the JavaScript grammar, not
 =typescript-ts-mode=. Parsing JavaScript with the TypeScript grammar
@@ -723,24 +748,24 @@ on =typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
            ("\\.Dockerfile\\'" . dockerfile-ts-mode))
     :preface
     (defconst tb/treesit-grammar-sources
-      '((bash       "https://github.com/tree-sitter/tree-sitter-bash")
+      '((bash       "https://github.com/tree-sitter/tree-sitter-bash"       "v0.25.1")
         (c          "https://github.com/tree-sitter/tree-sitter-c"          "v0.20.7")
-        (cmake      "https://github.com/uyha/tree-sitter-cmake")
-        (cpp        "https://github.com/tree-sitter/tree-sitter-cpp")
+        (cmake      "https://github.com/uyha/tree-sitter-cmake"             "v0.4.1")
+        (cpp        "https://github.com/tree-sitter/tree-sitter-cpp"        "v0.23.4")
         (css        "https://github.com/tree-sitter/tree-sitter-css"        "v0.20.0")
-        (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+        (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile" "v0.2.0")
         (go         "https://github.com/tree-sitter/tree-sitter-go"         "v0.20.0")
-        (gomod      "https://github.com/camdencheek/tree-sitter-go-mod")
+        (gomod      "https://github.com/camdencheek/tree-sitter-go-mod"     "v1.1.0")
         (html       "https://github.com/tree-sitter/tree-sitter-html"       "v0.20.1")
-        (java       "https://github.com/tree-sitter/tree-sitter-java")
+        (java       "https://github.com/tree-sitter/tree-sitter-java"       "v0.23.5")
         (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.21.2" "src")
         (json       "https://github.com/tree-sitter/tree-sitter-json"       "v0.20.2")
-        (just       "https://github.com/IndianBoy42/tree-sitter-just")
-        (lua        "https://github.com/tree-sitter-grammars/tree-sitter-lua")
+        (just       "https://github.com/IndianBoy42/tree-sitter-just"       "v0.2.0")
+        (lua        "https://github.com/tree-sitter-grammars/tree-sitter-lua" "v0.5.0")
         (python     "https://github.com/tree-sitter/tree-sitter-python"     "v0.20.4")
-        (ruby       "https://github.com/tree-sitter/tree-sitter-ruby")
+        (ruby       "https://github.com/tree-sitter/tree-sitter-ruby"       "v0.23.1")
         (rust       "https://github.com/tree-sitter/tree-sitter-rust"       "v0.24.1" "src")
-        (toml       "https://github.com/tree-sitter/tree-sitter-toml")
+        (toml       "https://github.com/tree-sitter/tree-sitter-toml"       "v0.5.1")
         (tsx        "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "tsx/src")
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src")
         (yaml       "https://github.com/ikatyang/tree-sitter-yaml"          "v0.5.0")))

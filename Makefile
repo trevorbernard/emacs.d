@@ -85,7 +85,7 @@ compile: configuration.elc ## Tangle and byte-compile
 native: early-init.el ## Native-compile package files that have no .eln yet
 	@$(EMACS) $(EMACS_FLAGS) -l '$(NATIVE_SCRIPT)'
 
-grammars: configuration.elc ## Install missing tree-sitter grammars (needs git and a C compiler)
+grammars: configuration.elc ## Build missing or re-pinned tree-sitter grammars (needs git and a C compiler)
 	@$(EMACS) $(EMACS_FLAGS) -l '$(GRAMMARS_SCRIPT)'
 
 # Byte-compiling only proves the config parses; this loads it and asserts the

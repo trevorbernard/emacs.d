@@ -13,7 +13,7 @@ make setup              # First-time setup: check deps, install packages, compil
 make                    # Tangle and byte-compile (incremental)
 make smoke              # Load the compiled config and assert key modes are on
 make tangle             # Extract configuration.el + early-init.el from configuration.org
-make grammars           # Install missing Tree-sitter grammars
+make grammars           # Build Tree-sitter grammars that are missing or whose pin changed
 make help               # List every target
 make quickstart         # Regenerate package-quickstart.el
 make native             # Native-compile package files that have no .eln yet
@@ -64,5 +64,6 @@ building Emacs (libgccjit check) as of 2026-10.
 - **Edit `configuration.org`, not `configuration.el` or `early-init.el`** - Both are generated
 - Adding a package: `make` installs any missing `:ensure` package during byte-compilation (and refreshes `package-quickstart.el`). `lisp/build.el` retries once against a fresh archive index and fails the build if the install still fails, so a green `make` means the package is installed
 - Native compilation: `make` native-compiles any package file with no `.eln` whenever it rebuilds the config (`lisp/native.el`, about a minute from an empty cache, 0.15s when there is nothing to do). Run `make native` by hand after an Emacs upgrade or a package upgrade made from inside Emacs. Files that define no functions are left as bytecode on purpose
+- Tree-sitter grammars: every entry in `tb/treesit-grammar-sources` is pinned to a tag (Emacs 30 clones with `git clone -b`, so not a commit hash). `lisp/grammars.el` records what each grammar was built from in `tree-sitter/pins.eld` and rebuilds on a pin change. After adding or bumping one, run `make grammars` then `make smoke`, which fontifies a sample per mode at font-lock level 4; a new grammar needs a sample in `lisp/smoke.el`
 - Removing a package: delete its `elpa/` directory, then run `make quickstart`. `package-quickstart.el` is not regenerated on removal, and its stale autoloads keep loading the removed package at startup. Check other packages' `*-pkg.el` before deleting a shared dependency
 - Run `make`, not bare `make tangle`, after org changes. `init.el` sets `load-prefer-newer`, so a tangled-but-uncompiled `configuration.el` shadows the stale `.elc` and Emacs loads the slower interpreted config

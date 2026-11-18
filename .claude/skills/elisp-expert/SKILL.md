@@ -196,5 +196,5 @@ source of truth.
 ### Tree-sitter problems
 1. Check if the grammar is installed: `(treesit-language-available-p 'rust)`
 2. Check `major-mode-remap-alist` for the mode mapping
-3. Run `M-x tb/setup-install-grammars` to reinstall missing grammars
+3. Run `make grammars` to build missing or re-pinned grammars, then `make smoke`
 4. Verify `treesit-available-p` returns t (needs Emacs compiled with tree-sitter)
