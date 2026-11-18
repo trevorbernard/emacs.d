@@ -1,5 +1,8 @@
 ;;; build.el --- Compile configuration files -*- lexical-binding: t -*-
 (require 'org)
+;; early-init.el loads neither at startup; the build needs both.
+(require 'package)
+(require 'use-package)
 
 ;; Load early-init.el to set up package system for compilation
 (load-file (expand-file-name "early-init.el" user-emacs-directory))
@@ -45,10 +48,12 @@
 (setq byte-compile-warnings '(not free-vars unresolved noruntime lexical make-local))
 
 ;; Byte-compile configuration.el so a basename `load' in init.el finds a .elc
-;; (≈2x faster than loading source). We deliberately do NOT native-compile:
-;; config code runs once at startup, byte vs native load time is identical, and
-;; the .eln is not loaded at interactive startup. Installed packages keep their
-;; own .eln. init.el is left as source: it is tiny and compiling it risks a
+;; (≈2x faster than loading source). We deliberately do NOT native-compile, and
+;; configuration.el carries `no-native-compile' so the JIT doesn't either: its
+;; subprocess never loads early-init.el, so use-package expanded without
+;; `use-package-always-defer' and the .eln, loaded in place of this .elc,
+;; required every untriggered package at startup. Installed packages keep
+;; their own .eln. init.el is left as source: it is tiny and compiling it risks a
 ;; stale init.elc shadowing edits (the bootstrap loads before load-prefer-newer).
 ;; byte-compile-file returns nil on failure without signalling, and batch Emacs
 ;; would still exit 0 — exit non-zero so make actually stops.

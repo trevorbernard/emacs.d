@@ -81,7 +81,8 @@ The user's boot sequence is: `early-init.el` → `init.el` → `configuration.el
 - Triggering package loads via `:hook`, `:bind`, `:mode`, `:commands` — not `:demand t` or `:config` blocks that force immediate loading
 - GC threshold set to `most-positive-fixnum` during init, restored in `emacs-startup-hook`
 - Native compilation (`native-comp-speed 2`) with async JIT
-- `file-name-handler-alist` set to nil during init load (already done in `init.el`)
+- `file-name-handler-alist` set to nil for all of startup (done in the `** Early Init` block, restored in `emacs-startup-hook`)
+- `configuration.el` carries `no-native-compile: t`; a JIT-built `.eln` expands use-package without `use-package-always-defer` and shadows the `.elc`
 
 **What kills startup:**
 - `:init` blocks that call autoloaded functions (e.g., `(projectile-mode)` in

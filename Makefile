@@ -60,6 +60,9 @@ configuration.el early-init.el &: $(CONFIGURATION_ORG)
 # early-init.el is a prerequisite because $(COMPILE_SCRIPT) loads it.
 configuration.elc: configuration.el early-init.el $(COMPILE_SCRIPT)
 	@echo "Byte-compiling Emacs configuration..."
+	@# A configuration.eln from before the no-native-compile cookie would be
+	@# loaded in place of the new .elc (see the Preamble in configuration.org).
+	@rm -f "$(ELN_CACHE_DIR)"/*/configuration-*.eln
 	@$(EMACS) $(EMACS_FLAGS) -l '$(COMPILE_SCRIPT)'
 
 tangle: configuration.el

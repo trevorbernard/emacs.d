@@ -22,6 +22,13 @@
 (smoke-check (eq (car completion-styles) 'orderless))
 (smoke-check (null completion-category-defaults))
 
+;; These load at startup only when the config was expanded without
+;; `use-package-always-defer' (a JIT-built configuration.eln did that) or
+;; early-init.el went back to requiring package.el.
+(dolist (feature '(package cape rust-mode js css-mode just-ts-mode))
+  (when (featurep feature)
+    (push (format "%s loaded at startup" feature) smoke--failures)))
+
 (dolist (mode '(emacs-lisp-mode text-mode conf-mode))
   (with-temp-buffer
     (funcall mode)

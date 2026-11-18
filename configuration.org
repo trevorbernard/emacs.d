@@ -37,6 +37,22 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
 ** Early Init
 
+The GC threshold comes back down from an idle timer, not directly in
+=emacs-startup-hook=. Lowering it there collects everything init
+allocated right before the first frame draws.
+
+=file-name-handler-alist= is emptied for the whole of startup, not just
+the config load. Every =require= probes each =load-path= directory, and
+with 80-odd package directories each probe runs through the handler
+regexps. That tripled the load time of org or anything else pulled in
+by the file named on the command line. The handlers stay when an
+argument needs one (=foo.gz=, =/ssh:host:file=).
+
+Neither =package= nor =use-package= is required here. The quickstart
+file activates packages without =package.el=, and the compiled
+configuration only needs =bind-key=, which it requires itself.
+=lisp/build.el= loads both for the build.
+
 #+begin_src emacs-lisp :tangle early-init.el
   ;;; -*- lexical-binding: t -*-
 
@@ -45,14 +61,29 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
   (add-hook 'emacs-startup-hook
             (lambda ()
-              (setq gc-cons-threshold 16777216
-                    gc-cons-percentage 0.1)
+              (run-with-idle-timer
+               1 nil (lambda ()
+                       (setq gc-cons-threshold 16777216
+                             gc-cons-percentage 0.1)))
               (message "Emacs ready in %s with %d garbage collections."
                        (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
                        gcs-done)))
 
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.9)
+
+  (defvar tb/file-name-handler-alist file-name-handler-alist)
+
+  (unless (seq-some (lambda (arg)
+                      (find-file-name-handler arg 'insert-file-contents))
+                    (cdr command-line-args))
+    (setq file-name-handler-alist nil)
+    (add-hook 'emacs-startup-hook
+              (lambda ()
+                (setq file-name-handler-alist
+                      (delete-dups (append file-name-handler-alist
+                                           tb/file-name-handler-alist))))
+              100))
 
   (set-face-attribute 'mode-line nil :background 'unspecified)
   (set-face-attribute 'header-line nil :background 'unspecified)
@@ -82,9 +113,6 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
   (setenv "LSP_USE_PLISTS" "true")
 
-  ;; Bootstrap package system and use-package for better startup performance
-  (require 'package)
-
   (setq package-archives '(("melpa" . "https://melpa.org/packages/")
                            ("melpa-stable" . "https://stable.melpa.org/packages/")
                            ("gnu" . "https://elpa.gnu.org/packages/")
@@ -103,15 +131,27 @@ threshold is cranked up during init and restored at the [[*Epilogue][end]].
 
   (setq use-package-always-defer t
         use-package-verbose nil)
-  (require 'use-package)
 
   (provide 'early-init)
 #+end_src
 
 ** Preamble
 
+=no-native-compile= is load-bearing. Without it the JIT native-compiles
+=configuration.el= in a subprocess that never loads early-init, so
+=use-package= expands without =use-package-always-defer=. The resulting
+=.eln= is then loaded in place of the =.elc= and requires every package
+that has no explicit trigger (rust-mode, js, css-mode, cape) at
+startup. Loading rust-mode that early also put =.rs= back on plain
+=rust-mode=, ahead of rustic.
+
+=use-package= is only needed to expand the macros, so it's required at
+compile time, or when this file is loaded as source.
+
 #+begin_src emacs-lisp
-  ;;; -*- lexical-binding: t -*-
+  ;;; -*- lexical-binding: t; no-native-compile: t -*-
+  (eval-when-compile (require 'use-package))
+
   (setq user-full-name "Trevor Bernard"
         user-mail-address "trevor.bernard@pm.me")
 #+end_src
@@ -732,6 +772,14 @@ on =typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
 I use LSP for most languages. [[https://github.com/blahgeek/emacs-lsp-booster][emacs-lsp-booster]] wraps the server when
 it's on =PATH= to speed up JSON parsing.
 
+=lsp-client-packages= lists only the clients I use. The default is
+every client lsp-mode ships, about 130 files plus treemacs, dap-mode,
+and cc-mode by way of lsp-java, all loaded on the first =lsp= call.
+That blocked Emacs for some 700ms right after the first buffer drew. A
+language missing from this list gets "no language server" from =M-x
+lsp=, so add its client here. lsp-java is left out on purpose and
+loaded from the Java hook instead.
+
 #+begin_src emacs-lisp
   (use-package lsp-ui
     :ensure t
@@ -747,6 +795,15 @@ it's on =PATH= to speed up JSON parsing.
     :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
     (setq lsp-use-plists t)
+    (setq lsp-client-packages '(lsp-javascript
+                                lsp-json
+                                lsp-nix
+                                lsp-pylsp
+                                lsp-python-ty
+                                lsp-ruff
+                                lsp-rust
+                                lsp-terraform
+                                lsp-yaml))
     (setq lsp-enable-dap-auto-configure nil)
     ;; Corfu consumes lsp-mode's capf itself; :none stops lsp-mode from
     ;; configuring company. lsp-mode pins lsp-capf to the lsp-passthrough
@@ -913,6 +970,11 @@ I almost exclusively use =C-j= in place of the enter key, and org
 binds it to =org-return-indent=. Rather than remap my brain, remap
 the key to =org-return=.
 
+=org-modules= is emptied. The default list is link types for gnus,
+eww, docview, bibtex and friends, and the first org buffer loaded all
+of them, which more than doubled the time to open an org file. rustic
+requires org too, so Rust buffers paid the same.
+
 #+begin_src emacs-lisp
   (use-package ob-rust
     :ensure t
@@ -927,6 +989,8 @@ the key to =org-return=.
      ("C-c a" . org-agenda)
      ("C-c c" . org-capture))
     :hook (org-mode . auto-fill-mode)
+    :custom
+    (org-modules nil)
     :config
     (set-face-attribute 'org-block nil :background 'unspecified)
     (set-face-attribute 'org-block-begin-line nil :background 'unspecified)
@@ -997,8 +1061,7 @@ treemacs, inside the byte-compiler.
 
   (use-package lsp-java
     :ensure t
-    :after lsp-mode
-    :hook (java-ts-mode . lsp))
+    :defer t)
 #+end_src
 
 I only want DAP for Java, but lsp-mode turns on
@@ -1007,9 +1070,15 @@ installed, and lsp-java depends on it. So it's off globally in the
 lsp-mode block and back on buffer-locally here, before =lsp=
 configures the buffer.
 
+The same hook loads lsp-java. It isn't in =lsp-client-packages=, so
+only Java buffers pay for treemacs and dap-mode. =lsp-deferred= from
+the lsp-mode block starts the server once the buffer is idle, and the
+client is registered by then.
+
 #+begin_src emacs-lisp
   (defun my/lsp-java-enable-dap ()
-    (setq-local lsp-enable-dap-auto-configure t))
+    (setq-local lsp-enable-dap-auto-configure t)
+    (require 'lsp-java))
 
   (add-hook 'java-ts-mode-hook #'my/lsp-java-enable-dap)
 #+end_src
@@ -1091,4 +1160,5 @@ on those builds.
 
 * Epilogue
 
-The GC threshold is restored by =emacs-startup-hook= in early-init.
+The GC threshold and =file-name-handler-alist= are restored from
+=emacs-startup-hook= in early-init.
