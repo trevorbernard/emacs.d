@@ -770,17 +770,6 @@ on =typescript-ts-mode=, =.tsx= on =tsx-ts-mode=.
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "v0.20.3" "typescript/src")
         (yaml       "https://github.com/ikatyang/tree-sitter-yaml"          "v0.5.0")))
 
-    (defun tb/setup-install-grammars ()
-      "Install any missing tree-sitter grammars."
-      (interactive)
-      (when (and (fboundp 'treesit-available-p) (treesit-available-p))
-        (require 'treesit)
-        (dolist (entry tb/treesit-grammar-sources)
-          (let ((lang (car entry)))
-            (add-to-list 'treesit-language-source-alist entry)
-            (unless (treesit-language-available-p lang)
-              (treesit-install-language-grammar lang))))))
-
     (dolist (mapping
              '((bash-mode . bash-ts-mode)
                (c++-mode . c++-ts-mode)
