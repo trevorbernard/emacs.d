@@ -9,12 +9,19 @@
 (let ((file-name-handler-alist nil)
       (config (expand-file-name "configuration" user-emacs-directory)))
   ;; Load the byte-compiled configuration.elc when present (≈2x faster than
-  ;; loading source); fall back to source, or tangle from org on a fresh clone.
+  ;; loading source), or the tangled source after a bare `make tangle'.
+  ;; There is deliberately no fallback that tangles from org. On a fresh
+  ;; clone early-init.el doesn't exist yet either, so the packages came from
+  ;; the default archives (no MELPA) at versions `make setup' would not have
+  ;; picked, init never finished, and a later `make' kept what was installed.
   (if (or (file-exists-p (concat config ".elc"))
           (file-exists-p (concat config ".el")))
       (load config nil t)
-    (require 'org)
-    (org-babel-load-file (concat config ".org"))))
+    (display-warning
+     'init
+     (format "The configuration isn't built. Run `make setup' in %s, then restart Emacs."
+             (abbreviate-file-name user-emacs-directory))
+     :error)))
 
 ;; Keep Custom's writes (safe-local-variable-values, M-x customize) out of
 ;; this git-tracked file. custom.el is gitignored, machine-local state.

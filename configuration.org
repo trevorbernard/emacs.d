@@ -29,7 +29,8 @@ and compiles the configuration. Requires Emacs 30+ (=use-package= with
 the grammars. =make setup= checks for all of them first.
 
 Start Emacs with =emacs -nw=. After editing =configuration.org=, run =make=
-to tangle and recompile.
+to tangle and recompile. Started before =make setup=, Emacs comes up
+bare with a warning to run it.
 
 * Bootstrap
 
@@ -792,6 +793,12 @@ language missing from this list gets "No LSP server" from =M-x lsp=,
 so add its client here. lsp-java is left out on purpose and
 loaded from the Java hook instead.
 
+The command map goes on =C-c l=. Its default prefix is =s-l=, and a
+terminal can't send Super, so outside Rust (rustic binds its own keys)
+rename, code actions and formatting were only reachable through =M-x=.
+The prefix is read when lsp-mode loads, so it's set in =:init=. Org
+binds =C-c l= in its own map, where lsp-mode never runs.
+
 #+begin_src emacs-lisp
   (use-package lsp-ui
     :ensure t
@@ -807,6 +814,7 @@ loaded from the Java hook instead.
     :hook ((tsx-ts-mode typescript-ts-mode js-ts-mode python-ts-mode java-ts-mode) . lsp-deferred)
     :init
     (setq lsp-use-plists t)
+    (setq lsp-keymap-prefix "C-c l")
     (setq lsp-client-packages '(lsp-javascript
                                 lsp-json
                                 lsp-nix

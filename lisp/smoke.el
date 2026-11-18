@@ -60,6 +60,10 @@
 (smoke-check (featurep 'rustic-lsp))
 (smoke-check (not (featurep 'org)))
 
+;; lsp-mode's default prefix is s-l, which a terminal can't send.
+(require 'lsp-mode)
+(smoke-check (keymapp (keymap-lookup lsp-mode-map "C-c l")))
+
 ;; Skip kill-emacs-hook: savehist, projectile and friends would write this
 ;; batch session's state over the real files in the checkout.
 (let ((kill-emacs-hook nil))

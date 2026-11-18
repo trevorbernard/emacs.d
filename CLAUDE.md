@@ -43,7 +43,7 @@ building Emacs (libgccjit check) as of 2026-10.
 
 **Boot sequence:**
 1. `early-init.el` - GC tuning, native-comp settings, package bootstrap, frame setup
-2. `init.el` - Loads `configuration.el` (compiled) or tangles from org if missing
+2. `init.el` - Loads `configuration.el` (compiled), or warns to run `make setup` if it hasn't been built
 3. `configuration.el` - Generated from `configuration.org`, contains all packages and settings
 
 **Key directories:**
