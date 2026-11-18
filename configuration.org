@@ -41,6 +41,11 @@ The GC threshold comes back down from an idle timer, not directly in
 =emacs-startup-hook=. Lowering it there collects everything init
 allocated right before the first frame draws.
 
+The ready message is timed at the first idle moment, after the first
+frame has drawn. =after-init-time= stops the clock before
+=after-init-hook=, the scratch buffer's mode setup, and the file named
+on the command line, so it reported 50ms for a start that took 190.
+
 =file-name-handler-alist= is emptied for the whole of startup, not just
 the config load. Every =require= probes each =load-path= directory, and
 with 80-odd package directories each probe runs through the handler
@@ -65,9 +70,11 @@ configuration only needs =bind-key=, which it requires itself.
                1 nil (lambda ()
                        (setq gc-cons-threshold 16777216
                              gc-cons-percentage 0.1)))
-              (message "Emacs ready in %s with %d garbage collections."
-                       (format "%.2f seconds" (float-time (time-subtract after-init-time before-init-time)))
-                       gcs-done)))
+              (run-with-idle-timer
+               0 nil (lambda ()
+                       (message "Emacs ready in %.0f ms with %d garbage collections."
+                                (* 1000 (float-time (time-since before-init-time)))
+                                gcs-done)))))
 
   (setq gc-cons-threshold most-positive-fixnum
         gc-cons-percentage 0.9)
