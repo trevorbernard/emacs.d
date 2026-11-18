@@ -272,14 +272,11 @@ where OSC-52 is the only way to the pasteboard.
 
 A terminal emulator built on libghostty-vt, the engine behind Ghostty.
 It ships as a prebuilt native module that downloads on the first
-=M-x ghostel=, so nothing needs to be installed system-wide. =:defer t=
-is spelled out even though deferral is the global default, so a
-byte-compile without early-init still doesn't load it.
+=M-x ghostel=, so nothing needs to be installed system-wide.
 
 #+begin_src emacs-lisp
   (use-package ghostel
-    :ensure t
-    :defer t)
+    :ensure t)
 #+end_src
 
 * Editing
@@ -900,7 +897,6 @@ backend because I don't have vterm.
 #+begin_src emacs-lisp
   (use-package claude-code-ide
     :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
-    :defer t
     :custom
     (claude-code-ide-terminal-backend 'ghostel))
 #+end_src
@@ -1085,8 +1081,7 @@ treemacs, inside the byte-compiler.
     (defvar treemacs-no-load-time-warnings t))
 
   (use-package lsp-java
-    :ensure t
-    :defer t)
+    :ensure t)
 #+end_src
 
 I only want DAP for Java, but lsp-mode turns on
@@ -1116,7 +1111,6 @@ on those builds.
 
 #+begin_src emacs-lisp
   (use-package dap-mode
-    :defer t
     :config
     (unless (fboundp 'x-hide-tip)
       (setq dap-auto-configure-features
