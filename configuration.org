@@ -939,11 +939,21 @@ Rust is my language du jour and slowly becoming my favourite. rustic
 layers cargo integration and rust-analyzer (via LSP) on top of
 rust-mode.
 
+rustic loads all of its modules up front, and two of them,
+=rustic-babel= and =rustic-playground=, require org. That made every
+Rust buffer load org, about 250ms for features that only matter inside
+org files. =rustic-load-optional-libraries= turns the eager loading
+off, and =:config= requires everything except those two. ob-rust still
+runs Rust source blocks. The variable's docstring says it might be
+removed. If that happens org comes back silently, so the smoke test
+checks for it.
+
 #+begin_src emacs-lisp
   (use-package rust-mode
     :ensure t
     :init
-    (setq rust-mode-treesitter-derive t))
+    (setq rust-mode-treesitter-derive t
+          rustic-load-optional-libraries nil))
 
   (use-package rustic
     :ensure t
@@ -961,7 +971,22 @@ rust-mode.
     (rustic-compile-command "cargo b --release")
     (rustic-default-clippy-arguments "--all-targets --all-features -- -D warnings")
     (rust-format-on-save t)
-    (rustic-ansi-faces ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"]))
+    (rustic-ansi-faces ["black" "#bf616a" "#a3be8c" "#ecbe7b" "#2257a0" "#b48ead" "#4db5bd" "white"])
+    :config
+    (dolist (lib '(rustic-compile
+                   rustic-popup
+                   rustic-cargo
+                   rustic-doc
+                   rustic-clippy
+                   rustic-comint
+                   rustic-rustfmt
+                   rustic-rustfix
+                   rustic-lsp
+                   rustic-expand
+                   rustic-spellcheck))
+      (require lib))
+    (with-eval-after-load 'flycheck
+      (require 'rustic-flycheck)))
 #+end_src
 
 ** Org

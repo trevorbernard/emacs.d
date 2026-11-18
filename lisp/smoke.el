@@ -37,6 +37,13 @@
     (unless (eq (car completion-styles) 'tb/orderless-in-buffer)
       (push (format "tb/orderless-in-buffer in %s" mode) smoke--failures))))
 
+;; rustic must come up with its cargo and LSP modules but without org
+;; (see the Rust section of configuration.org). Nothing above loads org.
+(require 'rustic)
+(smoke-check (featurep 'rustic-cargo))
+(smoke-check (featurep 'rustic-lsp))
+(smoke-check (not (featurep 'org)))
+
 ;; Skip kill-emacs-hook: savehist, projectile and friends would write this
 ;; batch session's state over the real files in the checkout.
 (let ((kill-emacs-hook nil))
