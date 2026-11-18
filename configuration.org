@@ -1172,9 +1172,13 @@ on those builds.
     :mode "\\.pest\\'"
     :hook (pest-mode . flycheck-mode))
 
+  ;; Nothing registers the pest checker unless flycheck-pest-setup runs.
+  ;; It's autoloaded, so the hook also loads the package. It lands ahead
+  ;; of flycheck-mode on the hook, so the checker is in place when
+  ;; flycheck starts.
   (use-package flycheck-pest
     :ensure t
-    :after pest-mode)
+    :hook (pest-mode . flycheck-pest-setup))
 #+end_src
 
 * Epilogue

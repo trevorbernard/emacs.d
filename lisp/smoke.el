@@ -38,6 +38,12 @@
     (unless (eq (car completion-styles) 'tb/orderless-in-buffer)
       (push (format "tb/orderless-in-buffer in %s" mode) smoke--failures))))
 
+;; flycheck-mode came up in pest buffers with no pest checker registered.
+(with-temp-buffer
+  (pest-mode)
+  (smoke-check (bound-and-true-p flycheck-mode))
+  (smoke-check (memq 'pest flycheck-checkers)))
+
 ;; rustic must come up with its cargo and LSP modules but without org
 ;; (see the Rust section of configuration.org). Nothing above loads org.
 (require 'rustic)
