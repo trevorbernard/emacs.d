@@ -34,7 +34,8 @@ to tangle and recompile.
 * Bootstrap
 
 Everything here runs before the main configuration loads. The GC
-threshold is cranked up during init and restored at the [[*Epilogue][end]].
+threshold is cranked up during init and brought back down once startup
+is over; see the [[*Epilogue][end]].
 
 ** Early Init
 
@@ -49,9 +50,9 @@ on the command line, so it reported 50ms for a start that took 190.
 
 =file-name-handler-alist= is emptied for the whole of startup, not just
 the config load. Every =require= probes each =load-path= directory, and
-with 80-odd package directories each probe runs through the handler
-regexps. That tripled the load time of org or anything else pulled in
-by the file named on the command line. The handlers stay when an
+with about 80 package directories each probe runs through the handler
+regexps. That more than doubled the load time of org or anything else
+pulled in by the file named on the command line. The handlers stay when an
 argument needs one (=foo.gz=, =/ssh:host:file=).
 
 Neither =package= nor =use-package= is required here. The quickstart
@@ -109,7 +110,7 @@ configuration only needs =bind-key=, which it requires itself.
   (setq inhibit-startup-message t)
 
   ;; A lisp-interaction-mode scratch buffer fires every prog-mode hook at
-  ;; startup, dragging in corfu, yasnippet, and paredit (~70ms).
+  ;; startup, dragging in corfu, yasnippet, and paredit (~40ms).
   ;; (setq initial-major-mode 'fundamental-mode)
 
   (when (native-comp-available-p)
@@ -447,7 +448,7 @@ own.
 
 ** Projectile
 
-Enable =projectile-mode= on the first idle moment rather than in
+Enable =projectile-mode= after half a second of idle rather than in
 =:config=. There it would only run once =C-c p= had loaded the
 package, and until then the mode line and anything else asking for
 the current project would get nothing.
@@ -576,9 +577,9 @@ Lock as Control your fingers never leave the home row.
 ** Paredit
 
 Some handy dandy paredit shortcuts. On Mac, =^-left= and =^-right=
-are taken by Mission Control. Go to System Preferences > Keyboard >
-Shortcuts > Mission Control and change or disable "Move left a space"
-and "Move right a space".
+are taken by Mission Control. Go to System Settings > Keyboard >
+Keyboard Shortcuts > Mission Control and change or disable "Move left
+a space" and "Move right a space".
 
 #+begin_src emacs-lisp
   (use-package paredit
@@ -676,15 +677,17 @@ Needs aspell installed. Right-click corrects the word under the mouse.
 
 ** Tree-sitter
 
-Emacs 29+ has tree-sitter built in. This installs the grammars and
-remaps the traditional major modes to their =-ts-mode= equivalents.
+Emacs 29+ has tree-sitter built in. This lists the grammars, which
+=make grammars= installs, and remaps the traditional major modes to
+their =-ts-mode= equivalents.
 
 Every grammar here must have a =*-ts-mode= that something actually
 reaches, or it gets downloaded and compiled for nothing. Emacs 30 has
 no =elisp-ts-mode=, =make-ts-mode=, =markdown-ts-mode=, or
-=scss-ts-mode=, so those grammars are out. =go=, =html=, =toml=, and
-=cmake= need explicit =:mode= entries because Emacs doesn't route
-their extensions to the tree-sitter mode on its own.
+=scss-ts-mode=, so those grammars are out. =go= and =cmake= need
+explicit =:mode= entries because Emacs has no classic mode for them
+and doesn't route their extensions to the tree-sitter mode on its own.
+=html= and =toml= are reached through the remap list instead.
 
 JavaScript uses =js-ts-mode= and the JavaScript grammar, not
 =typescript-ts-mode=. Parsing JavaScript with the TypeScript grammar
@@ -692,8 +695,9 @@ is wrong, and it left =js-ts-mode= unreachable even though the LSP and
 =indent-bars= hooks reference it.
 
 =.jsx= goes to =js-ts-mode= too, on purpose. The JavaScript grammar
-parses JSX natively, and the body of =js-ts-mode= re-prepends
-=("\\.jsx?\\'" . js-ts-mode)= to =auto-mode-alist= every time it runs.
+parses JSX natively, and the body of =js-ts-mode= re-prepends its own
+=auto-mode-alist= entry for =.js=, =.jsx=, =.jsm= and =.har= every time
+it runs.
 Point =.jsx= at =tsx-ts-mode= and it silently flips back after the
 first =.js= file is opened. Agreeing with it keeps the mapping
 order-independent. TypeScript keeps its own grammars: =.ts= and =.mts=
@@ -780,11 +784,11 @@ I use LSP for most languages. [[https://github.com/blahgeek/emacs-lsp-booster][e
 it's on =PATH= to speed up JSON parsing.
 
 =lsp-client-packages= lists only the clients I use. The default is
-every client lsp-mode ships, about 130 files plus treemacs, dap-mode,
+every client lsp-mode ships, about 150 files plus treemacs, dap-mode,
 and cc-mode by way of lsp-java, all loaded on the first =lsp= call.
 That blocked Emacs for some 700ms right after the first buffer drew. A
-language missing from this list gets "no language server" from =M-x
-lsp=, so add its client here. lsp-java is left out on purpose and
+language missing from this list gets "No LSP server" from =M-x lsp=,
+so add its client here. lsp-java is left out on purpose and
 loaded from the Java hook instead.
 
 #+begin_src emacs-lisp
@@ -947,7 +951,7 @@ rust-mode.
 
 rustic loads all of its modules up front, and two of them,
 =rustic-babel= and =rustic-playground=, require org. That made every
-Rust buffer load org, about 250ms for features that only matter inside
+Rust buffer load org, about 230ms for features that only matter inside
 org files. =rustic-load-optional-libraries= turns the eager loading
 off, and =:config= requires everything except those two. ob-rust still
 runs Rust source blocks. The variable's docstring says it might be
@@ -998,13 +1002,13 @@ checks for it.
 ** Org
 
 I almost exclusively use =C-j= in place of the enter key, and org
-binds it to =org-return-indent=. Rather than remap my brain, remap
-the key to =org-return=.
+binds it to =org-return-and-maybe-indent=. Rather than remap my
+brain, remap the key to =org-return=.
 
 =org-modules= is emptied. The default list is link types for gnus,
 eww, docview, bibtex and friends, and the first org buffer loaded all
-of them, which more than doubled the time to open an org file. rustic
-requires org too, so Rust buffers paid the same.
+of them, which more than doubled the time to open an org file. Rust
+buffers paid the same while rustic still loaded org.
 
 #+begin_src emacs-lisp
   (use-package ob-rust
@@ -1193,5 +1197,6 @@ on those builds.
 
 * Epilogue
 
-The GC threshold and =file-name-handler-alist= are restored from
-=emacs-startup-hook= in early-init.
+=file-name-handler-alist= is restored in =emacs-startup-hook=, and the
+GC threshold from an idle timer a second later. Both are set up in
+early-init.
