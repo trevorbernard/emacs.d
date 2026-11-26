@@ -138,6 +138,11 @@
 (require 'lsp-mode)
 (smoke-check (keymapp (keymap-lookup lsp-mode-map "C-c l")))
 
+;; tsgo must outrank ts-ls, or it only starts when ts-ls is missing.
+(require 'lsp-javascript)
+(smoke-check (> (lsp--client-priority (gethash 'tsgo lsp-clients))
+                (lsp--client-priority (gethash 'ts-ls lsp-clients))))
+
 ;; Skip kill-emacs-hook: savehist, projectile and friends would write this
 ;; batch session's state over the real files in the checkout.
 (let ((kill-emacs-hook nil))
