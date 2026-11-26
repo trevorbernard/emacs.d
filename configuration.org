@@ -869,7 +869,19 @@ binds =C-c l= in its own map, where lsp-mode never runs.
 
     (advice-add (if (fboundp 'json-parse-buffer) 'json-parse-buffer 'json-read)
                 :around #'lsp-booster--advice-json-parse)
-    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command))
+    (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
+    ;; lsp-mode writes the capability as (inlineCompletion . ()), which
+    ;; serializes to null. tsgo rejects the whole initialize request.
+    (defun tb/lsp-inline-completion-capability (capabilities)
+      "Send textDocument.inlineCompletion in CAPABILITIES as {}, not null."
+      (let* ((capabilities (copy-tree capabilities))
+             (cell (assq 'inlineCompletion (alist-get 'textDocument capabilities))))
+        (when (and cell (null (cdr cell)))
+          (setcdr cell (make-hash-table)))
+        capabilities))
+
+    (advice-add 'lsp--client-capabilities :filter-return #'tb/lsp-inline-completion-capability))
 #+end_src
 
 TypeScript and JavaScript prefer [[https://github.com/microsoft/typescript-go][tsgo]], the native Go port of the

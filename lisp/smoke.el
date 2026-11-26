@@ -138,6 +138,13 @@
 (require 'lsp-mode)
 (smoke-check (keymapp (keymap-lookup lsp-mode-map "C-c l")))
 
+;; tsgo fails initialize on a null client capability; lsp-mode sends
+;; textDocument.inlineCompletion as one unless the config's advice is on.
+(smoke-check (not (string-search
+                   "\"inlineCompletion\":null"
+                   (json-serialize (lsp--client-capabilities)
+                                   :null-object nil :false-object :json-false))))
+
 ;; tsgo must outrank ts-ls, or it only starts when ts-ls is missing.
 (require 'lsp-javascript)
 (smoke-check (> (lsp--client-priority (gethash 'tsgo lsp-clients))
